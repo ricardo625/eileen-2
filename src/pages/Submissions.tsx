@@ -108,6 +108,15 @@ const DATE_OPTIONS = [
 
 const FILTER_SELECTS = ['State', 'Banner', 'Notes', 'Acc Manager', 'Campaign', 'Display Status']
 
+const FILTER_OPTIONS: Record<string, string[]> = {
+  'State':          ['CA'],
+  'Banner':         ['Albertsons', 'Bel Air Foods', 'Nob Hill Foods', 'Pavilions', "Raley's", 'Vons'],
+  'Notes':          ['Additional SKU Found', 'Behind Counter', 'Behind Glass', 'Display Not Found', 'Locked Case', 'Promotional Pricing'],
+  'Acc Manager':    ['Direct Shop', 'Distributor', 'Grocery DC'],
+  'Campaign':       ['Your Shelf Check'],
+  'Display Status': ['All', 'Found', 'Not Found'],
+}
+
 function SubmissionCard({ submission, selected, onToggle, onOpen }: {
   submission: Submission
   selected: boolean
@@ -165,7 +174,7 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
   const [activeDateRange, setActiveDateRange] = useState('Today')
   const [openFilterSelect, setOpenFilterSelect] = useState<string | null>(null)
   const [filterSelections, setFilterSelections] = useState<Record<string, string[]>>(
-    Object.fromEntries(FILTER_SELECTS.map(k => [k, [...SIGNAL_OPTIONS]])),
+    Object.fromEntries(FILTER_SELECTS.map(k => [k, [...(FILTER_OPTIONS[k] ?? [])]])),
   )
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [drawerOpen, setDrawerOpen] = useState(openDrawer)
@@ -338,7 +347,7 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
         >
           <SlidersHorizontal className="size-4 text-foreground" />
           <span className="size-6 flex items-center justify-center bg-darker text-brighter rounded-full text-xs font-medium shrink-0">
-            {Object.values(filterSelections).filter(v => v.length < SIGNAL_OPTIONS.length).length}
+            {FILTER_SELECTS.filter(k => (filterSelections[k]?.length ?? 0) < (FILTER_OPTIONS[k]?.length ?? 0)).length}
           </span>
         </button>
         <button className="h-9 flex items-center px-3 text-sm text-foreground underline hover:opacity-70 transition-opacity shrink-0">
@@ -376,8 +385,9 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
             {/* Right: filter selects */}
             <div className="flex flex-col gap-2 w-[195px]">
               {FILTER_SELECTS.map(label => {
-                const count = filterSelections[label]?.length ?? 0
-                const hasCount = count > 0 && count < SIGNAL_OPTIONS.length
+                const opts = FILTER_OPTIONS[label] ?? []
+                const selected = filterSelections[label] ?? []
+                const hasCount = selected.length > 0 && selected.length < opts.length
                 const isOpen = openFilterSelect === label
                 return (
                   <div key={label} className="relative">
@@ -388,7 +398,7 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
                       <span className="flex-1 text-left">{label}</span>
                       {hasCount && (
                         <span className="size-6 flex items-center justify-center bg-darker text-brighter rounded-full text-xs font-medium shrink-0">
-                          {count}
+                          {selected.length}
                         </span>
                       )}
                       <ChevronDown className="size-4 text-muted-foreground shrink-0" />
@@ -396,8 +406,8 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
 
                     {isOpen && (
                       <div className="absolute top-full left-0 mt-2 w-[209px] bg-background border border-sidebar-border rounded-2xl shadow-[0px_4px_28px_0px_var(--shadow)] p-0.5 z-10">
-                        {SIGNAL_OPTIONS.map((option, i) => {
-                          const isActive = filterSelections[label]?.includes(option)
+                        {opts.map((option, i) => {
+                          const isActive = selected.includes(option)
                           return (
                             <button
                               key={option}

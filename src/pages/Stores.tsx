@@ -118,7 +118,8 @@ function StoreMapPopover({ store, anchorEl, onClose, onLearnMore }: {
   if (top < 8) top = rect.bottom + 12
   left = Math.max(8, Math.min(left, window.innerWidth - popoverWidth - 8))
 
-  const { badgeFrom, badgeText, barColor: riskColor } = RISK_STYLES[store.risk.label]
+  const riskStyle = RISK_STYLES[store.risk.label as RiskLevel]
+  const { barColor: riskColor } = riskStyle
 
   return (
     <div
@@ -178,8 +179,8 @@ function StoreMapPopover({ store, anchorEl, onClose, onLearnMore }: {
       <div className="flex flex-col gap-4 px-5 py-4 border-t border-border-alpha">
         <div className="flex items-center gap-4">
           <span className="flex-1 font-sans font-medium text-sm text-card-foreground leading-5">Risk</span>
-          <div className={cn('flex items-center px-3 py-1 rounded-md border border-black/5 bg-gradient-to-r to-brighter', RISK_STYLES[store.risk.label].badgeFrom)}>
-            <span className={cn('font-sans font-semibold text-xs leading-4 whitespace-nowrap', RISK_STYLES[store.risk.label].badgeText)}>
+          <div className={cn('flex items-center px-3 py-1 rounded-md border border-black/5 bg-gradient-to-r to-brighter', riskStyle.badgeFrom)}>
+            <span className={cn('font-sans font-semibold text-xs leading-4 whitespace-nowrap', riskStyle.badgeText)}>
               {store.risk.label}
             </span>
           </div>

@@ -158,7 +158,7 @@ function SubmissionCard({ submission, selected, onToggle, onOpen }: {
   )
 }
 
-export function SubmissionsPage({ openDrawer = false, onDrawerClose }: { openDrawer?: boolean; onDrawerClose?: () => void }) {
+export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; onDrawerClose?: () => void }) {
   const [search, setSearch] = useState('')
   const [filterOpen, setFilterOpen] = useState(false)
   const [activeDateRange, setActiveDateRange] = useState('Today')

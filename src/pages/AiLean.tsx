@@ -24,7 +24,7 @@ function gradientColor(i: number, total: number) {
 
 function useTypewriter(total: number, speed = 80) {
   const [count, setCount] = useState(0)
-  const ref = useRef<ReturnType<typeof setTimeout>>()
+  const ref = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   useEffect(() => {
     if (count >= total) return

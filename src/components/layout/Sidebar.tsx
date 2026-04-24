@@ -9,7 +9,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Layers,
-  Library,
   Settings,
   Store,
   Truck,
@@ -19,6 +18,8 @@ import {
 interface SidebarProps {
   collapsed: boolean
   onToggle: () => void
+  activePage?: string
+  onNavigate?: (page: string) => void
 }
 
 function EileenLogogram({ className }: { className?: string }) {
@@ -88,7 +89,7 @@ function NavItem({
   onSubItemClick,
 }: NavItemProps) {
   const buttonRef = useRef<HTMLButtonElement>(null)
-  const hideTimer = useRef<ReturnType<typeof setTimeout>>()
+  const hideTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const [popoverPos, setPopoverPos] = useState<{ top: number; left: number } | null>(null)
 
   const showPopover = () => {
@@ -215,26 +216,45 @@ function NavItem({
 
 function SubNavItem({
   label,
+  active,
   collapsed,
+  badge,
+  onClick,
 }: {
   label: string
+  active?: boolean
   collapsed?: boolean
+  badge?: number
+  onClick?: () => void
 }) {
   if (collapsed) return null
   return (
-    <button className="group relative isolate flex items-center h-11 pl-[48px] pr-4 rounded-full w-full cursor-pointer text-left">
-      <span className="absolute inset-0 -z-[1] rounded-full bg-gradient-to-r from-sidebar-accent to-brighter shadow-[0px_0px_14px_0px_var(--sidebar-accent)] dark:bg-sidebar-accent dark:bg-none dark:shadow-none opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
-      <span className="relative flex-1 font-poppins font-medium text-sm leading-5 text-sidebar-foreground whitespace-nowrap overflow-hidden">
+    <button
+      onClick={onClick}
+      className={cn(
+        'group relative isolate flex items-center h-11 pl-[48px] pr-4 rounded-full w-full cursor-pointer text-left',
+        active && 'bg-gradient-to-r from-sidebar-accent to-brighter shadow-[0px_0px_14px_0px_var(--sidebar-accent)] dark:bg-sidebar-accent dark:bg-none dark:shadow-none'
+      )}
+    >
+      {!active && (
+        <span className="absolute inset-0 -z-[1] rounded-full bg-gradient-to-r from-sidebar-accent to-brighter shadow-[0px_0px_14px_0px_var(--sidebar-accent)] dark:bg-sidebar-accent dark:bg-none dark:shadow-none opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
+      )}
+      <span className={cn(
+        'relative flex-1 font-poppins font-medium text-sm leading-5 whitespace-nowrap overflow-hidden',
+        active ? 'text-sidebar-accent-foreground' : 'text-sidebar-foreground'
+      )}>
         {label}
       </span>
+      {badge !== undefined && <NavBadge count={badge} />}
     </button>
   )
 }
 
-export function Sidebar({ collapsed, onToggle }: SidebarProps) {
+export function Sidebar({ collapsed, onToggle, activePage, onNavigate }: SidebarProps) {
   const [storeInsightsExpanded, setStoreInsightsExpanded] = useState(true)
-  const [activeSubItem, setActiveSubItem] = useState<string | undefined>(undefined)
   const [planProgress, setPlanProgress] = useState(0)
+
+  const activeSubItem = activePage === 'submissions' ? 'The Shelf' : activePage === 'stores' ? 'Stores' : undefined
 
   useEffect(() => {
     const t = setTimeout(() => setPlanProgress(46), 100)
@@ -288,14 +308,9 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             <NavItem
               icon={<Bot className="size-5" />}
               label="Ai.Lean"
-              active
+              active={activePage === 'ai-lean'}
               collapsed={collapsed}
-            />
-            <NavItem
-              icon={<Library className="size-5" />}
-              label="The Shelf"
-              badge={5}
-              collapsed={collapsed}
+              onClick={() => onNavigate?.('ai-lean')}
             />
 
             {/* Store Insights expandable group */}
@@ -307,14 +322,27 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                 expanded={storeInsightsExpanded}
                 collapsed={collapsed}
                 onClick={() => setStoreInsightsExpanded(e => !e)}
-                subItems={['Banner', 'All Submissions']}
+                subItems={['The Shelf', 'Stores']}
                 activeSubItem={activeSubItem}
-                onSubItemClick={setActiveSubItem}
+                onSubItemClick={item => {
+                  if (item === 'The Shelf') onNavigate?.('submissions')
+                }}
               />
               {storeInsightsExpanded && (
                 <>
-                  <SubNavItem label="Banner" collapsed={collapsed} />
-                  <SubNavItem label="All Submissions" collapsed={collapsed} />
+                  <SubNavItem
+                    label="The Shelf"
+                    active={activePage === 'submissions'}
+                    collapsed={collapsed}
+                    badge={39}
+                    onClick={() => onNavigate?.('submissions')}
+                  />
+                  <SubNavItem
+                    label="Stores"
+                    active={activePage === 'stores'}
+                    collapsed={collapsed}
+                    onClick={() => onNavigate?.('stores')}
+                  />
                 </>
               )}
             </div>

@@ -1,6 +1,7 @@
 import { Archive, Check, CheckCircle2, ChevronLeft, ChevronRight, CircleDashed, FileDown, FlagTriangleRight, Forward, Link, Plus, Search, Sheet, X, XCircle, AlertCircle } from 'lucide-react'
 import { Toast } from '@/components/ui/Toast'
 import { ShareDialog } from '@/components/ShareDialog'
+import { Tooltip } from '@/components/ui/Tooltip'
 import { cn } from '@/lib/utils'
 import { useState, useRef, useEffect } from 'react'
 
@@ -174,26 +175,32 @@ export function SubmissionDrawer({ open, onClose }: Props) {
 
             {/* Action buttons */}
             <div className="absolute right-6 top-3.5 flex items-center gap-2">
-              <button
-                onClick={() => setFlagged(f => !f)}
-                className={cn(
-                  'size-9 flex items-center justify-center rounded-full transition-colors',
-                  flagged ? 'bg-gradient-to-r from-soft-red to-brighter' : 'hover:bg-accent',
-                )}
-              >
-                <FlagTriangleRight className={cn('size-4 transition-colors', flagged ? 'text-[#f91616]' : 'text-foreground')} />
-              </button>
-              <button className="size-9 flex items-center justify-center rounded-full bg-secondary hover:bg-accent transition-colors">
-                <Archive className="size-4 text-foreground" />
-              </button>
-              <div className="relative">
+              <Tooltip label="Flag">
                 <button
-                  ref={sendBtnRef}
-                  onClick={() => setSendOpen(o => !o)}
-                  className="size-9 flex items-center justify-center rounded-full bg-secondary hover:bg-accent transition-colors"
+                  onClick={() => setFlagged(f => !f)}
+                  className={cn(
+                    'size-9 flex items-center justify-center rounded-full transition-colors',
+                    flagged ? 'bg-gradient-to-r from-soft-red to-brighter' : 'hover:bg-accent',
+                  )}
                 >
-                  <Forward className="size-4 text-foreground" />
+                  <FlagTriangleRight className={cn('size-4 transition-colors', flagged ? 'text-[#f91616]' : 'text-foreground')} />
                 </button>
+              </Tooltip>
+              <Tooltip label="Archive">
+                <button className="size-9 flex items-center justify-center rounded-full bg-secondary hover:bg-accent transition-colors">
+                  <Archive className="size-4 text-foreground" />
+                </button>
+              </Tooltip>
+              <div className="relative">
+                <Tooltip label="Send">
+                  <button
+                    ref={sendBtnRef}
+                    onClick={() => setSendOpen(o => !o)}
+                    className="size-9 flex items-center justify-center rounded-full bg-secondary hover:bg-accent transition-colors"
+                  >
+                    <Forward className="size-4 text-foreground" />
+                  </button>
+                </Tooltip>
                 {sendOpen && (
                   <div
                     ref={sendDropdownRef}

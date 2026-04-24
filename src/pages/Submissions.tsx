@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 import { SubmissionDrawer } from '@/components/SubmissionDrawer'
 import { Toast } from '@/components/ui/Toast'
 import { ShareDialog } from '@/components/ShareDialog'
+import { Tooltip } from '@/components/ui/Tooltip'
 
 const imgStore1 = 'https://www.figma.com/api/mcp/asset/9025c9da-709d-4f18-9a81-41c33a7b83e0'
 const imgStore2 = 'https://www.figma.com/api/mcp/asset/3b9ad25a-73bf-4493-8225-d2d38ff0dc54'
@@ -66,22 +67,22 @@ interface Submission {
 const SUBMISSIONS: Submission[] = [
   {
     id: '1',
-    storeName: 'Target Shorewood',
-    address: '1111 Brook Forest Aya, Shorewood, IL, USA 60423',
+    storeName: 'Albertsons Newport Beach',
+    address: '2660 San Miguel Dr, Newport Beach, CA, USA 92660',
     image: imgStore1,
     badges: ['flagged', 'notes', 'no-stock'],
   },
   {
     id: '2',
-    storeName: 'Target Shorewood',
-    address: '1111 Brook Forest Aya, Shorewood, IL, USA 60423',
+    storeName: 'Vons Buena Park',
+    address: '8148 La Palma Ave, Buena Park, CA, USA 90620',
     image: imgStore2,
     badges: ['notes', 'low-stock'],
   },
   {
     id: '3',
-    storeName: 'Target Shorewood',
-    address: '1111 Brook Forest Aya, Shorewood, IL, USA 60423',
+    storeName: 'Pavilions Garden Grove',
+    address: '13200 Chapman Ave, Garden Grove, CA, USA 92840',
     image: imgStore3,
     badges: ['no-stock'],
   },
@@ -131,7 +132,7 @@ function SubmissionCard({ submission, selected, onToggle, onOpen }: {
         />
       </div>
       <div className="flex flex-col gap-1.5 px-2.5">
-        <span className="font-semibold text-sm leading-5 text-foreground underline decoration-dotted">
+        <span className="font-semibold text-sm leading-5 text-foreground underline decoration-dotted underline-offset-4">
           {submission.storeName}
         </span>
         <span className="text-sm leading-5 text-muted-foreground">
@@ -232,35 +233,43 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
       <div className="flex items-center justify-between">
         <h1 className="font-sans font-medium text-2xl leading-8 text-foreground">The Shelf</h1>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() =>
-              setSelectedIds(prev =>
-                prev.size === SUBMISSIONS.length
-                  ? new Set()
-                  : new Set(SUBMISSIONS.map(s => s.id))
-              )
-            }
-            className="size-9 flex items-center justify-center rounded-md hover:bg-accent transition-colors"
-          >
-            <CircleCheck className={cn('size-4 transition-colors', selectedIds.size === SUBMISSIONS.length ? 'text-[#f91616]' : 'text-foreground')} />
-          </button>
-          <button
-            onClick={() => setToast('Exported to CSV successfully')}
-            className="size-9 flex items-center justify-center rounded-md hover:bg-accent transition-colors"
-          >
-            <Upload className="size-4 text-foreground" />
-          </button>
+          <Tooltip label="Select all">
+            <button
+              onClick={() =>
+                setSelectedIds(prev =>
+                  prev.size === SUBMISSIONS.length
+                    ? new Set()
+                    : new Set(SUBMISSIONS.map(s => s.id))
+                )
+              }
+              className="size-9 flex items-center justify-center rounded-md hover:bg-accent transition-colors"
+            >
+              <CircleCheck className={cn('size-4 transition-colors', selectedIds.size === SUBMISSIONS.length ? 'text-[#f91616]' : 'text-foreground')} />
+            </button>
+          </Tooltip>
+          <Tooltip label="Export CSV">
+            <button
+              onClick={() => setToast('Exported to CSV successfully')}
+              className="size-9 flex items-center justify-center rounded-md hover:bg-accent transition-colors"
+            >
+              <Upload className="size-4 text-foreground" />
+            </button>
+          </Tooltip>
           <button className="h-9 flex items-center gap-2 px-3 bg-background border border-input rounded-full shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] text-sm text-foreground hover:bg-accent transition-colors">
             <span>25 per page</span>
             <ChevronDown className="size-4 text-muted-foreground" />
           </button>
           <div className="flex items-center p-0.5 bg-secondary rounded-full">
-            <button className="size-8 flex items-center justify-center rounded-full bg-brighter shadow-sm">
-              <LayoutGrid className="size-4 text-foreground" />
-            </button>
-            <button className="size-8 flex items-center justify-center rounded-full hover:bg-accent transition-colors">
-              <LayoutList className="size-4 text-muted-foreground" />
-            </button>
+            <Tooltip label="Grid view">
+              <button className="size-8 flex items-center justify-center rounded-full bg-brighter shadow-sm">
+                <LayoutGrid className="size-4 text-foreground" />
+              </button>
+            </Tooltip>
+            <Tooltip label="List view">
+              <button className="size-8 flex items-center justify-center rounded-full hover:bg-accent transition-colors">
+                <LayoutList className="size-4 text-muted-foreground" />
+              </button>
+            </Tooltip>
           </div>
         </div>
       </div>
@@ -450,28 +459,34 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
             </button>
             <div className="w-px h-[26px] bg-border shrink-0" />
             <div className="flex items-center gap-2">
-              <button
-                onClick={() => setIslandFlagged(f => !f)}
-                className={cn(
-                  'size-9 flex items-center justify-center rounded-full transition-colors',
-                  islandFlagged
-                    ? 'bg-gradient-to-r from-soft-red to-brighter'
-                    : 'bg-background hover:bg-accent',
-                )}
-              >
-                <FlagTriangleRight className={cn('size-4 transition-colors', islandFlagged ? 'text-[#f91616]' : 'text-foreground')} />
-              </button>
-              <button className="size-9 flex items-center justify-center rounded-full bg-background hover:bg-accent transition-colors">
-                <Archive className="size-4 text-foreground" />
-              </button>
-              <div className="relative">
+              <Tooltip label="Flag">
                 <button
-                  ref={islandSendBtnRef}
-                  onClick={() => setIslandSendOpen(o => !o)}
-                  className="size-9 flex items-center justify-center rounded-full bg-background hover:bg-accent transition-colors"
+                  onClick={() => setIslandFlagged(f => !f)}
+                  className={cn(
+                    'size-9 flex items-center justify-center rounded-full transition-colors',
+                    islandFlagged
+                      ? 'bg-gradient-to-r from-soft-red to-brighter'
+                      : 'bg-background hover:bg-accent',
+                  )}
                 >
-                  <Forward className="size-4 text-foreground" />
+                  <FlagTriangleRight className={cn('size-4 transition-colors', islandFlagged ? 'text-[#f91616]' : 'text-foreground')} />
                 </button>
+              </Tooltip>
+              <Tooltip label="Archive">
+                <button className="size-9 flex items-center justify-center rounded-full bg-background hover:bg-accent transition-colors">
+                  <Archive className="size-4 text-foreground" />
+                </button>
+              </Tooltip>
+              <div className="relative">
+                <Tooltip label="Send">
+                  <button
+                    ref={islandSendBtnRef}
+                    onClick={() => setIslandSendOpen(o => !o)}
+                    className="size-9 flex items-center justify-center rounded-full bg-background hover:bg-accent transition-colors"
+                  >
+                    <Forward className="size-4 text-foreground" />
+                  </button>
+                </Tooltip>
                 {islandSendOpen && (
                   <div
                     ref={islandSendDropdownRef}

@@ -5,6 +5,7 @@ import {
   ChevronRight, Sparkles, Plus, Minus, ArrowUpRight,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Tooltip } from '@/components/ui/Tooltip'
 import raleysLogo from '@/assets/logos/raleys.png'
 import pavilionsLogo from '@/assets/logos/pavilions.png'
 import albertsonsLogo from '@/assets/logos/albertsons.png'
@@ -257,12 +258,16 @@ function MapView({ onLearnMore }: { onLearnMore: () => void }) {
       ))}
       {/* Zoom controls */}
       <div className="absolute top-4 right-4 bg-white rounded-lg shadow-md overflow-hidden flex flex-col w-9">
-        <button className="h-9 flex items-center justify-center hover:bg-accent transition-colors border-b border-border">
-          <Plus className="size-4 text-foreground" />
-        </button>
-        <button className="h-9 flex items-center justify-center hover:bg-accent transition-colors">
-          <Minus className="size-4 text-foreground" />
-        </button>
+        <Tooltip label="Zoom in">
+          <button className="h-9 flex items-center justify-center hover:bg-accent transition-colors border-b border-border w-full">
+            <Plus className="size-4 text-foreground" />
+          </button>
+        </Tooltip>
+        <Tooltip label="Zoom out">
+          <button className="h-9 flex items-center justify-center hover:bg-accent transition-colors w-full">
+            <Minus className="size-4 text-foreground" />
+          </button>
+        </Tooltip>
       </div>
 
       {selected && (
@@ -448,9 +453,9 @@ function CellValue({ row, col }: { row: Row; col: typeof COLUMNS[number] }) {
     <span className={cn(
       'font-sans font-medium text-sm leading-none',
       isName
-        ? 'text-foreground underline decoration-dotted'
+        ? 'text-foreground underline decoration-dotted underline-offset-4'
         : 'text-muted-foreground',
-      isLinked && !isName && 'underline decoration-dotted',
+      isLinked && !isName && 'underline decoration-dotted underline-offset-4',
     )}>
       {String(value)}
     </span>
@@ -478,32 +483,38 @@ export function StoresPage({ onLearnMore, onNavigateToShelf }: { onLearnMore?: (
       <div className="flex items-center justify-between">
         <h1 className="font-sans font-medium text-2xl leading-8 text-foreground">Stores</h1>
         <div className="flex items-center gap-2">
-          <button className="size-9 flex items-center justify-center rounded-md hover:bg-accent transition-colors">
-            <Upload className="size-4 text-foreground" />
-          </button>
+          <Tooltip label="Export">
+            <button className="size-9 flex items-center justify-center rounded-md hover:bg-accent transition-colors">
+              <Upload className="size-4 text-foreground" />
+            </button>
+          </Tooltip>
           <button className="h-9 flex items-center gap-2 px-3 bg-background border border-input rounded-full shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] text-sm text-foreground hover:bg-accent transition-colors">
             <span>25 per page</span>
             <ChevronDown className="size-4 text-muted-foreground" />
           </button>
           <div className="flex items-center p-0.5 bg-secondary rounded-full">
-            <button
-              onClick={() => setView('table')}
-              className={cn(
-                'size-8 flex items-center justify-center rounded-full transition-colors',
-                view === 'table' ? 'bg-brighter shadow-sm' : 'hover:bg-accent',
-              )}
-            >
-              <TableProperties className={cn('size-4', view === 'table' ? 'text-foreground' : 'text-muted-foreground')} />
-            </button>
-            <button
-              onClick={() => setView('map')}
-              className={cn(
-                'size-8 flex items-center justify-center rounded-full transition-colors',
-                view === 'map' ? 'bg-brighter shadow-sm' : 'hover:bg-accent',
-              )}
-            >
-              <Map className={cn('size-4', view === 'map' ? 'text-foreground' : 'text-muted-foreground')} />
-            </button>
+            <Tooltip label="Table view">
+              <button
+                onClick={() => setView('table')}
+                className={cn(
+                  'size-8 flex items-center justify-center rounded-full transition-colors',
+                  view === 'table' ? 'bg-brighter shadow-sm' : 'hover:bg-accent',
+                )}
+              >
+                <TableProperties className={cn('size-4', view === 'table' ? 'text-foreground' : 'text-muted-foreground')} />
+              </button>
+            </Tooltip>
+            <Tooltip label="Map view">
+              <button
+                onClick={() => setView('map')}
+                className={cn(
+                  'size-8 flex items-center justify-center rounded-full transition-colors',
+                  view === 'map' ? 'bg-brighter shadow-sm' : 'hover:bg-accent',
+                )}
+              >
+                <Map className={cn('size-4', view === 'map' ? 'text-foreground' : 'text-muted-foreground')} />
+              </button>
+            </Tooltip>
           </div>
         </div>
       </div>

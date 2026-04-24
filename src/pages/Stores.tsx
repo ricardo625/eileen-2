@@ -427,7 +427,7 @@ function RowPopover({ style, risk, signal, aiSuggestions }: {
       <div className="p-1">
         <div
           className="flex flex-col gap-4 px-5 py-4 rounded-xl overflow-hidden"
-          style={{ background: 'radial-gradient(ellipse at 92% 88%, #fef8f7 0%, #ffffff 100%)' }}
+          style={{ background: 'radial-gradient(ellipse at 92% 88%, var(--soft-red) 0%, var(--card) 100%)' }}
         >
           <div className="flex items-center gap-4">
             <span className="flex-1 font-sans font-medium text-sm text-foreground leading-5">Ai.Lean</span>

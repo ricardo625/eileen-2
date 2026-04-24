@@ -12,6 +12,11 @@
   to   { opacity: 1; translate: 0 0; }
 }
 
+@keyframes popoverIn {
+  from { opacity: 0; scale: 0.97; }
+  to   { opacity: 1; scale: 1; }
+}
+
 .sidebar-scroll::-webkit-scrollbar {
   width: 4px;
 }
@@ -58,6 +63,29 @@
   --color-brighter: var(--brighter);
   --color-darker: var(--darker);
   --color-green: var(--green);
+  --color-red: var(--red);
+  --color-amber: var(--amber);
+  --color-soft-red: var(--soft-red);
+  --color-soft-red-foreground: var(--soft-red-foreground);
+  --color-soft-orangle: var(--soft-orangle);
+  --color-soft-orangle-foreground: var(--soft-orangle-foreground);
+  --color-soft-amber: var(--soft-amber);
+  --color-soft-amber-foreground: var(--soft-amber-foreground);
+  --color-soft-indigo: var(--soft-indigo);
+  --color-soft-indigo-foreground: var(--soft-indigo-foreground);
+  --color-soft-fuchsia: var(--soft-fuchsia);
+  --color-soft-fuchsia-foreground: var(--soft-fuchsia-foreground);
+  --color-soft-rose: var(--soft-rose);
+  --color-soft-rose-foreground: var(--soft-rose-foreground);
+  --color-soft-lime: var(--soft-lime);
+  --color-soft-lime-foreground: var(--soft-lime-foreground);
+  --color-soft-green: var(--soft-green);
+  --color-soft-green-foreground: var(--soft-green-foreground);
+  --color-soft-salmon: var(--soft-salmon);
+  --color-soft-salmon-foreground: var(--soft-salmon-foreground);
+  --color-neutral: var(--neutral);
+  --color-neutral-foreground: var(--neutral-foreground);
+  --color-border-alpha: var(--border-alpha);
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
@@ -107,10 +135,10 @@
   --muted-foreground: #959fad;
   --accent: #00000005;
   --accent-foreground: #644a46;
-  --destructive: #ef4444;
+  --destructive: #ffffff;
   --border: #e9e9e9;
   --input: #e5e5e5;
-  --ring: #e9e9e9;
+  --ring: #ffffff;
   --sidebar: #ffffff;
   --sidebar-foreground: #64748b;
   --sidebar-primary: #ffffff;
@@ -126,6 +154,17 @@
   --brighter: #ffffff;
   --darker: #000000;
   --green: #519249;
+  --red: #f91616;
+  --amber: #ffb900;
+  --soft-red: #fef2f2;
+  --soft-red-foreground: #460809;
+  --soft-amber: #fffbeb;
+  --soft-amber-foreground: #461901;
+  --soft-lime: #f7fee7;
+  --soft-lime-foreground: #192e03;
+  --soft-green: #f0fdf4;
+  --soft-green-foreground: #032e15;
+  --border-alpha: #0000000d;
 }
 
 /* ─── Theme 2 ────────────────────────────────────────────────────────────── */
@@ -144,10 +183,10 @@
   --muted-foreground: #3b434d80;
   --accent: #00000005;
   --accent-foreground: #644a46;
-  --destructive: #ef4444;
+  --destructive: #ffffff;
   --border: #fcebe8;
   --input: #e5e5e5;
-  --ring: #fcebe8;
+  --ring: #ffffff;
   --sidebar: #ffffff;
   --sidebar-foreground: #64748b;
   --sidebar-primary: #ffffff;
@@ -163,6 +202,17 @@
   --brighter: #ffffff;
   --darker: #000000;
   --green: #519249;
+  --red: #f91616;
+  --amber: #ffb900;
+  --soft-red: #fef2f2;
+  --soft-red-foreground: #460809;
+  --soft-amber: #fffbeb;
+  --soft-amber-foreground: #461901;
+  --soft-lime: #f7fee7;
+  --soft-lime-foreground: #192e03;
+  --soft-green: #f0fdf4;
+  --soft-green-foreground: #032e15;
+  --border-alpha: #0000000d;
 }
 
 /* ─── Theme 3 ────────────────────────────────────────────────────────────── */
@@ -181,10 +231,10 @@
   --muted-foreground: #3b434d80;
   --accent: #00000005;
   --accent-foreground: #644a46;
-  --destructive: #ef4444;
+  --destructive: #ffffff;
   --border: #e9e9e9;
   --input: #e5e5e5;
-  --ring: #e9e9e9;
+  --ring: #ffffff;
   --sidebar: #ffffff;
   --sidebar-foreground: #64748b;
   --sidebar-primary: #ffffff;
@@ -200,6 +250,11 @@
   --brighter: #ffffff;
   --darker: #000000;
   --green: #519249;
+  --red: #f91616;
+  --amber: #ffb900;
+  --soft-red: #fef2f2;
+  --soft-red-foreground: #460809;
+  --border-alpha: #0000000d;
 }
 
 /* ─── Theme 4 (brand pink primary) ──────────────────────────────────────── */
@@ -218,10 +273,10 @@
   --muted-foreground: #3b434d80;
   --accent: #00000005;
   --accent-foreground: #644a46;
-  --destructive: #ef4444;
+  --destructive: #ffffff;
   --border: #fcebe8;
   --input: #fbe5e1;
-  --ring: #fcebe8;
+  --ring: #ffffff;
   --sidebar: #fdf2f0;
   --sidebar-foreground: #64748b;
   --sidebar-primary: #ffffff;
@@ -237,6 +292,17 @@
   --brighter: #ffffff;
   --darker: #000000;
   --green: #519249;
+  --red: #f91616;
+  --amber: #ffb900;
+  --soft-red: #fef2f2;
+  --soft-red-foreground: #460809;
+  --soft-amber: #fffbeb;
+  --soft-amber-foreground: #461901;
+  --soft-lime: #f7fee7;
+  --soft-lime-foreground: #192e03;
+  --soft-green: #f0fdf4;
+  --soft-green-foreground: #032e15;
+  --border-alpha: #0000000d;
 }
 
 /* ─── Dark ───────────────────────────────────────────────────────────────── */
@@ -255,7 +321,7 @@
   --muted-foreground: #b0b0b0;
   --accent: #ffffff0f;
   --accent-foreground: #fbe5e1;
-  --destructive: #ef4444;
+  --destructive: #ffffff;
   --border: #323232;
   --input: #323232;
   --ring: #f7d6d0;
@@ -274,6 +340,17 @@
   --brighter: #000000;
   --darker: #ffffff;
   --green: #a8d7a2;
+  --red: #ff6b6b;
+  --amber: #ffc929;
+  --soft-red: #2d1515;
+  --soft-red-foreground: #ffb3b3;
+  --soft-amber: #2d1f00;
+  --soft-amber-foreground: #fcd34d;
+  --soft-lime: #1a2e00;
+  --soft-lime-foreground: #a3e635;
+  --soft-green: #0a2e15;
+  --soft-green-foreground: #86efac;
+  --border-alpha: #ffffff0d;
 }
 
 /* ─── Theme 5 (purple primary) ───────────────────────────────────────────── */
@@ -292,10 +369,10 @@
   --muted-foreground: #3b434d80;
   --accent: #00000005;
   --accent-foreground: #644a46;
-  --destructive: #ef4444;
+  --destructive: #ffffff;
   --border: #e9e9e9;
   --input: #e5e5e5;
-  --ring: #e9e9e9;
+  --ring: #ffffff;
   --sidebar: #ffffff;
   --sidebar-foreground: #64748b;
   --sidebar-primary: #ffffff;
@@ -311,4 +388,27 @@
   --brighter: #ffffff;
   --darker: #000000;
   --green: #519249;
+  --red: #f91616;
+  --amber: #ffb900;
+  --soft-red: #fef2f2;
+  --soft-red-foreground: #460809;
+  --soft-orangle: #fff7ed;
+  --soft-orangle-foreground: #441306;
+  --soft-amber: #fffbeb;
+  --soft-amber-foreground: #461901;
+  --soft-indigo: #eef2ff;
+  --soft-indigo-foreground: #1e1a4d;
+  --soft-fuchsia: #fdf4ff;
+  --soft-fuchsia-foreground: #4b004f;
+  --soft-rose: #fff1f2;
+  --soft-rose-foreground: #4d0218;
+  --soft-lime: #f7fee7;
+  --soft-lime-foreground: #192e03;
+  --soft-green: #f0fdf4;
+  --soft-green-foreground: #032e15;
+  --soft-salmon: #fef8f7;
+  --soft-salmon-foreground: #322523;
+  --neutral: #ffffff;
+  --neutral-foreground: #0a0a0a;
+  --border-alpha: #0000000d;
 }

@@ -3,17 +3,24 @@ import { Moon, Sun } from 'lucide-react'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { AiLeanPage } from '@/pages/AiLean'
 import { SubmissionsPage } from '@/pages/Submissions'
+import { StoresPage } from '@/pages/Stores'
 
 type Theme = 'theme-4' | 'dark'
-type Page = 'ai-lean' | 'submissions'
+type Page = 'ai-lean' | 'submissions' | 'stores'
 
 export default function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [theme, setTheme] = useState<Theme>('theme-4')
   const [page, setPage] = useState<Page>('submissions')
+  const [submissionsDrawerOpen, setSubmissionsDrawerOpen] = useState(false)
+
+  function handleLearnMore() {
+    setPage('submissions')
+    setSubmissionsDrawerOpen(true)
+  }
 
   const isDark = theme === 'dark'
-  const isSubmissions = page === 'submissions'
+  const isFullPage = page === 'submissions' || page === 'stores'
 
   return (
     <div className={`${theme} h-screen bg-background flex overflow-hidden`}>
@@ -21,10 +28,12 @@ export default function App() {
         <Sidebar
           collapsed={sidebarCollapsed}
           onToggle={() => setSidebarCollapsed(c => !c)}
+          activePage={page}
+          onNavigate={p => setPage(p as Page)}
         />
       </div>
 
-      <main className={`relative flex-1 overflow-y-auto ${isSubmissions ? '' : 'flex items-center justify-center'}`}>
+      <main className={`relative flex-1 overflow-y-auto ${isFullPage ? '' : 'flex items-center justify-center'}`}>
         {/* Theme toggle */}
         <button
           onClick={() => setTheme(isDark ? 'theme-4' : 'dark')}
@@ -37,15 +46,9 @@ export default function App() {
           }
         </button>
 
-        {/* Page toggle (dev helper) */}
-        <button
-          onClick={() => setPage(p => p === 'ai-lean' ? 'submissions' : 'ai-lean')}
-          className="absolute top-4 right-16 h-9 px-3 flex items-center rounded-full border border-border bg-background shadow-sm transition hover:bg-accent text-xs text-muted-foreground z-10"
-        >
-          {isSubmissions ? 'Ai.Lean' : 'The Shelf'}
-        </button>
-
-        {isSubmissions ? <SubmissionsPage /> : <AiLeanPage />}
+        {page === 'submissions' && <SubmissionsPage openDrawer={submissionsDrawerOpen} onDrawerClose={() => setSubmissionsDrawerOpen(false)} />}
+        {page === 'stores'      && <StoresPage onLearnMore={handleLearnMore} onNavigateToShelf={() => { setPage('submissions'); setSubmissionsDrawerOpen(false) }} />}
+        {page === 'ai-lean'     && <AiLeanPage />}
       </main>
     </div>
   )

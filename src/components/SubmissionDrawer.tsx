@@ -1,5 +1,6 @@
 import { Archive, Check, CheckCircle2, ChevronLeft, ChevronRight, CircleDashed, FileDown, FlagTriangleRight, Forward, Link, Plus, Search, Sheet, X, XCircle, AlertCircle } from 'lucide-react'
 import { Toast } from '@/components/ui/Toast'
+import { ShareDialog } from '@/components/ShareDialog'
 import { cn } from '@/lib/utils'
 import { useState, useRef, useEffect } from 'react'
 
@@ -57,6 +58,7 @@ export function SubmissionDrawer({ open, onClose }: Props) {
   const [flagged, setFlagged] = useState(false)
   const [sendOpen, setSendOpen] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+  const [shareOpen, setShareOpen] = useState(false)
   const sendBtnRef = useRef<HTMLButtonElement>(null)
   const sendDropdownRef = useRef<HTMLDivElement>(null)
   const sectionRefs = useRef<Map<string, HTMLDivElement>>(new Map())
@@ -204,7 +206,7 @@ export function SubmissionDrawer({ open, onClose }: Props) {
                     ].map(({ label, Icon, toast: msg }) => (
                       <button
                         key={label}
-                        onClick={() => { setSendOpen(false); if (msg) setToast(msg) }}
+                        onClick={() => { setSendOpen(false); if (msg) setToast(msg); if (label === 'Share URL') setShareOpen(true) }}
                         className="flex items-center gap-3 h-11 px-4 rounded-xl hover:bg-accent transition-colors text-left w-full"
                       >
                         <Icon className="size-4 text-muted-foreground shrink-0" />
@@ -459,6 +461,7 @@ export function SubmissionDrawer({ open, onClose }: Props) {
       )}
 
       {toast && <Toast message={toast} onDismiss={() => setToast(null)} />}
+      {shareOpen && <ShareDialog onClose={() => setShareOpen(false)} />}
     </>
   )
 }

@@ -131,7 +131,7 @@ export function SubmissionDrawer({ open, onClose }: Props) {
       />
 
       {/* Drawer */}
-      <div className="fixed right-0 top-0 h-full w-[640px] bg-card z-50 overflow-y-auto overflow-x-hidden shadow-2xl animate-in slide-in-from-right duration-300 ease-out flex flex-col gap-6">
+      <div className="fixed right-0 top-0 h-full w-[640px] bg-card z-50 overflow-y-auto overflow-x-hidden scroll-parent shadow-2xl animate-in slide-in-from-right duration-300 ease-out flex flex-col gap-6">
 
         {/* Hero image */}
         <div className="relative shrink-0">
@@ -346,7 +346,7 @@ export function SubmissionDrawer({ open, onClose }: Props) {
                     )}
 
                     {/* Items list */}
-                    <div className="overflow-y-auto max-h-[264px] pr-3">
+                    <div className={cn(filteredNotes.length > 5 ? 'overflow-y-auto max-h-[220px] hover-scroll' : '', 'pr-3')}>
                       {filteredNotes.map(note => {
                         const checked = (selectedNotes[openSection!] ?? []).includes(note)
                         return (
@@ -369,8 +369,6 @@ export function SubmissionDrawer({ open, onClose }: Props) {
                       })}
                     </div>
 
-                    {/* Scroll handle */}
-                    <div className="absolute right-0.5 top-1/2 -translate-y-1/2 w-[7px] h-[112px] bg-darker opacity-20 rounded-full pointer-events-none" />
                   </div>
                 )}
               </div>
@@ -380,7 +378,7 @@ export function SubmissionDrawer({ open, onClose }: Props) {
         </div>
 
         {/* Product table */}
-        <div className="overflow-x-auto shrink-0">
+        <div className="overflow-x-auto shrink-0 child-scroll">
         <div className="flex flex-col min-w-max">
           {/* Table header */}
           <div className="flex items-center gap-6 px-6 py-5 bg-accent border border-border-alpha">
@@ -414,10 +412,6 @@ export function SubmissionDrawer({ open, onClose }: Props) {
         </div>
         </div>
 
-        {/* Scroll handle */}
-        <div className="flex justify-center py-4 shrink-0">
-          <div className="w-[243px] h-[7px] bg-darker opacity-20 rounded-full" />
-        </div>
       </div>
 
       {/* Lightbox */}

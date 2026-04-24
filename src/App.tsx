@@ -34,7 +34,7 @@ export default function App() {
         />
       </div>
 
-      <main className={`relative flex-1 overflow-y-auto overflow-x-hidden ${isFullPage ? '' : 'flex items-center justify-center'}`}>
+      <main className={`relative flex-1 overflow-y-auto overflow-x-hidden hover-scroll ${isFullPage ? '' : 'flex items-center justify-center'}`}>
         {/* Theme toggle */}
         <Tooltip label={isDark ? 'Light mode' : 'Dark mode'} className="absolute top-4 right-4 z-10">
           <button

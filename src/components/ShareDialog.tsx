@@ -2,14 +2,16 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Copy, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Tooltip } from '@/components/ui/Tooltip'
 
 const SHARE_URL = 'https://foundey.app.shopwitheileen.com/s/8a2hf6fi'
 
 interface ShareDialogProps {
   onClose: () => void
+  onCopy?: () => void
 }
 
-export function ShareDialog({ onClose }: ShareDialogProps) {
+export function ShareDialog({ onClose, onCopy }: ShareDialogProps) {
   const [copied, setCopied] = useState(false)
   const dialogRef = useRef<HTMLDivElement>(null)
 
@@ -24,6 +26,7 @@ export function ShareDialog({ onClose }: ShareDialogProps) {
   function handleCopy() {
     navigator.clipboard.writeText(SHARE_URL).catch(() => {})
     setCopied(true)
+    onCopy?.()
     setTimeout(() => setCopied(false), 2000)
   }
 
@@ -59,19 +62,21 @@ export function ShareDialog({ onClose }: ShareDialogProps) {
         </div>
 
         {/* URL input */}
-        <div className="relative flex items-center h-9 px-3 bg-background border border-input rounded-full shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] overflow-hidden">
-          <span className="flex-1 font-sans text-sm text-muted-foreground truncate pr-8">
+        <div className="flex items-center h-9 px-3 bg-background border border-input rounded-full shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)]">
+          <span className="flex-1 font-sans text-sm text-muted-foreground truncate min-w-0">
             {SHARE_URL}
           </span>
-          <button
-            onClick={handleCopy}
-            className={cn(
-              'absolute right-3 size-5 flex items-center justify-center transition-colors',
-              copied ? 'text-green' : 'text-muted-foreground hover:text-foreground',
-            )}
-          >
-            <Copy className="size-4" />
-          </button>
+          <Tooltip label={copied ? 'Copied!' : 'Copy link'}>
+            <button
+              onClick={handleCopy}
+              className={cn(
+                'shrink-0 ml-2 size-5 flex items-center justify-center transition-colors',
+                copied ? 'text-green' : 'text-muted-foreground hover:text-foreground',
+              )}
+            >
+              <Copy className="size-4" />
+            </button>
+          </Tooltip>
         </div>
 
         {/* Footer */}

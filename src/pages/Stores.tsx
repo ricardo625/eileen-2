@@ -234,28 +234,31 @@ function MapView({ onLearnMore }: { onLearnMore: () => void }) {
         className="absolute inset-0 w-full h-full object-cover"
         style={{ filter: 'saturate(0)' }}
       />
-      {STORE_DOTS.map(dot => (
-        <button
-          key={dot.id}
-          onClick={e => handleDotClick(e, dot)}
-          className="absolute -translate-x-1/2 -translate-y-1/2 group cursor-pointer"
-          style={{ left: `${dot.x}%`, top: `${dot.y}%` }}
-        >
-          {dot.ring && (
+      {STORE_DOTS.map(dot => {
+        const isSelected = selected?.store.id === dot.id
+        return (
+          <button
+            key={dot.id}
+            onClick={e => handleDotClick(e, dot)}
+            className="absolute -translate-x-1/2 -translate-y-1/2 group cursor-pointer"
+            style={{ left: `${dot.x}%`, top: `${dot.y}%` }}
+          >
+            {!isSelected && dot.ring && (
+              <div
+                className="absolute -inset-3 rounded-full opacity-20 group-hover:opacity-30 transition-opacity"
+                style={{ backgroundColor: dot.color }}
+              />
+            )}
             <div
-              className="absolute -inset-3 rounded-full opacity-20 group-hover:opacity-30 transition-opacity"
-              style={{ backgroundColor: dot.color }}
+              className="size-3.5 rounded-full shadow-sm group-hover:scale-125 transition-transform"
+              style={{
+                backgroundColor: dot.color,
+                boxShadow: !isSelected && dot.ring ? `0 0 0 2px white, 0 0 0 3px ${dot.color}` : undefined,
+              }}
             />
-          )}
-          <div
-            className="size-3.5 rounded-full shadow-sm group-hover:scale-125 transition-transform"
-            style={{
-              backgroundColor: dot.color,
-              boxShadow: dot.ring ? `0 0 0 2px white, 0 0 0 3px ${dot.color}` : undefined,
-            }}
-          />
-        </button>
-      ))}
+          </button>
+        )
+      })}
       {/* Zoom controls */}
       <div className="absolute top-4 right-4 bg-white rounded-lg shadow-md overflow-hidden flex flex-col w-9">
         <Tooltip label="Zoom in">
@@ -462,9 +465,33 @@ function CellValue({ row, col }: { row: Row; col: typeof COLUMNS[number] }) {
   )
 }
 
+const RECENT_SEARCHES = [
+  'Albertsons',
+  'Vons Anaheim',
+  'Pavilions Pasadena',
+  'Safeway Long Beach',
+  "Raley's Sacramento",
+]
+
 export function StoresPage({ onLearnMore, onNavigateToShelf }: { onLearnMore?: () => void; onNavigateToShelf?: () => void }) {
   const [search, setSearch] = useState('')
+  const [searchFocused, setSearchFocused] = useState(false)
+  const searchWrapperRef = useRef<HTMLDivElement>(null)
   const [view, setView] = useState<'table' | 'map'>('table')
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (searchWrapperRef.current && !searchWrapperRef.current.contains(e.target as Node)) {
+        setSearchFocused(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const filteredRows = search.trim()
+    ? ROWS.filter(r => r.banner.toLowerCase().includes(search.toLowerCase()))
+    : ROWS
   const [popoverState, setPopoverState] = useState<{ top: number; left: number; risk: Row['risk']; signal: string; aiSuggestions: Row['aiSuggestions'] } | null>(null)
 
   function handleRowMouseMove(e: React.MouseEvent<HTMLDivElement>, row: Row) {
@@ -521,14 +548,39 @@ export function StoresPage({ onLearnMore, onNavigateToShelf }: { onLearnMore?: (
 
       {/* Search */}
       <div className="flex items-center gap-3">
-        <div className="flex-1 flex items-center gap-2 h-9 px-3 bg-background border border-input rounded-full shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] overflow-hidden">
-          <Search className="size-4 text-muted-foreground shrink-0" />
-          <input
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search by store name, banner, city and state."
-            className="flex-1 text-sm bg-transparent outline-none text-foreground placeholder:text-muted-foreground min-w-0"
-          />
+        <div ref={searchWrapperRef} className="flex-1 relative">
+          <div className="flex items-center gap-2 h-9 px-3 bg-background border border-input rounded-full shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] overflow-hidden">
+            <Search className="size-4 text-muted-foreground shrink-0" />
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              onFocus={() => setSearchFocused(true)}
+              placeholder="Search by store name, banner, city and state."
+              className="flex-1 text-sm bg-transparent outline-none text-foreground placeholder:text-muted-foreground min-w-0"
+            />
+          </div>
+          {searchFocused && (() => {
+            const q = search.trim().toLowerCase()
+            const items = q
+              ? RECENT_SEARCHES.filter(r => r.toLowerCase().includes(q))
+              : RECENT_SEARCHES
+            if (items.length === 0) return null
+            return (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-2xl shadow-[0px_4px_28px_0px_var(--shadow)] overflow-hidden z-50">
+                <p className="px-4 pt-3 pb-1 text-xs font-medium text-muted-foreground uppercase tracking-wide">Recent searches</p>
+                {items.map(item => (
+                  <button
+                    key={item}
+                    onMouseDown={e => { e.preventDefault(); setSearch(item); setSearchFocused(false) }}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors text-left"
+                  >
+                    <Search className="size-3.5 text-muted-foreground shrink-0" />
+                    {item}
+                  </button>
+                ))}
+              </div>
+            )
+          })()}
         </div>
         <button
           onClick={() => setSearch('')}
@@ -573,7 +625,13 @@ export function StoresPage({ onLearnMore, onNavigateToShelf }: { onLearnMore?: (
             </div>
 
             {/* Data rows */}
-            {ROWS.map((row, i) => (
+            {filteredRows.length === 0 && (
+              <div className="flex flex-col items-center justify-center gap-3 py-24">
+                <img src="https://www.figma.com/api/mcp/asset/d8837dbf-801d-4d35-9390-d176b4a144b7" alt="" className="size-[120px]" />
+                <p className="text-sm text-muted-foreground">No matched banners</p>
+              </div>
+            )}
+            {filteredRows.map((row, i) => (
               <div
                 key={row.banner}
                 className={cn(

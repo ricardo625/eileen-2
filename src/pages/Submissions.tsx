@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import {
-  Archive, ChevronDown, CircleCheck, ChevronsDown, CircleDashed,
-  FileDown, FlagTriangleRight, Forward, LayoutGrid, LayoutList, Check,
-  Link, Search, Sheet, SlidersHorizontal, StickyNote, Upload,
+  Archive, ChevronDown, CircleCheck, ChevronsDown, CircleDashed, FileDown,
+  FlagTriangleRight, Forward, LayoutGrid, LayoutList, Check, Link,
+  Search, Sheet, SlidersHorizontal, StickyNote, Upload, X,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { SubmissionDrawer } from '@/components/SubmissionDrawer'
@@ -62,6 +63,12 @@ interface Submission {
   address: string
   image: string
   badges: BadgeVariant[]
+  archived?: boolean
+  imageCount?: number
+  completedAt?: string
+  completedBy?: string
+  completedAvatar?: string
+  noteCount?: number
 }
 
 const SUBMISSIONS: Submission[] = [
@@ -71,6 +78,10 @@ const SUBMISSIONS: Submission[] = [
     address: '2660 San Miguel Dr, Newport Beach, CA, USA 92660',
     image: imgStore1,
     badges: ['flagged', 'notes', 'no-stock'],
+    noteCount: 4,
+    imageCount: 13,
+    completedAt: 'Apr 18, 2026',
+    completedBy: 'Jaqueline',
   },
   {
     id: '2',
@@ -78,6 +89,11 @@ const SUBMISSIONS: Submission[] = [
     address: '8148 La Palma Ave, Buena Park, CA, USA 90620',
     image: imgStore2,
     badges: ['notes', 'low-stock'],
+    noteCount: 2,
+    archived: true,
+    imageCount: 7,
+    completedAt: 'Apr 17, 2026',
+    completedBy: 'Marcus',
   },
   {
     id: '3',
@@ -85,6 +101,9 @@ const SUBMISSIONS: Submission[] = [
     address: '13200 Chapman Ave, Garden Grove, CA, USA 92840',
     image: imgStore3,
     badges: ['no-stock'],
+    imageCount: 5,
+    completedAt: 'Apr 16, 2026',
+    completedBy: 'Sara',
   },
 ]
 
@@ -114,7 +133,7 @@ const FILTER_OPTIONS: Record<string, string[]> = {
   'Notes':          ['Additional SKU Found', 'Behind Counter', 'Behind Glass', 'Display Not Found', 'Locked Case', 'Promotional Pricing'],
   'Acc Manager':    ['Direct Shop', 'Distributor', 'Grocery DC'],
   'Campaign':       ['Your Shelf Check'],
-  'Display Status': ['All', 'Found', 'Not Found'],
+  'Display Status': ['All', 'Found', 'Not Found', 'Archived'],
 }
 
 function SubmissionCard({ submission, selected, onToggle, onOpen }: {
@@ -123,6 +142,8 @@ function SubmissionCard({ submission, selected, onToggle, onOpen }: {
   onToggle: () => void
   onOpen: () => void
 }) {
+  const [imgOpen, setImgOpen] = useState(false)
+
   return (
     <div
       onClick={onOpen}
@@ -133,13 +154,53 @@ function SubmissionCard({ submission, selected, onToggle, onOpen }: {
           : 'border border-border bg-card',
       )}
     >
-      <div className="h-[193px] rounded-md overflow-hidden shrink-0 w-full">
+      {/* Image with controls */}
+      <div className="group/img relative h-[193px] rounded-md shrink-0 w-full">
         <img
           src={submission.image}
           alt={submission.storeName}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover rounded-md"
         />
+
+        {/* Archived badge */}
+        {submission.archived && (
+          <div className="absolute top-2.5 left-2.5 bg-brighter border border-black/5 rounded-md px-3 py-1.5">
+            <span className="font-sans font-semibold text-xs leading-4 text-foreground whitespace-nowrap">Archived</span>
+          </div>
+        )}
+
+        {/* Expand button — visible only on hover */}
+        <button
+          onClick={e => { e.stopPropagation(); setImgOpen(true) }}
+          className="absolute top-2.5 right-2.5 size-10 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-sm text-white hover:bg-black/75 transition-all opacity-0 group-hover/img:opacity-100"
+        >
+          <img src="https://www.figma.com/api/mcp/asset/140f4632-f821-42e0-a60a-5279e7fbc00e" alt="Expand" className="size-4" />
+        </button>
       </div>
+
+      {/* Image lightbox */}
+      {imgOpen && createPortal(
+        <div
+          className="fixed inset-0 z-[400] bg-black/80 flex items-center justify-center"
+          onClick={e => { e.stopPropagation(); setImgOpen(false) }}
+        >
+          <button
+            onClick={e => { e.stopPropagation(); setImgOpen(false) }}
+            className="absolute top-4 right-4 size-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+          >
+            <X className="size-5" />
+          </button>
+          <img
+            src={submission.image}
+            alt={submission.storeName}
+            className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-2xl"
+            onClick={e => e.stopPropagation()}
+          />
+        </div>,
+        document.body,
+      )}
+
+      {/* Info */}
       <div className="flex flex-col gap-1.5 px-2.5">
         <span className="font-semibold text-sm leading-5 text-foreground underline decoration-dotted underline-offset-4">
           {submission.storeName}
@@ -147,9 +208,25 @@ function SubmissionCard({ submission, selected, onToggle, onOpen }: {
         <span className="text-sm leading-5 text-muted-foreground">
           {submission.address}
         </span>
+
+        {/* Completed by */}
+        {submission.completedAt && (
+          <div className="flex items-center gap-1 mt-0.5">
+            <span className="text-xs text-muted-foreground leading-none">Completed {submission.completedAt} by</span>
+            <div className="size-4 rounded-full bg-[#ffb31f] flex items-center justify-center shrink-0">
+              <span className="text-[8px] font-semibold text-white leading-none">
+                {submission.completedBy?.[0]}
+              </span>
+            </div>
+            <span className="text-xs text-muted-foreground leading-none">{submission.completedBy}</span>
+          </div>
+        )}
+
         <div className="flex items-center gap-1.5 pt-4">
           {submission.badges.map(b => (
-            <Badge key={b} variant={b} />
+            b === 'notes' && submission.noteCount
+              ? <Tooltip key={b} label={`${submission.noteCount} note${submission.noteCount !== 1 ? 's' : ''}`}><Badge variant={b} /></Tooltip>
+              : <Badge key={b} variant={b} />
           ))}
           <div className="flex-1 flex items-center justify-end min-w-0">
             <div
@@ -168,16 +245,109 @@ function SubmissionCard({ submission, selected, onToggle, onOpen }: {
   )
 }
 
+function SubmissionListRow({ submission, selected, onToggle, onOpen }: {
+  submission: Submission
+  selected: boolean
+  onToggle: () => void
+  onOpen: () => void
+}) {
+  return (
+    <div
+      onClick={onOpen}
+      className={cn(
+        'rounded-2xl shadow-[0px_2px_2px_0px_var(--shadow)] flex items-center gap-4 pl-6 pr-2.5 py-2.5 cursor-pointer transition-all',
+        selected
+          ? 'border-2 border-primary bg-gradient-to-b from-[rgba(249,185,175,0.35)] to-[rgba(255,255,255,0.35)]'
+          : 'border border-border bg-card',
+      )}
+    >
+      {/* Checkbox */}
+      <div
+        onClick={e => { e.stopPropagation(); onToggle() }}
+        className={cn(
+          'size-4 rounded-[4px] flex items-center justify-center shrink-0 transition-colors cursor-pointer',
+          selected ? 'bg-darker shadow-sm' : 'border border-darker opacity-40',
+        )}
+      >
+        {selected && <Check className="size-3 text-brighter" />}
+      </div>
+
+      {/* Thumbnail */}
+      <div className="relative size-20 rounded-md overflow-hidden shrink-0">
+        <img src={submission.image} alt={submission.storeName} className="w-full h-full object-cover" />
+        {submission.archived && (
+          <div className="absolute top-1.5 right-1.5 bg-brighter border border-black/5 rounded-md px-2 py-1">
+            <span className="font-sans font-semibold text-xs leading-4 text-foreground whitespace-nowrap">Archived</span>
+          </div>
+        )}
+      </div>
+
+      {/* Info + Badges */}
+      <div className="flex flex-1 items-center gap-4 min-w-0 px-2.5">
+        <div className="flex flex-col gap-1.5 shrink-0">
+          <span className="font-semibold text-sm leading-5 text-foreground underline decoration-dotted underline-offset-4 whitespace-nowrap">
+            {submission.storeName}
+          </span>
+          <span className="text-sm leading-5 text-muted-foreground whitespace-nowrap">
+            {submission.address}
+          </span>
+          {submission.completedAt && (
+            <div className="flex items-center gap-1">
+              <span className="text-xs text-muted-foreground leading-none whitespace-nowrap">Completed {submission.completedAt} by</span>
+              <div className="size-4 rounded-full bg-[#ffb31f] flex items-center justify-center shrink-0">
+                <span className="text-[8px] font-semibold text-white leading-none">{submission.completedBy?.[0]}</span>
+              </div>
+              <span className="text-xs text-muted-foreground leading-none whitespace-nowrap">{submission.completedBy}</span>
+            </div>
+          )}
+        </div>
+        <div className="flex-1 flex items-center justify-end gap-1.5 min-w-0">
+          {submission.badges.map(b => (
+            b === 'notes' && submission.noteCount
+              ? <Tooltip key={b} label={`${submission.noteCount} note${submission.noteCount !== 1 ? 's' : ''}`}><Badge variant={b} /></Tooltip>
+              : <Badge key={b} variant={b} />
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const RECENT_SEARCHES = [
+  'Albertsons Newport Beach',
+  'Vons Santa Monica',
+  'Pavilions Pasadena',
+  'Albertsons Anaheim',
+  'Safeway Long Beach',
+]
+
 export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; onDrawerClose?: () => void }) {
   const [search, setSearch] = useState('')
+  const [searchFocused, setSearchFocused] = useState(false)
+  const searchWrapperRef = useRef<HTMLDivElement>(null)
+  const [view, setView] = useState<'grid' | 'list'>('grid')
   const [filterOpen, setFilterOpen] = useState(false)
+
   const [activeDateRange, setActiveDateRange] = useState('Today')
   const [openFilterSelect, setOpenFilterSelect] = useState<string | null>(null)
   const [filterSelections, setFilterSelections] = useState<Record<string, string[]>>(
-    Object.fromEntries(FILTER_SELECTS.map(k => [k, [...(FILTER_OPTIONS[k] ?? [])]])),
+    Object.fromEntries(FILTER_SELECTS.map(k => [
+      k,
+      (FILTER_OPTIONS[k] ?? []).filter(v => v !== 'Archived'),
+    ])),
   )
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [drawerOpen, setDrawerOpen] = useState(openDrawer)
+
+  const showArchived = filterSelections['Display Status']?.includes('Archived') ?? false
+  const filteredSubmissions = SUBMISSIONS.filter(s => {
+    if (s.archived && !showArchived) return false
+    if (!search.trim()) return true
+    return (
+      s.storeName.toLowerCase().includes(search.toLowerCase()) ||
+      s.address.toLowerCase().includes(search.toLowerCase())
+    )
+  })
 
   useEffect(() => { if (openDrawer) setDrawerOpen(true) }, [openDrawer])
 
@@ -231,6 +401,9 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
       ) {
         setIslandSendOpen(false)
       }
+      if (searchWrapperRef.current && !searchWrapperRef.current.contains(t)) {
+        setSearchFocused(false)
+      }
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
@@ -270,13 +443,13 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
           </button>
           <div className="flex items-center p-0.5 bg-secondary rounded-full">
             <Tooltip label="Grid view">
-              <button className="size-8 flex items-center justify-center rounded-full bg-brighter shadow-sm">
-                <LayoutGrid className="size-4 text-foreground" />
+              <button onClick={() => setView('grid')} className={cn('size-8 flex items-center justify-center rounded-full transition-colors', view === 'grid' ? 'bg-brighter shadow-sm' : 'hover:bg-accent')}>
+                <LayoutGrid className={cn('size-4', view === 'grid' ? 'text-foreground' : 'text-muted-foreground')} />
               </button>
             </Tooltip>
             <Tooltip label="List view">
-              <button className="size-8 flex items-center justify-center rounded-full hover:bg-accent transition-colors">
-                <LayoutList className="size-4 text-muted-foreground" />
+              <button onClick={() => setView('list')} className={cn('size-8 flex items-center justify-center rounded-full transition-colors', view === 'list' ? 'bg-brighter shadow-sm' : 'hover:bg-accent')}>
+                <LayoutList className={cn('size-4', view === 'list' ? 'text-foreground' : 'text-muted-foreground')} />
               </button>
             </Tooltip>
           </div>
@@ -285,14 +458,39 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
 
       {/* Search + Filters */}
       <div className="relative flex items-center gap-3">
-        <div className="flex-1 flex items-center gap-1 h-9 px-3 bg-background border border-input rounded-full shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] overflow-hidden">
-          <Search className="size-5 text-muted-foreground shrink-0" />
-          <input
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search by store name, banner, city and state."
-            className="flex-1 text-sm bg-transparent outline-none text-foreground placeholder:text-muted-foreground min-w-0"
-          />
+        <div ref={searchWrapperRef} className="flex-1 relative">
+          <div className="flex items-center gap-1 h-9 px-3 bg-background border border-input rounded-full shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] overflow-hidden">
+            <Search className="size-5 text-muted-foreground shrink-0" />
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              onFocus={() => setSearchFocused(true)}
+              placeholder="Search by store name, banner, city and state."
+              className="flex-1 text-sm bg-transparent outline-none text-foreground placeholder:text-muted-foreground min-w-0"
+            />
+          </div>
+          {searchFocused && (() => {
+            const q = search.trim().toLowerCase()
+            const items = q
+              ? RECENT_SEARCHES.filter(r => r.toLowerCase().includes(q))
+              : RECENT_SEARCHES
+            if (items.length === 0) return null
+            return (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-2xl shadow-[0px_4px_28px_0px_var(--shadow)] overflow-hidden z-50">
+                <p className="px-4 pt-3 pb-1 text-xs font-medium text-muted-foreground uppercase tracking-wide">Recent searches</p>
+                {items.map(item => (
+                  <button
+                    key={item}
+                    onMouseDown={e => { e.preventDefault(); setSearch(item); setSearchFocused(false) }}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors text-left"
+                  >
+                    <Search className="size-3.5 text-muted-foreground shrink-0" />
+                    {item}
+                  </button>
+                ))}
+              </div>
+            )
+          })()}
         </div>
         <div className="relative shrink-0">
           <button
@@ -347,10 +545,10 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
         >
           <SlidersHorizontal className="size-4 text-foreground" />
           <span className="size-6 flex items-center justify-center bg-darker text-brighter rounded-full text-xs font-medium shrink-0">
-            {FILTER_SELECTS.filter(k => (filterSelections[k]?.length ?? 0) < (FILTER_OPTIONS[k]?.length ?? 0)).length}
+            {Object.values(filterSelections).reduce((sum, arr) => sum + arr.length, 0)}
           </span>
         </button>
-        <button className="h-9 flex items-center px-3 text-sm text-foreground underline hover:opacity-70 transition-opacity shrink-0">
+        <button onClick={() => setSearch('')} className="h-9 flex items-center px-3 text-sm text-foreground underline hover:opacity-70 transition-opacity shrink-0">
           Clear
         </button>
 
@@ -439,18 +637,37 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
         )}
       </div>
 
-      {/* Cards Grid */}
-      <div className="grid grid-cols-3 gap-3 pb-24">
-        {SUBMISSIONS.map(s => (
-          <SubmissionCard
-            key={s.id}
-            submission={s}
-            selected={selectedIds.has(s.id)}
-            onToggle={() => toggleSelected(s.id)}
-            onOpen={() => setDrawerOpen(true)}
-          />
-        ))}
-      </div>
+      {/* Cards / List */}
+      {filteredSubmissions.length === 0 ? (
+        <div className="flex flex-col items-center justify-center gap-3 flex-1 min-h-[400px]">
+          <img src="https://www.figma.com/api/mcp/asset/f6eb4b32-3525-4047-96ae-7fa1d23c2dcb" alt="" className="size-[120px]" />
+          <p className="text-sm text-muted-foreground">No matching submissions</p>
+        </div>
+      ) : view === 'grid' ? (
+        <div className="grid grid-cols-3 gap-3 pb-24">
+          {filteredSubmissions.map(s => (
+            <SubmissionCard
+              key={s.id}
+              submission={s}
+              selected={selectedIds.has(s.id)}
+              onToggle={() => toggleSelected(s.id)}
+              onOpen={() => setDrawerOpen(true)}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col gap-3 pb-24">
+          {filteredSubmissions.map(s => (
+            <SubmissionListRow
+              key={s.id}
+              submission={s}
+              selected={selectedIds.has(s.id)}
+              onToggle={() => toggleSelected(s.id)}
+              onOpen={() => setDrawerOpen(true)}
+            />
+          ))}
+        </div>
+      )}
 
       <SubmissionDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
 
@@ -483,7 +700,7 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
                 </button>
               </Tooltip>
               <Tooltip label="Archive">
-                <button className="size-9 flex items-center justify-center rounded-full bg-background hover:bg-accent transition-colors">
+                <button onClick={() => setToast('Submissions archived successfully')} className="size-9 flex items-center justify-center rounded-full bg-background hover:bg-accent transition-colors">
                   <Archive className="size-4 text-foreground" />
                 </button>
               </Tooltip>
@@ -525,7 +742,7 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
       )}
 
       {toast && <Toast message={toast} onDismiss={() => setToast(null)} />}
-      {shareOpen && <ShareDialog onClose={() => setShareOpen(false)} />}
+      {shareOpen && <ShareDialog onClose={() => setShareOpen(false)} onCopy={() => setToast('Link copied successfully')} />}
     </div>
   )
 }

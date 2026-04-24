@@ -1,4 +1,4 @@
-import { Archive, Check, CheckCircle2, ChevronLeft, ChevronRight, CircleDashed, FileDown, FlagTriangleRight, Forward, Link, Plus, Search, Sheet, X, XCircle, AlertCircle } from 'lucide-react'
+import { Archive, Check, ChevronsDown, ChevronLeft, ChevronRight, CircleDashed, FileDown, FlagTriangleRight, Forward, Link, Plus, Search, Sheet, X, XCircle } from 'lucide-react'
 import { Toast } from '@/components/ui/Toast'
 import { ShareDialog } from '@/components/ShareDialog'
 import { Tooltip } from '@/components/ui/Tooltip'
@@ -14,8 +14,8 @@ const IMAGES = [imgStore, imgStore, imgStore]
 type StatusType = 'good' | 'low' | 'none' | 'out'
 
 const STATUS_ICON: Record<StatusType, React.ReactNode> = {
-  good: <CheckCircle2 className="size-4 text-green shrink-0" />,
-  low:  <AlertCircle  className="size-4 text-[var(--amber,#ffb900)] shrink-0" />,
+  good: <Check        className="size-4 text-green shrink-0" />,
+  low:  <ChevronsDown className="size-4 text-[var(--amber,#ffb900)] shrink-0" />,
   none: <XCircle      className="size-4 text-[var(--red,#f91616)] shrink-0" />,
   out:  <CircleDashed className="size-4 text-muted-foreground shrink-0" />,
 }
@@ -152,11 +152,11 @@ export function SubmissionDrawer({ open, onClose }: Props) {
                 key={i}
                 onClick={() => { setLightboxIndex(i); setLightboxOpen(true) }}
                 className={cn(
-                  'relative rounded-md shrink-0 size-12 overflow-hidden',
-                  i === 0 && 'ring-2 ring-darker ring-offset-2 ring-offset-background',
+                  'relative rounded-md shrink-0 size-12',
+                  i === 0 && 'border-2 border-brighter shadow-[0px_0px_0px_2px_var(--darker)]',
                 )}
               >
-                <img src={src} alt="" className="w-full h-full object-cover" />
+                <img src={src} alt="" className="w-full h-full object-cover rounded-md" />
               </button>
             ))}
           </div>
@@ -268,6 +268,7 @@ export function SubmissionDrawer({ open, onClose }: Props) {
                   else sectionRefs.current.delete(title)
                 }}
               >
+                <Tooltip label={`Add ${title}`}>
                 <button
                   className="size-9 flex items-center justify-center rounded-full bg-background border border-input shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] hover:bg-accent transition-colors"
                   onClick={() => {
@@ -279,6 +280,7 @@ export function SubmissionDrawer({ open, onClose }: Props) {
                 >
                   <Plus className="size-4 text-foreground" />
                 </button>
+                </Tooltip>
 
                 {openSection === title && (
                   <div className="absolute right-0 bottom-full mb-2 w-[258px] bg-background border border-sidebar-border rounded-2xl shadow-[0px_4px_28px_0px_var(--shadow)] p-0.5 z-[60] flex flex-col overflow-hidden">
@@ -382,7 +384,7 @@ export function SubmissionDrawer({ open, onClose }: Props) {
         <div className="flex flex-col min-w-max">
           {/* Table header */}
           <div className="flex items-center gap-6 px-6 py-5 bg-accent border border-border-alpha">
-            <span className="w-[67px] font-sans font-medium text-sm text-foreground leading-none underline decoration-dotted shrink-0">Status</span>
+            <span className="w-[67px] font-sans font-medium text-sm text-foreground leading-none underline decoration-dotted underline-offset-4 shrink-0">Status</span>
             <span className="w-[140px] font-sans font-medium text-sm text-muted-foreground leading-none shrink-0">Item</span>
             <span className="w-[81px] font-sans font-medium text-sm text-muted-foreground leading-none shrink-0">Price</span>
             <span className="w-[104px] font-sans font-medium text-sm text-muted-foreground leading-none shrink-0">Sale Price</span>

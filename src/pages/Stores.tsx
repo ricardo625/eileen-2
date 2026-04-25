@@ -637,9 +637,10 @@ export function StoresPage({ onLearnMore, onNavigateToShelf }: { onLearnMore?: (
               <div
                 key={row.banner}
                 className={cn(
-                  'flex items-center gap-4 px-6 py-5 border-t border-border-alpha transition-colors hover:bg-accent/60',
+                  'flex items-center gap-4 px-6 py-5 border-t border-border-alpha transition-colors hover:bg-accent/60 cursor-pointer',
                   i === 0 && 'border-t-0',
                 )}
+                onClick={() => onNavigateToShelf?.()}
                 onMouseMove={e => handleRowMouseMove(e, row)}
                 onMouseLeave={() => setPopoverState(null)}
               >

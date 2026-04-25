@@ -331,15 +331,13 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
   const [activeDateRange, setActiveDateRange] = useState('Today')
   const [openFilterSelect, setOpenFilterSelect] = useState<string | null>(null)
   const [filterSelections, setFilterSelections] = useState<Record<string, string[]>>(
-    Object.fromEntries(FILTER_SELECTS.map(k => [
-      k,
-      (FILTER_OPTIONS[k] ?? []).filter(v => v !== 'Archived'),
-    ])),
+    Object.fromEntries(FILTER_SELECTS.map(k => [k, []]))
   )
   const [submissions, setSubmissions] = useState<Submission[]>(INITIAL_SUBMISSIONS)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [drawerOpen, setDrawerOpen] = useState(openDrawer)
   const [activeSubmissionId, setActiveSubmissionId] = useState<string | null>(null)
+  const [pageSize, setPageSize] = useState(25)
 
   const showArchived = filterSelections['Display Status']?.includes('Archived') ?? false
   const filteredSubmissions = submissions.filter(s => {
@@ -349,7 +347,7 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
       s.storeName.toLowerCase().includes(search.toLowerCase()) ||
       s.address.toLowerCase().includes(search.toLowerCase())
     )
-  })
+  }).slice(0, pageSize)
 
   useEffect(() => { if (openDrawer) setDrawerOpen(true) }, [openDrawer])
 
@@ -369,7 +367,7 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
       return next
     })
   const [signalOpen, setSignalOpen] = useState(false)
-  const [activeSignals, setActiveSignals] = useState<string[]>([...SIGNAL_OPTIONS])
+  const [activeSignals, setActiveSignals] = useState<string[]>([])
   const [islandSendOpen, setIslandSendOpen] = useState(false)
   const [islandFlagged, setIslandFlagged] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
@@ -381,6 +379,9 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
   const signalDropdownRef = useRef<HTMLDivElement>(null)
   const islandSendBtnRef = useRef<HTMLButtonElement>(null)
   const islandSendDropdownRef = useRef<HTMLDivElement>(null)
+  const pageSizeBtnRef = useRef<HTMLButtonElement>(null)
+  const pageSizeDropdownRef = useRef<HTMLDivElement>(null)
+  const [pageSizeOpen, setPageSizeOpen] = useState(false)
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -406,6 +407,12 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
       }
       if (searchWrapperRef.current && !searchWrapperRef.current.contains(t)) {
         setSearchFocused(false)
+      }
+      if (
+        pageSizeDropdownRef.current && !pageSizeDropdownRef.current.contains(t) &&
+        pageSizeBtnRef.current && !pageSizeBtnRef.current.contains(t)
+      ) {
+        setPageSizeOpen(false)
       }
     }
     document.addEventListener('mousedown', handler)
@@ -435,15 +442,41 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
           <Tooltip label="Export CSV">
             <button
               onClick={() => setToast('Exported to CSV successfully')}
-              className="size-9 flex items-center justify-center rounded-md hover:bg-accent transition-colors"
+              disabled={selectedIds.size === 0}
+              className="size-9 flex items-center justify-center rounded-md hover:bg-accent transition-colors disabled:opacity-40 disabled:pointer-events-none"
             >
               <Upload className="size-4 text-foreground" />
             </button>
           </Tooltip>
-          <button className="h-9 flex items-center gap-2 px-3 bg-background border border-input rounded-full shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] text-sm text-foreground hover:bg-accent transition-colors">
-            <span>25 per page</span>
-            <ChevronDown className="size-4 text-muted-foreground" />
-          </button>
+          <div className="relative">
+            <button
+              ref={pageSizeBtnRef}
+              onClick={() => setPageSizeOpen(o => !o)}
+              className="h-9 flex items-center gap-2 px-3 bg-background border border-input rounded-full shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] text-sm text-foreground hover:bg-accent transition-colors"
+            >
+              <span>{pageSize} per page</span>
+              <ChevronDown className="size-4 text-muted-foreground" />
+            </button>
+            {pageSizeOpen && (
+              <div
+                ref={pageSizeDropdownRef}
+                className="absolute right-0 top-full mt-1 w-[160px] bg-card border border-border rounded-2xl shadow-[0px_4px_28px_0px_var(--shadow)] p-0.5 z-50 flex flex-col"
+              >
+                {[10, 25, 50].map(size => (
+                  <button
+                    key={size}
+                    onClick={() => { setPageSize(size); setPageSizeOpen(false) }}
+                    className={cn(
+                      'flex items-center h-9 px-4 rounded-xl text-sm transition-colors text-left',
+                      pageSize === size ? 'text-foreground font-medium' : 'text-muted-foreground hover:bg-accent',
+                    )}
+                  >
+                    {size} per page
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           <div className="flex items-center p-0.5 bg-secondary rounded-full">
             <Tooltip label="Grid view">
               <button onClick={() => setView('grid')} className={cn('size-8 flex items-center justify-center rounded-full transition-colors', view === 'grid' ? 'bg-brighter shadow-sm' : 'hover:bg-accent')}>

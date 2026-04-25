@@ -4,8 +4,8 @@ Changes are appended here after every user-requested modification.
 ---
 
 [2026-04-25]
-- Clear button now resets search, filters, and signals
-- Store table rows navigate to Shelf page on click
-- Filters and signals default to deselected on page load
-- Per-page dropdown (10 / 25 / 50) with working slice pagination
-- Export button disabled when no cards selected
+- [Shelf] Clear button now resets search, filters, and signals
+- [Stores] Table rows navigate to Shelf page on click
+- [Shelf] Filters and signals default to deselected on page load
+- [Shelf] Per-page dropdown (10 / 25 / 50) with working slice pagination
+- [Shelf] Export button disabled when no cards selected

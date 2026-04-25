@@ -1,5 +1,5 @@
 import { Archive, Check, ChevronsDown, ChevronLeft, ChevronRight, CircleDashed, FileDown, FlagTriangleRight, Forward, Link, Plus, Search, Sheet, X, XCircle } from 'lucide-react'
-import { Toast } from '@/components/ui/Toast'
+import { ToastStack, type ToastItem } from '@/components/ui/Toast'
 import { ShareDialog } from '@/components/ShareDialog'
 import { Tooltip } from '@/components/ui/Tooltip'
 import { cn } from '@/lib/utils'
@@ -59,7 +59,7 @@ export function SubmissionDrawer({ open, onClose, onArchive }: Props) {
   const [lightboxIndex, setLightboxIndex] = useState(0)
   const [flagged, setFlagged] = useState(false)
   const [sendOpen, setSendOpen] = useState(false)
-  const [toast, setToast] = useState<string | null>(null)
+  const [toasts, setToasts] = useState<ToastItem[]>([])
   const [shareOpen, setShareOpen] = useState(false)
   const sendBtnRef = useRef<HTMLButtonElement>(null)
   const sendDropdownRef = useRef<HTMLDivElement>(null)
@@ -217,7 +217,7 @@ export function SubmissionDrawer({ open, onClose, onArchive }: Props) {
                     ].map(({ label, Icon, toast: msg }) => (
                       <button
                         key={label}
-                        onClick={() => { setSendOpen(false); if (msg) setToast(msg); if (label === 'Share URL') setShareOpen(true) }}
+                        onClick={() => { setSendOpen(false); if (msg) setToasts(prev => [...prev, { id: Date.now() + Math.random(), message: msg }]); if (label === 'Share URL') setShareOpen(true) }}
                         className="flex items-center gap-3 h-11 px-4 rounded-xl hover:bg-accent transition-colors text-left w-full"
                       >
                         <Icon className="size-4 text-muted-foreground shrink-0" />
@@ -467,7 +467,7 @@ export function SubmissionDrawer({ open, onClose, onArchive }: Props) {
         </>
       )}
 
-      {toast && <Toast message={toast} onDismiss={() => setToast(null)} />}
+      <ToastStack toasts={toasts} onDismiss={id => setToasts(prev => prev.filter(t => t.id !== id))} />
       {shareOpen && <ShareDialog onClose={() => setShareOpen(false)} />}
     </>
   )

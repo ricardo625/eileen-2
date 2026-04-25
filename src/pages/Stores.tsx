@@ -72,7 +72,7 @@ const STORE_DOTS: StoreDot[] = [
     banner: 'RALEYS',
     bannerLogo: raleysLogo,
     signals: [{ label: 'Promotion', Icon: Tags, variant: 'default' }],
-    risk: { label: 'Low', percent: 20 },
+    risk: { label: 'Medium', percent: 42 },
   },
 ]
 

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Moon, Sun } from 'lucide-react'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Tooltip } from '@/components/ui/Tooltip'
@@ -19,6 +19,10 @@ export default function App() {
     setPage('submissions')
     setSubmissionsDrawerOpen(true)
   }
+
+  useEffect(() => {
+    document.body.className = theme
+  }, [theme])
 
   const isDark = theme === 'dark'
   const isFullPage = page === 'submissions' || page === 'stores'

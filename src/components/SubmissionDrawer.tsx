@@ -3,6 +3,7 @@ import { ToastStack, type ToastItem } from '@/components/ui/Toast'
 import { ShareDialog } from '@/components/ShareDialog'
 import { Tooltip } from '@/components/ui/Tooltip'
 import { cn } from '@/lib/utils'
+import { trackEvent } from '@/lib/clarity'
 import { useState, useRef, useEffect } from 'react'
 
 const imgStore = 'https://www.figma.com/api/mcp/asset/ac384ba7-b735-44e4-bbe2-dcc285a54722'
@@ -43,9 +44,10 @@ interface Props {
   open: boolean
   onClose: () => void
   onArchive?: () => void
+  cardId?: string | null
 }
 
-export function SubmissionDrawer({ open, onClose, onArchive }: Props) {
+export function SubmissionDrawer({ open, onClose, onArchive, cardId }: Props) {
   const [openSection, setOpenSection] = useState<string | null>(null)
   const [noteSearch, setNoteSearch] = useState('')
   const [selectedNotes, setSelectedNotes] = useState<Record<string, string[]>>({
@@ -102,7 +104,12 @@ export function SubmissionDrawer({ open, onClose, onArchive }: Props) {
     n.toLowerCase().includes(noteSearch.toLowerCase())
   )
 
-  const toggleNote = (section: string, note: string) =>
+  const toggleNote = (section: string, note: string) => {
+    const isAdding = !(selectedNotes[section] ?? []).includes(note)
+    if (isAdding) {
+      // track existing tag selected from the dropdown
+      trackEvent('select_tag_shelf_drawer', { card_id: cardId ?? null, tag_name: note, is_new: false })
+    }
     setSelectedNotes(prev => {
       const current = prev[section] ?? []
       return {
@@ -110,6 +117,7 @@ export function SubmissionDrawer({ open, onClose, onArchive }: Props) {
         [section]: current.includes(note) ? current.filter(n => n !== note) : [...current, note],
       }
     })
+  }
 
   const removeNote = (section: string, note: string) =>
     setSelectedNotes(prev => ({
@@ -276,6 +284,15 @@ export function SubmissionDrawer({ open, onClose, onArchive }: Props) {
                 <button
                   className="size-9 flex items-center justify-center rounded-full bg-background border border-input shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] hover:bg-accent transition-colors"
                   onClick={() => {
+                    const isOpening = openSection !== title
+                    if (isOpening) {
+                      // track intent to add a tag — fires when the dropdown opens
+                      trackEvent('click_add_tag_shelf_drawer', {
+                        card_id: cardId ?? null,
+                        existing_tags_count: tags.length,
+                        source: 'drawer',
+                      })
+                    }
                     setOpenSection(openSection === title ? null : title)
                     setNoteSearch('')
                     setCreatingNote(false)
@@ -322,10 +339,14 @@ export function SubmissionDrawer({ open, onClose, onArchive }: Props) {
                         onSubmit={e => {
                           e.preventDefault()
                           const name = newNoteName.trim()
-                          if (name && openSection) setSelectedNotes(prev => ({
-                            ...prev,
-                            [openSection]: [...(prev[openSection] ?? []), name],
-                          }))
+                          if (name && openSection) {
+                            // track custom tag created by user
+                            trackEvent('select_tag_shelf_drawer', { card_id: cardId ?? null, tag_name: name, is_new: true })
+                            setSelectedNotes(prev => ({
+                              ...prev,
+                              [openSection]: [...(prev[openSection] ?? []), name],
+                            }))
+                          }
                           setCreatingNote(false)
                           setNewNoteName('')
                         }}

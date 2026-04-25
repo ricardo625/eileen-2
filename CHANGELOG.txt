@@ -3,6 +3,25 @@ Changes are appended here after every user-requested modification.
 
 ---
 
+[2026-04-25] Clarity export & share tracking
+- [Shelf] Track header export button: click_export_shelf (format: csv, source: header, selected_count)
+- [Shelf Island] Track island PDF/CSV export: click_export_shelf (format: pdf|csv, source: island, selected_count)
+- [Shelf Island] Track Share URL click: click_share_url_shelf (source: island, selected_count)
+- [Shelf Island] Track copy link inside share dialog: click_copy_link_share_shelf (source: island)
+
+[2026-04-25] Clarity event tracking
+- [Global] Added src/lib/clarity.ts — trackEvent() helper with window.clarity safety guard
+- [Shelf] Track card clicks: click_card_shelf (card_id, card_type, position)
+- [Shelf] Track filter/signal/date-range selections: select_filter_shelf (filter_type, value, action)
+- [Shelf Drawer] Track + button open: click_add_tag_shelf_drawer (card_id, existing_tags_count, source)
+- [Shelf Drawer] Track tag select/create: select_tag_shelf_drawer (card_id, tag_name, is_new)
+- [Shelf Drawer] Accepts cardId prop forwarded from SubmissionsPage
+- [Stores] Track map pin click: click_pin_store_map (store_id, coordinates) — fires on open only
+- [Stores] Track Learn More button: click_learn_more_store_popover (store_id, source)
+- [Stores] Track signal card click: interact_signal_store (store_id, signal_type, severity)
+
+---
+
 [2026-04-25]
 - [Shelf] Clear button now resets search, filters, and signals
 - [Stores] Table rows navigate to Shelf page on click

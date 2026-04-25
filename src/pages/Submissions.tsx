@@ -7,6 +7,7 @@ import {
   Search, Sheet, SlidersHorizontal, StickyNote, Upload, X,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { trackEvent } from '@/lib/clarity'
 import { SubmissionDrawer } from '@/components/SubmissionDrawer'
 import { ToastStack, type ToastItem } from '@/components/ui/Toast'
 import { ShareDialog } from '@/components/ShareDialog'
@@ -470,7 +471,11 @@ export function SubmissionsPage() {
           </Tooltip>
           <Tooltip label="Export CSV">
             <button
-              onClick={() => triggerExport('Exported to CSV successfully')}
+              onClick={() => {
+                // track header export button click
+                trackEvent('click_export_shelf', { format: 'csv', source: 'header', selected_count: selectedIds.size })
+                triggerExport('Exported to CSV successfully')
+              }}
               disabled={selectedIds.size === 0}
               className="size-9 flex items-center justify-center rounded-md hover:bg-accent transition-colors disabled:opacity-40 disabled:pointer-events-none"
             >
@@ -578,11 +583,12 @@ export function SubmissionsPage() {
                 return (
                   <button
                     key={option}
-                    onClick={() =>
-                      setActiveSignals(prev =>
-                        prev.includes(option) ? prev.filter(x => x !== option) : [...prev, option],
-                      )
-                    }
+                    onClick={() => {
+                      const isActive = activeSignals.includes(option)
+                      setActiveSignals(prev => isActive ? prev.filter(x => x !== option) : [...prev, option])
+                      // track signal filter toggle
+                      trackEvent('select_filter_shelf', { filter_type: 'signal', value: option, action: isActive ? 'deselect' : 'select' })
+                    }}
                     className={cn(
                       'w-full flex items-center gap-3 h-11 px-4 text-left transition-colors',
                       i === 0 ? 'rounded-[14px] bg-accent' : 'rounded-full hover:bg-accent',
@@ -635,7 +641,13 @@ export function SubmissionsPage() {
               {DATE_OPTIONS.map((option, i) => (
                 <button
                   key={option}
-                  onClick={() => setActiveDateRange(option)}
+                  onClick={() => {
+                    if (activeDateRange !== option) {
+                      // track date range filter change
+                      trackEvent('select_filter_shelf', { filter_type: 'date_range', value: option })
+                    }
+                    setActiveDateRange(option)
+                  }}
                   className={cn(
                     'flex items-center h-11 px-4 gap-3 w-full text-left transition-colors',
                     i === 0 ? 'rounded-[14px]' : 'rounded-full',
@@ -681,7 +693,13 @@ export function SubmissionsPage() {
                           return (
                             <button
                               key={option}
-                              onClick={e => { e.stopPropagation(); toggleFilterOption(label, option) }}
+                              onClick={e => {
+                                e.stopPropagation()
+                                const isActive = selected.includes(option)
+                                toggleFilterOption(label, option)
+                                // track dropdown filter selection
+                                trackEvent('select_filter_shelf', { filter_type: label, value: option, action: isActive ? 'deselect' : 'select' })
+                              }}
                               className={cn(
                                 'w-full flex items-center gap-3 h-11 px-4 text-left transition-colors',
                                 i === 0 ? 'rounded-[14px] bg-accent' : 'rounded-full hover:bg-accent',
@@ -718,25 +736,33 @@ export function SubmissionsPage() {
         </div>
       ) : view === 'grid' ? (
         <div className="grid grid-cols-3 gap-3 pb-24">
-          {filteredSubmissions.map(s => (
+          {filteredSubmissions.map((s, index) => (
             <SubmissionCard
               key={s.id}
               submission={s}
               selected={selectedIds.has(s.id)}
               onToggle={() => toggleSelected(s.id)}
-              onOpen={() => openDrawerFor(s.id)}
+              onOpen={() => {
+                // track card click position in the current filtered set
+                trackEvent('click_card_shelf', { card_id: s.id, card_type: 'submission', position: index })
+                openDrawerFor(s.id)
+              }}
             />
           ))}
         </div>
       ) : (
         <div className="flex flex-col gap-3 pb-24">
-          {filteredSubmissions.map(s => (
+          {filteredSubmissions.map((s, index) => (
             <SubmissionListRow
               key={s.id}
               submission={s}
               selected={selectedIds.has(s.id)}
               onToggle={() => toggleSelected(s.id)}
-              onOpen={() => openDrawerFor(s.id)}
+              onOpen={() => {
+                // track card click position in the current filtered set
+                trackEvent('click_card_shelf', { card_id: s.id, card_type: 'submission', position: index })
+                openDrawerFor(s.id)
+              }}
             />
           ))}
         </div>
@@ -744,6 +770,7 @@ export function SubmissionsPage() {
 
       <SubmissionDrawer
         open={drawerOpen}
+        cardId={activeSubmissionId}
         onClose={closeDrawer}
         onArchive={() => {
           if (activeSubmissionId) {
@@ -838,7 +865,22 @@ export function SubmissionsPage() {
                     ].map(({ label, Icon, toast: msg }) => (
                       <button
                         key={label}
-                        onClick={() => { setIslandSendOpen(false); if (msg) triggerExport(msg); if (label === 'Share URL') setShareOpen(true) }}
+                        onClick={() => {
+                          setIslandSendOpen(false)
+                          if (label === 'Export to PDF') {
+                            // track island PDF export
+                            trackEvent('click_export_shelf', { format: 'pdf', source: 'island', selected_count: selectedIds.size })
+                            triggerExport(msg!)
+                          } else if (label === 'Export to CSV') {
+                            // track island CSV export
+                            trackEvent('click_export_shelf', { format: 'csv', source: 'island', selected_count: selectedIds.size })
+                            triggerExport(msg!)
+                          } else if (label === 'Share URL') {
+                            // track share URL intent from island
+                            trackEvent('click_share_url_shelf', { source: 'island', selected_count: selectedIds.size })
+                            setShareOpen(true)
+                          }
+                        }}
                         className="flex items-center gap-3 h-11 px-4 rounded-xl hover:bg-accent transition-colors text-left w-full"
                       >
                         <Icon className="size-4 text-muted-foreground shrink-0" />
@@ -854,7 +896,11 @@ export function SubmissionsPage() {
       )}
 
       <ToastStack toasts={toasts} onDismiss={dismissToast} />
-      {shareOpen && <ShareDialog onClose={() => setShareOpen(false)} onCopy={() => showToast('Link copied successfully')} />}
+      {shareOpen && <ShareDialog onClose={() => setShareOpen(false)} onCopy={() => {
+        // track copy link click inside the share dialog (opened from island)
+        trackEvent('click_copy_link_share_shelf', { source: 'island' })
+        showToast('Link copied successfully')
+      }} />}
     </div>
   )
 }

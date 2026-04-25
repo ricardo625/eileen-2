@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { trackEvent } from '@/lib/clarity'
 import {
   MoveDown, CircleDashed, Check, FlagTriangleRight, Ban,
   ChevronDown, Search, Tags, Upload, TableProperties, Map,
@@ -207,7 +208,11 @@ function StoreMapPopover({ store, anchorEl, onClose, onLearnMore }: {
       {/* Footer */}
       <div className="px-5 py-4 border-t border-border-alpha">
         <button
-          onClick={onLearnMore}
+          onClick={() => {
+            // track learn more click from the map popover card
+            trackEvent('click_learn_more_store_popover', { store_id: store.id, source: 'popover' })
+            onLearnMore()
+          }}
           className="w-full h-9 flex items-center justify-center gap-2 border border-black/5 rounded-md shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] text-sm font-medium text-card-foreground hover:bg-accent transition-colors"
         >
           Learn more
@@ -224,7 +229,12 @@ function MapView({ onLearnMore }: { onLearnMore: () => void }) {
   function handleDotClick(e: React.MouseEvent<HTMLButtonElement>, store: StoreDot) {
     e.stopPropagation()
     const el = e.currentTarget
+    const isOpening = selected?.store.id !== store.id
     setSelected(prev => prev?.store.id === store.id ? null : { store, el })
+    if (isOpening) {
+      // track map pin click — fires on open only, not on dismiss
+      trackEvent('click_pin_store_map', { store_id: store.id, coordinates: { x: store.x, y: store.y } })
+    }
   }
 
   return (
@@ -596,7 +606,11 @@ export function StoresPage({ onLearnMore, onNavigateToShelf }: { onLearnMore?: (
         {SIGNAL_CARDS.map(({ label, count, Icon, iconClass }) => (
           <button
             key={label}
-            onClick={() => onNavigateToShelf?.()}
+            onClick={() => {
+              // track signal card click — aggregate view, no single store_id
+              trackEvent('interact_signal_store', { store_id: null, signal_type: label, severity: count })
+              onNavigateToShelf?.()
+            }}
             className="relative flex flex-col justify-between h-[113px] p-4 bg-card border border-border rounded-2xl shadow-[0px_2px_2px_0px_var(--shadow)] text-left hover:bg-accent transition-colors"
           >
             <div className="flex flex-col flex-1 justify-between">

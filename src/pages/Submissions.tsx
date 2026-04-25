@@ -24,22 +24,22 @@ const BADGE_CONFIG: Record<BadgeVariant, {
 }> = {
   flagged: {
     label: 'Flagged',
-    wrapperClass: 'bg-gradient-to-r from-[#fef2f2] to-[white] text-[#460809] dark:from-[#fef2f2]/10 dark:to-transparent dark:text-[#fca5a5]',
+    wrapperClass: 'bg-gradient-to-r from-soft-red to-brighter text-soft-red-foreground',
     Icon: FlagTriangleRight,
   },
   notes: {
     label: 'Notes',
-    wrapperClass: 'bg-gradient-to-r from-[#eef2ff] to-[white] text-[#1e1a4d] dark:from-[#eef2ff]/10 dark:to-transparent dark:text-[#a5b4fc]',
+    wrapperClass: 'bg-gradient-to-r from-soft-indigo to-brighter text-soft-indigo-foreground',
     Icon: StickyNote,
   },
   'no-stock': {
     label: 'No Stock',
-    wrapperClass: 'bg-[white] text-foreground dark:bg-white/5',
+    wrapperClass: 'bg-card text-foreground',
     Icon: CircleDashed,
   },
   'low-stock': {
     label: 'Low Stock',
-    wrapperClass: 'bg-gradient-to-r from-[#fffbeb] to-[white] text-[#461901] dark:from-[#fffbeb]/10 dark:to-transparent dark:text-[#fcd34d]',
+    wrapperClass: 'bg-gradient-to-r from-soft-amber to-brighter text-soft-amber-foreground',
     Icon: ChevronsDown,
   },
 }
@@ -48,7 +48,7 @@ function Badge({ variant }: { variant: BadgeVariant }) {
   const { label, wrapperClass, Icon } = BADGE_CONFIG[variant]
   return (
     <div className={cn(
-      'flex items-center gap-1 px-3 py-2.5 rounded-md border border-black/5 text-xs font-semibold whitespace-nowrap shrink-0',
+      'flex items-center gap-1 px-3 py-2.5 rounded-md border border-border text-xs font-semibold whitespace-nowrap shrink-0',
       wrapperClass,
     )}>
       <Icon className="size-4 opacity-40 shrink-0" />
@@ -71,7 +71,7 @@ interface Submission {
   noteCount?: number
 }
 
-const SUBMISSIONS: Submission[] = [
+const INITIAL_SUBMISSIONS: Submission[] = [
   {
     id: '1',
     storeName: 'Albertsons Newport Beach',
@@ -336,11 +336,13 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
       (FILTER_OPTIONS[k] ?? []).filter(v => v !== 'Archived'),
     ])),
   )
+  const [submissions, setSubmissions] = useState<Submission[]>(INITIAL_SUBMISSIONS)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [drawerOpen, setDrawerOpen] = useState(openDrawer)
+  const [activeSubmissionId, setActiveSubmissionId] = useState<string | null>(null)
 
   const showArchived = filterSelections['Display Status']?.includes('Archived') ?? false
-  const filteredSubmissions = SUBMISSIONS.filter(s => {
+  const filteredSubmissions = submissions.filter(s => {
     if (s.archived && !showArchived) return false
     if (!search.trim()) return true
     return (
@@ -419,14 +421,14 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
             <button
               onClick={() =>
                 setSelectedIds(prev =>
-                  prev.size === SUBMISSIONS.length
+                  prev.size === submissions.length
                     ? new Set()
-                    : new Set(SUBMISSIONS.map(s => s.id))
+                    : new Set(submissions.map(s => s.id))
                 )
               }
               className="size-9 flex items-center justify-center rounded-md hover:bg-accent transition-colors"
             >
-              <CircleCheck className={cn('size-4 transition-colors', selectedIds.size === SUBMISSIONS.length ? 'text-[#f91616]' : 'text-foreground')} />
+              <CircleCheck className={cn('size-4 transition-colors', selectedIds.size === submissions.length ? 'text-[#f91616]' : 'text-foreground')} />
             </button>
           </Tooltip>
           <Tooltip label="Export CSV">
@@ -640,7 +642,8 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
       {/* Cards / List */}
       {filteredSubmissions.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-3 flex-1 min-h-[400px]">
-          <img src="https://www.figma.com/api/mcp/asset/f6eb4b32-3525-4047-96ae-7fa1d23c2dcb" alt="" className="size-[120px]" />
+          <img src="https://www.figma.com/api/mcp/asset/f6eb4b32-3525-4047-96ae-7fa1d23c2dcb" alt="" className="size-[120px] dark:hidden" />
+          <img src="https://www.figma.com/api/mcp/asset/e977927e-3031-4146-a73b-69318d7894a0" alt="" className="size-[120px] hidden dark:block" />
           <p className="text-sm text-muted-foreground">No matching submissions</p>
         </div>
       ) : view === 'grid' ? (
@@ -651,7 +654,7 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
               submission={s}
               selected={selectedIds.has(s.id)}
               onToggle={() => toggleSelected(s.id)}
-              onOpen={() => setDrawerOpen(true)}
+              onOpen={() => { setActiveSubmissionId(s.id); setDrawerOpen(true) }}
             />
           ))}
         </div>
@@ -663,13 +666,22 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
               submission={s}
               selected={selectedIds.has(s.id)}
               onToggle={() => toggleSelected(s.id)}
-              onOpen={() => setDrawerOpen(true)}
+              onOpen={() => { setActiveSubmissionId(s.id); setDrawerOpen(true) }}
             />
           ))}
         </div>
       )}
 
-      <SubmissionDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+      <SubmissionDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onArchive={() => {
+          if (activeSubmissionId) {
+            setSubmissions(prev => prev.map(s => s.id === activeSubmissionId ? { ...s, archived: true } : s))
+            setToast('Submissions archived successfully')
+          }
+        }}
+      />
 
       {/* Selection island */}
       {selectedIds.size > 0 && (
@@ -700,7 +712,14 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
                 </button>
               </Tooltip>
               <Tooltip label="Archive">
-                <button onClick={() => setToast('Submissions archived successfully')} className="size-9 flex items-center justify-center rounded-full bg-background hover:bg-accent transition-colors">
+                <button
+                  onClick={() => {
+                    setSubmissions(prev => prev.map(s => selectedIds.has(s.id) ? { ...s, archived: true } : s))
+                    setSelectedIds(new Set())
+                    setToast('Submissions archived successfully')
+                  }}
+                  className="size-9 flex items-center justify-center rounded-full bg-background hover:bg-accent transition-colors"
+                >
                   <Archive className="size-4 text-foreground" />
                 </button>
               </Tooltip>

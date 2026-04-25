@@ -42,9 +42,10 @@ const NOTE_OPTIONS: Record<string, string[]> = {
 interface Props {
   open: boolean
   onClose: () => void
+  onArchive?: () => void
 }
 
-export function SubmissionDrawer({ open, onClose }: Props) {
+export function SubmissionDrawer({ open, onClose, onArchive }: Props) {
   const [openSection, setOpenSection] = useState<string | null>(null)
   const [noteSearch, setNoteSearch] = useState('')
   const [selectedNotes, setSelectedNotes] = useState<Record<string, string[]>>({
@@ -117,9 +118,9 @@ export function SubmissionDrawer({ open, onClose }: Props) {
     }))
 
   const BADGE_STYLE: Record<string, { bg: string; text: string }> = {
-    'Account Management':  { bg: 'from-[#f7fee7] to-white', text: 'text-[#3f6212]' },
-    'Internal Store Notes': { bg: 'from-[#eef2ff] to-white', text: 'text-[#1e1a4d]' },
-    'Action Items':        { bg: 'from-[#eef2ff] to-white', text: 'text-[#1e1a4d]' },
+    'Account Management':  { bg: 'from-soft-rose to-brighter', text: 'text-soft-rose-foreground' },
+    'Internal Store Notes': { bg: 'from-soft-indigo to-brighter', text: 'text-soft-indigo-foreground' },
+    'Action Items':        { bg: 'from-soft-lime to-brighter', text: 'text-soft-lime-foreground' },
   }
 
   return (
@@ -131,7 +132,7 @@ export function SubmissionDrawer({ open, onClose }: Props) {
       />
 
       {/* Drawer */}
-      <div className="fixed right-0 top-0 h-full w-[640px] bg-card z-50 overflow-y-auto overflow-x-hidden scroll-parent shadow-2xl animate-in slide-in-from-right duration-300 ease-out flex flex-col gap-6">
+      <div className="fixed right-0 top-0 h-full w-[640px] bg-card z-50 overflow-y-auto overflow-x-hidden scroll-parent shadow-2xl animate-in slide-in-from-right duration-300 ease-out flex flex-col gap-6 pb-6">
 
         {/* Hero image */}
         <div className="relative shrink-0">
@@ -187,7 +188,10 @@ export function SubmissionDrawer({ open, onClose }: Props) {
                 </button>
               </Tooltip>
               <Tooltip label="Archive">
-                <button className="size-9 flex items-center justify-center rounded-full bg-secondary hover:bg-accent transition-colors">
+                <button
+                  onClick={() => { onArchive?.(); onClose() }}
+                  className="size-9 flex items-center justify-center rounded-full bg-secondary hover:bg-accent transition-colors"
+                >
                   <Archive className="size-4 text-foreground" />
                 </button>
               </Tooltip>
@@ -241,7 +245,7 @@ export function SubmissionDrawer({ open, onClose }: Props) {
                       <span
                         key={tag}
                         className={cn(
-                          'inline-flex items-center gap-1 px-3 py-1.5 rounded-md border border-black/5 bg-gradient-to-r text-xs font-semibold font-sans whitespace-nowrap',
+                          'inline-flex items-center gap-1 px-3 py-1.5 rounded-md border border-border bg-gradient-to-r text-xs font-semibold font-sans whitespace-nowrap',
                           badge.bg, badge.text,
                         )}
                       >

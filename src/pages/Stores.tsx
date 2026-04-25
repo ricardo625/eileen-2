@@ -627,7 +627,8 @@ export function StoresPage({ onLearnMore, onNavigateToShelf }: { onLearnMore?: (
             {/* Data rows */}
             {filteredRows.length === 0 && (
               <div className="flex flex-col items-center justify-center gap-3 py-24">
-                <img src="https://www.figma.com/api/mcp/asset/d8837dbf-801d-4d35-9390-d176b4a144b7" alt="" className="size-[120px]" />
+                <img src="https://www.figma.com/api/mcp/asset/d8837dbf-801d-4d35-9390-d176b4a144b7" alt="" className="size-[120px] dark:hidden" />
+                <img src="https://www.figma.com/api/mcp/asset/e5fc148b-4217-4586-90af-038c05bbc1af" alt="" className="size-[120px] hidden dark:block" />
                 <p className="text-sm text-muted-foreground">No matched banners</p>
               </div>
             )}

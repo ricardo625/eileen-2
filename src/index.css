@@ -94,6 +94,7 @@
   scrollbar-color: var(--sidebar-border) transparent;
 }
 
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -412,6 +413,12 @@
   --soft-lime-foreground: #a3e635;
   --soft-green: #0a2e15;
   --soft-green-foreground: #86efac;
+  --soft-rose: #4d0218;
+  --soft-rose-foreground: #fda4af;
+  --soft-indigo: #1e1a4d;
+  --soft-indigo-foreground: #a5b4fc;
+  --soft-fuchsia: #4b004f;
+  --soft-fuchsia-foreground: #e879f9;
   --border-alpha: #ffffff0d;
 }
 

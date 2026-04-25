@@ -7,7 +7,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { SubmissionDrawer } from '@/components/SubmissionDrawer'
-import { Toast } from '@/components/ui/Toast'
+import { ToastStack, type ToastItem } from '@/components/ui/Toast'
 import { ShareDialog } from '@/components/ShareDialog'
 import { Tooltip } from '@/components/ui/Tooltip'
 
@@ -16,6 +16,9 @@ const imgStore2 = 'https://www.figma.com/api/mcp/asset/3b9ad25a-73bf-4493-8225-d
 const imgStore3 = 'https://www.figma.com/api/mcp/asset/8373099e-bda5-4eaa-91b1-4c2bac4c2c66'
 
 type BadgeVariant = 'flagged' | 'notes' | 'no-stock' | 'low-stock'
+const BADGE_ORDER: BadgeVariant[] = ['flagged', 'notes', 'no-stock', 'low-stock']
+const sortBadges = (badges: BadgeVariant[]) =>
+  [...badges].sort((a, b) => BADGE_ORDER.indexOf(a) - BADGE_ORDER.indexOf(b))
 
 const BADGE_CONFIG: Record<BadgeVariant, {
   label: string
@@ -223,7 +226,7 @@ function SubmissionCard({ submission, selected, onToggle, onOpen }: {
         )}
 
         <div className="flex items-center gap-1.5 pt-4">
-          {submission.badges.map(b => (
+          {sortBadges(submission.badges).map(b => (
             b === 'notes' && submission.noteCount
               ? <Tooltip key={b} label={`${submission.noteCount} note${submission.noteCount !== 1 ? 's' : ''}`}><Badge variant={b} /></Tooltip>
               : <Badge key={b} variant={b} />
@@ -302,7 +305,7 @@ function SubmissionListRow({ submission, selected, onToggle, onOpen }: {
           )}
         </div>
         <div className="flex-1 flex items-center justify-end gap-1.5 min-w-0">
-          {submission.badges.map(b => (
+          {sortBadges(submission.badges).map(b => (
             b === 'notes' && submission.noteCount
               ? <Tooltip key={b} label={`${submission.noteCount} note${submission.noteCount !== 1 ? 's' : ''}`}><Badge variant={b} /></Tooltip>
               : <Badge key={b} variant={b} />
@@ -369,10 +372,25 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
   const [signalOpen, setSignalOpen] = useState(false)
   const [activeSignals, setActiveSignals] = useState<string[]>([])
   const [islandSendOpen, setIslandSendOpen] = useState(false)
-  const [islandFlagged, setIslandFlagged] = useState(false)
-  const [toast, setToast] = useState<string | null>(null)
-  const [undoFn, setUndoFn] = useState<(() => void) | null>(null)
+
+  const [toasts, setToasts] = useState<ToastItem[]>([])
   const [shareOpen, setShareOpen] = useState(false)
+
+  function showToast(msg: string, onUndo?: () => void) {
+    setToasts(prev => [...prev, { id: Date.now() + Math.random(), message: msg, onUndo }])
+  }
+
+  function dismissToast(id: number) {
+    setToasts(prev => prev.filter(t => t.id !== id))
+  }
+
+  function triggerExport(successMsg: string) {
+    let cancelled = false
+    const tid = setTimeout(() => {
+      if (!cancelled) showToast(successMsg, () => {})
+    }, 1800)
+    showToast('Preparing the file...', () => { cancelled = true; clearTimeout(tid) })
+  }
   const filterBtnRef = useRef<HTMLButtonElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const signalBtnRef = useRef<HTMLButtonElement>(null)
@@ -441,7 +459,7 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
           </Tooltip>
           <Tooltip label="Export CSV">
             <button
-              onClick={() => setToast('Exported to CSV successfully')}
+              onClick={() => triggerExport('Exported to CSV successfully')}
               disabled={selectedIds.size === 0}
               className="size-9 flex items-center justify-center rounded-md hover:bg-accent transition-colors disabled:opacity-40 disabled:pointer-events-none"
             >
@@ -584,7 +602,14 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
             {Object.values(filterSelections).reduce((sum, arr) => sum + arr.length, 0)}
           </span>
         </button>
-        <button onClick={() => setSearch('')} className="h-9 flex items-center px-3 text-sm text-foreground underline hover:opacity-70 transition-opacity shrink-0">
+        <button
+          onClick={() => {
+            setSearch('')
+            setFilterSelections(Object.fromEntries(FILTER_SELECTS.map(k => [k, []])))
+            setActiveSignals([])
+          }}
+          className="h-9 flex items-center px-3 text-sm text-foreground underline hover:opacity-70 transition-opacity shrink-0"
+        >
           Clear
         </button>
 
@@ -713,8 +738,7 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
           if (activeSubmissionId) {
             const snapshot = submissions
             setSubmissions(prev => prev.map(s => s.id === activeSubmissionId ? { ...s, archived: true } : s))
-            setUndoFn(() => () => setSubmissions(snapshot))
-            setToast('Submissions archived successfully')
+            showToast('Submissions archived successfully', () => setSubmissions(snapshot))
           }
         }}
       />
@@ -736,15 +760,35 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
             <div className="flex items-center gap-2">
               <Tooltip label="Flag">
                 <button
-                  onClick={() => setIslandFlagged(f => !f)}
+                  onClick={() => {
+                    const allFlagged = [...selectedIds].every(id =>
+                      submissions.find(s => s.id === id)?.badges.includes('flagged')
+                    )
+                    const snapshot = submissions
+                    if (allFlagged) {
+                      setSubmissions(prev => prev.map(s =>
+                        selectedIds.has(s.id)
+                          ? { ...s, badges: s.badges.filter(b => b !== 'flagged') }
+                          : s
+                      ))
+                      showToast('Submissions unflagged successfully', () => setSubmissions(snapshot))
+                    } else {
+                      setSubmissions(prev => prev.map(s =>
+                        selectedIds.has(s.id) && !s.badges.includes('flagged')
+                          ? { ...s, badges: [...s.badges, 'flagged'] }
+                          : s
+                      ))
+                      showToast('Submissions flagged successfully', () => setSubmissions(snapshot))
+                    }
+                  }}
                   className={cn(
                     'size-9 flex items-center justify-center rounded-full transition-colors',
-                    islandFlagged
+                    [...selectedIds].every(id => submissions.find(s => s.id === id)?.badges.includes('flagged'))
                       ? 'bg-gradient-to-r from-soft-red to-brighter'
                       : 'bg-background hover:bg-accent',
                   )}
                 >
-                  <FlagTriangleRight className={cn('size-4 transition-colors', islandFlagged ? 'text-[#f91616]' : 'text-foreground')} />
+                  <FlagTriangleRight className={cn('size-4 transition-colors', [...selectedIds].every(id => submissions.find(s => s.id === id)?.badges.includes('flagged')) ? 'text-[#f91616]' : 'text-foreground')} />
                 </button>
               </Tooltip>
               <Tooltip label="Archive">
@@ -754,8 +798,7 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
                     const restoredIds = new Set(selectedIds)
                     setSubmissions(prev => prev.map(s => selectedIds.has(s.id) ? { ...s, archived: true } : s))
                     setSelectedIds(new Set())
-                    setUndoFn(() => () => { setSubmissions(snapshot); setSelectedIds(restoredIds) })
-                    setToast('Submissions archived successfully')
+                    showToast('Submissions archived successfully', () => { setSubmissions(snapshot); setSelectedIds(restoredIds) })
                   }}
                   className="size-9 flex items-center justify-center rounded-full bg-background hover:bg-accent transition-colors"
                 >
@@ -784,7 +827,7 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
                     ].map(({ label, Icon, toast: msg }) => (
                       <button
                         key={label}
-                        onClick={() => { setIslandSendOpen(false); if (msg) setToast(msg); if (label === 'Share URL') setShareOpen(true) }}
+                        onClick={() => { setIslandSendOpen(false); if (msg) triggerExport(msg); if (label === 'Share URL') setShareOpen(true) }}
                         className="flex items-center gap-3 h-11 px-4 rounded-xl hover:bg-accent transition-colors text-left w-full"
                       >
                         <Icon className="size-4 text-muted-foreground shrink-0" />
@@ -799,8 +842,8 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
         </div>
       )}
 
-      {toast && <Toast message={toast} onDismiss={() => { setToast(null); setUndoFn(null) }} onUndo={undoFn ?? undefined} />}
-      {shareOpen && <ShareDialog onClose={() => setShareOpen(false)} onCopy={() => setToast('Link copied successfully')} />}
+      <ToastStack toasts={toasts} onDismiss={dismissToast} />
+      {shareOpen && <ShareDialog onClose={() => setShareOpen(false)} onCopy={() => showToast('Link copied successfully')} />}
     </div>
   )
 }

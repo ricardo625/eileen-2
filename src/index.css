@@ -17,6 +17,16 @@
   to   { opacity: 1; scale: 1; }
 }
 
+@keyframes toast-progress {
+  from { width: calc(100% + 2px); }
+  to   { width: 0; }
+}
+
+@keyframes toast-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
 .sidebar-scroll::-webkit-scrollbar {
   width: 4px;
 }

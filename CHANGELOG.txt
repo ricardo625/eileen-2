@@ -9,3 +9,10 @@ Changes are appended here after every user-requested modification.
 - [Shelf] Filters and signals default to deselected on page load
 - [Shelf] Per-page dropdown (10 / 25 / 50) with working slice pagination
 - [Shelf] Export button disabled when no cards selected
+- [Shelf] Island Flag button adds flagged badge to selected cards that don't have it, with undo support
+- [Shelf] Badge display order enforced: Flagged → Notes → Stock status
+- [Shelf] Export actions show "Preparing the file..." toast then success toast
+- [Shelf] Island Flag button toggles — flags unflagged cards, unflags all-flagged selection
+- [Component: Toast] Added regressive progress bar that drains over the toast duration
+- [Component: Toast] Rebuilt to match Figma: 388px, horizontal layout, bg-darker regressive bar pinned to bottom
+- [Component: Toast] Toasts now stack on top of each other with individual dismiss and undo per toast

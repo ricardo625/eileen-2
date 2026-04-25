@@ -130,7 +130,7 @@ function StoreMapPopover({ store, anchorEl, onClose, onLearnMore }: {
         top,
         left,
         animation: 'popoverIn 150ms ease-out forwards',
-        transition: 'top 120ms ease-out, left 120ms ease-out',
+        transition: 'top 300ms ease-out, left 300ms ease-out',
       }}
     >
       {/* Header */}

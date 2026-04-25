@@ -150,7 +150,7 @@ function SubmissionCard({ submission, selected, onToggle, onOpen }: {
       className={cn(
         'rounded-2xl shadow-[0px_2px_2px_0px_var(--shadow)] flex flex-col gap-4 pt-2.5 px-2.5 pb-4 cursor-pointer transition-all',
         selected
-          ? 'border-2 border-primary bg-gradient-to-b from-[rgba(249,185,175,0.35)] to-[rgba(255,255,255,0.35)]'
+          ? 'border-2 border-primary bg-gradient-to-b from-[rgba(249,185,175,0.35)] to-[rgba(255,255,255,0.35)] dark:from-muted dark:to-muted'
           : 'border border-border bg-card',
       )}
     >
@@ -257,7 +257,7 @@ function SubmissionListRow({ submission, selected, onToggle, onOpen }: {
       className={cn(
         'rounded-2xl shadow-[0px_2px_2px_0px_var(--shadow)] flex items-center gap-4 pl-6 pr-2.5 py-2.5 cursor-pointer transition-all',
         selected
-          ? 'border-2 border-primary bg-gradient-to-b from-[rgba(249,185,175,0.35)] to-[rgba(255,255,255,0.35)]'
+          ? 'border-2 border-primary bg-gradient-to-b from-[rgba(249,185,175,0.35)] to-[rgba(255,255,255,0.35)] dark:from-muted dark:to-muted'
           : 'border border-border bg-card',
       )}
     >
@@ -373,6 +373,7 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
   const [islandSendOpen, setIslandSendOpen] = useState(false)
   const [islandFlagged, setIslandFlagged] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+  const [undoFn, setUndoFn] = useState<(() => void) | null>(null)
   const [shareOpen, setShareOpen] = useState(false)
   const filterBtnRef = useRef<HTMLButtonElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -677,7 +678,9 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
         onClose={() => setDrawerOpen(false)}
         onArchive={() => {
           if (activeSubmissionId) {
+            const snapshot = submissions
             setSubmissions(prev => prev.map(s => s.id === activeSubmissionId ? { ...s, archived: true } : s))
+            setUndoFn(() => () => setSubmissions(snapshot))
             setToast('Submissions archived successfully')
           }
         }}
@@ -714,8 +717,11 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
               <Tooltip label="Archive">
                 <button
                   onClick={() => {
+                    const snapshot = submissions
+                    const restoredIds = new Set(selectedIds)
                     setSubmissions(prev => prev.map(s => selectedIds.has(s.id) ? { ...s, archived: true } : s))
                     setSelectedIds(new Set())
+                    setUndoFn(() => () => { setSubmissions(snapshot); setSelectedIds(restoredIds) })
                     setToast('Submissions archived successfully')
                   }}
                   className="size-9 flex items-center justify-center rounded-full bg-background hover:bg-accent transition-colors"
@@ -760,7 +766,7 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
         </div>
       )}
 
-      {toast && <Toast message={toast} onDismiss={() => setToast(null)} />}
+      {toast && <Toast message={toast} onDismiss={() => { setToast(null); setUndoFn(null) }} onUndo={undoFn ?? undefined} />}
       {shareOpen && <ShareDialog onClose={() => setShareOpen(false)} onCopy={() => setToast('Link copied successfully')} />}
     </div>
   )

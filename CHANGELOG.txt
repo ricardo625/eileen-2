@@ -17,3 +17,4 @@ Changes are appended here after every user-requested modification.
 - [Component: Toast] Rebuilt to match Figma: 388px, horizontal layout, bg-darker regressive bar pinned to bottom
 - [Component: Toast] Toasts now stack on top of each other with individual dismiss and undo per toast
 - [Global] Added Microsoft Clarity tracking script (tag: wheqsx3kbv)
+- [App] Added React Router with routes: /shelf, /stores, /ai-lean (default redirects to /shelf)

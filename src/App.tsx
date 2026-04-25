@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom'
 import { Moon, Sun } from 'lucide-react'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Tooltip } from '@/components/ui/Tooltip'
@@ -7,25 +8,32 @@ import { SubmissionsPage } from '@/pages/Submissions'
 import { StoresPage } from '@/pages/Stores'
 
 type Theme = 'theme-4' | 'dark'
-type Page = 'ai-lean' | 'submissions' | 'stores'
+
+const PATH_TO_PAGE: Record<string, string> = {
+  '/shelf':   'submissions',
+  '/stores':  'stores',
+  '/ai-lean': 'ai-lean',
+}
 
 export default function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [theme, setTheme] = useState<Theme>('theme-4')
-  const [page, setPage] = useState<Page>('submissions')
-  const [submissionsDrawerOpen, setSubmissionsDrawerOpen] = useState(false)
 
-  function handleLearnMore() {
-    setPage('submissions')
-    setSubmissionsDrawerOpen(true)
-  }
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  const activePage = PATH_TO_PAGE[location.pathname] ?? 'submissions'
 
   useEffect(() => {
     document.body.className = theme
   }, [theme])
 
   const isDark = theme === 'dark'
-  const isFullPage = page === 'submissions' || page === 'stores'
+  const isFullPage = activePage === 'submissions' || activePage === 'stores'
+
+  function handleLearnMore() {
+    navigate('/shelf')
+  }
 
   return (
     <div className={`${theme} h-screen bg-background flex overflow-hidden`}>
@@ -33,8 +41,11 @@ export default function App() {
         <Sidebar
           collapsed={sidebarCollapsed}
           onToggle={() => setSidebarCollapsed(c => !c)}
-          activePage={page}
-          onNavigate={p => setPage(p as Page)}
+          activePage={activePage}
+          onNavigate={page => {
+            const path = Object.entries(PATH_TO_PAGE).find(([, p]) => p === page)?.[0] ?? '/shelf'
+            navigate(path)
+          }}
         />
       </div>
 
@@ -52,9 +63,12 @@ export default function App() {
           </button>
         </Tooltip>
 
-        {page === 'submissions' && <SubmissionsPage openDrawer={submissionsDrawerOpen} onDrawerClose={() => setSubmissionsDrawerOpen(false)} />}
-        {page === 'stores'      && <StoresPage onLearnMore={handleLearnMore} onNavigateToShelf={() => { setPage('submissions'); setSubmissionsDrawerOpen(false) }} />}
-        {page === 'ai-lean'     && <AiLeanPage />}
+        <Routes>
+          <Route path="/shelf"   element={<SubmissionsPage />} />
+          <Route path="/stores"  element={<StoresPage onLearnMore={handleLearnMore} onNavigateToShelf={() => navigate('/shelf')} />} />
+          <Route path="/ai-lean" element={<AiLeanPage />} />
+          <Route path="*"        element={<Navigate to="/shelf" replace />} />
+        </Routes>
       </main>
     </div>
   )

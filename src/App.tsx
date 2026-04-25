@@ -15,6 +15,11 @@ const PATH_TO_PAGE: Record<string, string> = {
   '/ai-lean': 'ai-lean',
 }
 
+function getActivePage(pathname: string) {
+  if (pathname.startsWith('/shelf')) return 'submissions'
+  return PATH_TO_PAGE[pathname] ?? 'submissions'
+}
+
 export default function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [theme, setTheme] = useState<Theme>('theme-4')
@@ -22,7 +27,7 @@ export default function App() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const activePage = PATH_TO_PAGE[location.pathname] ?? 'submissions'
+  const activePage = getActivePage(location.pathname)
 
   useEffect(() => {
     document.body.className = theme
@@ -64,7 +69,8 @@ export default function App() {
         </Tooltip>
 
         <Routes>
-          <Route path="/shelf"   element={<SubmissionsPage />} />
+          <Route path="/shelf"                    element={<SubmissionsPage />} />
+          <Route path="/shelf/detail/:submissionId" element={<SubmissionsPage />} />
           <Route path="/stores"  element={<StoresPage onLearnMore={handleLearnMore} onNavigateToShelf={() => navigate('/shelf')} />} />
           <Route path="/ai-lean" element={<AiLeanPage />} />
           <Route path="*"        element={<Navigate to="/shelf" replace />} />

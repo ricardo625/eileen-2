@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 import { createPortal } from 'react-dom'
 import {
   Archive, ChevronDown, CircleCheck, ChevronsDown, CircleDashed, FileDown,
@@ -324,7 +325,9 @@ const RECENT_SEARCHES = [
   'Safeway Long Beach',
 ]
 
-export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; onDrawerClose?: () => void }) {
+export function SubmissionsPage() {
+  const { submissionId } = useParams<{ submissionId: string }>()
+  const navigate = useNavigate()
   const [search, setSearch] = useState('')
   const [searchFocused, setSearchFocused] = useState(false)
   const searchWrapperRef = useRef<HTMLDivElement>(null)
@@ -338,9 +341,19 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
   )
   const [submissions, setSubmissions] = useState<Submission[]>(INITIAL_SUBMISSIONS)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
-  const [drawerOpen, setDrawerOpen] = useState(openDrawer)
-  const [activeSubmissionId, setActiveSubmissionId] = useState<string | null>(null)
+  const [activeSubmissionId, setActiveSubmissionId] = useState<string | null>(submissionId ?? null)
   const [pageSize, setPageSize] = useState(25)
+
+  const drawerOpen = !!submissionId
+
+  function openDrawerFor(id: string) {
+    setActiveSubmissionId(id)
+    navigate(`/shelf/detail/${id}`)
+  }
+
+  function closeDrawer() {
+    navigate('/shelf')
+  }
 
   const showArchived = filterSelections['Display Status']?.includes('Archived') ?? false
   const filteredSubmissions = submissions.filter(s => {
@@ -351,8 +364,6 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
       s.address.toLowerCase().includes(search.toLowerCase())
     )
   }).slice(0, pageSize)
-
-  useEffect(() => { if (openDrawer) setDrawerOpen(true) }, [openDrawer])
 
   const toggleFilterOption = (select: string, option: string) =>
     setFilterSelections(prev => {
@@ -713,7 +724,7 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
               submission={s}
               selected={selectedIds.has(s.id)}
               onToggle={() => toggleSelected(s.id)}
-              onOpen={() => { setActiveSubmissionId(s.id); setDrawerOpen(true) }}
+              onOpen={() => openDrawerFor(s.id)}
             />
           ))}
         </div>
@@ -725,7 +736,7 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
               submission={s}
               selected={selectedIds.has(s.id)}
               onToggle={() => toggleSelected(s.id)}
-              onOpen={() => { setActiveSubmissionId(s.id); setDrawerOpen(true) }}
+              onOpen={() => openDrawerFor(s.id)}
             />
           ))}
         </div>
@@ -733,7 +744,7 @@ export function SubmissionsPage({ openDrawer = false }: { openDrawer?: boolean; 
 
       <SubmissionDrawer
         open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
+        onClose={closeDrawer}
         onArchive={() => {
           if (activeSubmissionId) {
             const snapshot = submissions

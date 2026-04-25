@@ -233,7 +233,7 @@ function MapView({ onLearnMore }: { onLearnMore: () => void }) {
     setSelected(prev => prev?.store.id === store.id ? null : { store, el })
     if (isOpening) {
       // track map pin click — fires on open only, not on dismiss
-      trackEvent('click_pin_store_map', { store_id: store.id, coordinates: { x: store.x, y: store.y } })
+      trackEvent('click_pin_store_map', { store_id: store.id, coord_x: store.x, coord_y: store.y })
     }
   }
 

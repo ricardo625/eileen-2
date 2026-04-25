@@ -3,6 +3,11 @@ Changes are appended here after every user-requested modification.
 
 ---
 
+[2026-04-25] Fix Clarity tracking to match official API
+- [Global] clarity.ts: events now use clarity("event", name) per the Clarity Events API
+- [Global] clarity.ts: tags use clarity("set", key, String(value)) — strings only, no objects
+- [Stores] Flattened coordinates object into coord_x / coord_y string tags
+
 [2026-04-25] Always-visible main page scrollbar
 - [Global] Added .always-scroll CSS class — scrollbar always visible (4px, rgba thumb)
 - [App] Main content area uses always-scroll instead of hover-scroll

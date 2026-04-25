@@ -3,6 +3,11 @@ Changes are appended here after every user-requested modification.
 
 ---
 
+[2026-04-25] Shelf: 20 new submission cards
+- [Shelf] Added 15 Unsplash store-shelf images (imgU01–imgU15)
+- [Shelf] Added 20 new cards: Ralph's Hollywood, Safeway Burbank, Target Pasadena, Vons West Hollywood, Stater Bros Pomona, Sprouts Culver City, Whole Foods El Segundo, Trader Joe's Silver Lake, Smart & Final Inglewood, Food 4 Less Compton, Ralph's Brentwood, Gelson's Studio City, Bristol Farms Manhattan Beach, WinCo Foods Fontana, Cardenas Anaheim, Safeway Redondo Beach, Target Torrance, Vons San Pedro, Stater Bros Upland, Ralph's Encino
+- [Shelf] Cards include varied badges, noteCount, imageCount, completedBy, and two archived entries
+
 [2026-04-25] Clarity export & share tracking
 - [Shelf] Track header export button: click_export_shelf (format: csv, source: header, selected_count)
 - [Shelf Island] Track island PDF/CSV export: click_export_shelf (format: pdf|csv, source: island, selected_count)

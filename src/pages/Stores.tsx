@@ -484,9 +484,6 @@ function MapView({ onLearnMore }: { onLearnMore: (submissionId: string) => void 
   )
 }
 
-function countDotSignal(label: string) {
-  return STORE_DOTS.filter(d => d.signals.some(s => s.label === label)).length
-}
 
 const SIGNAL_CARDS = [
   { label: 'Flagged',    count: SHELF_SIGNAL_COUNTS['Flagged']            ?? 0, Icon: FlagTriangleRight, iconClass: 'text-orange-400'       },

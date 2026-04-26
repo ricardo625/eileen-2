@@ -7,7 +7,7 @@ declare global {
 function clarityCall(method: string, ...args: unknown[]) {
   if (typeof window !== 'undefined' && typeof window.clarity === 'function') {
     window.clarity(method, ...args)
-    console.debug('[Clarity ✓]', method, ...args)
+    console.log('[Clarity ✓]', method, ...args)
   } else {
     console.warn('[Clarity ✗] window.clarity not available —', method, ...args)
   }

@@ -827,6 +827,11 @@ export function SubmissionsPage() {
   const [batch, setBatch] = useState(12)
   const [visibleCount, setVisibleCount] = useState(12)
   const [batchOpen, setBatchOpen] = useState(false)
+  const [signalOpen, setSignalOpen] = useState(false)
+  const [activeSignals, setActiveSignals] = useState<string[]>([])
+  const [islandSendOpen, setIslandSendOpen] = useState(false)
+  const [toasts, setToasts] = useState<ToastItem[]>([])
+  const [shareOpen, setShareOpen] = useState(false)
   const batchBtnRef = useRef<HTMLButtonElement>(null)
   const batchDropdownRef = useRef<HTMLDivElement>(null)
   const sentinelRef = useRef<HTMLDivElement>(null)
@@ -911,13 +916,6 @@ export function SubmissionsPage() {
       next.has(id) ? next.delete(id) : next.add(id)
       return next
     })
-  const [signalOpen, setSignalOpen] = useState(false)
-  const [activeSignals, setActiveSignals] = useState<string[]>([])
-  const [islandSendOpen, setIslandSendOpen] = useState(false)
-
-  const [toasts, setToasts] = useState<ToastItem[]>([])
-  const [shareOpen, setShareOpen] = useState(false)
-
   function showToast(msg: string, onUndo?: () => void) {
     setToasts(prev => [...prev, { id: Date.now() + Math.random(), message: msg, onUndo }])
   }

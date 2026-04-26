@@ -41,20 +41,24 @@ export default function App() {
     navigate(`/shelf/detail/${submissionId}`)
   }
 
+  const isDesignAssets = activePage === 'design-assets'
+
   return (
     <div className={`${theme} h-screen bg-background flex overflow-hidden`}>
-      <div className="shrink-0 p-4 h-full">
-        <Sidebar
-          collapsed={sidebarCollapsed}
-          onToggle={() => setSidebarCollapsed(c => !c)}
-          activePage={activePage}
-          shelfBadge={SHELF_SIGNAL_TOTAL}
-          onNavigate={page => {
-            const path = Object.entries(PATH_TO_PAGE).find(([, p]) => p === page)?.[0] ?? '/shelf'
-            navigate(path)
-          }}
-        />
-      </div>
+      {!isDesignAssets && (
+        <div className="shrink-0 p-4 h-full">
+          <Sidebar
+            collapsed={sidebarCollapsed}
+            onToggle={() => setSidebarCollapsed(c => !c)}
+            activePage={activePage}
+            shelfBadge={SHELF_SIGNAL_TOTAL}
+            onNavigate={page => {
+              const path = Object.entries(PATH_TO_PAGE).find(([, p]) => p === page)?.[0] ?? '/shelf'
+              navigate(path)
+            }}
+          />
+        </div>
+      )}
 
       <main className={`relative flex-1 overflow-y-auto overflow-x-hidden always-scroll ${isFullPage ? '' : 'flex items-center justify-center'}`}>
         {/* Theme toggle */}

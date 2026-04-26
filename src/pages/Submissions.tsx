@@ -605,10 +605,13 @@ export const SHELF_SIGNAL_COUNTS: Record<string, number> = Object.fromEntries(
 
 export const SHELF_SUBMISSION_TOTAL = INITIAL_SUBMISSIONS.length
 
+const RISK_TOTAL = Object.keys(STORE_RISK_MAP).length
+
 const SIGNAL_PCT: Record<string, number> = Object.fromEntries(
   ALL_SIGNAL_OPTIONS.map(sig => {
     const count = INITIAL_SUBMISSIONS.filter(s => signalMatches(sig, s)).length
-    return [sig, Math.round((count / INITIAL_SUBMISSIONS.length) * 100)]
+    const denominator = RISK_OPTIONS.includes(sig) ? RISK_TOTAL : INITIAL_SUBMISSIONS.length
+    return [sig, Math.round((count / denominator) * 100)]
   })
 )
 

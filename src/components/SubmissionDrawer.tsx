@@ -37,6 +37,19 @@ const PRODUCT_POOL = [
   'Watermelon Splash - PET Bottles',
 ]
 
+const PRODUCT_IMAGES = [
+  'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=80&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=80&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1595981267035-7b04ca84a82d?w=80&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1581098365948-6a5a912b7a49?w=80&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1543253687-c931c8e01820?w=80&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1563746924237-f81d1ab37df2?w=80&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?w=80&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=80&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=80&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=80&auto=format&fit=crop',
+]
+
 function generateProducts(id: string, badges: string[]) {
   const n = parseInt(id)
   const count = 3 + (n % 3)
@@ -55,6 +68,7 @@ function generateProducts(id: string, badges: string[]) {
     return {
       status,
       name:      PRODUCT_POOL[idx],
+      image:     PRODUCT_IMAGES[idx],
       price:     `$${base.toFixed(2).replace('.', ',')}`,
       salePrice: `$${(base + delta).toFixed(2).replace('.', ',')}`,
       priceDown: delta < 0,
@@ -479,7 +493,10 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
                     <span className="inline-flex">{STATUS_ICON[p.status]}</span>
                   </Tooltip>
                 </div>
-                <span className="w-[140px] font-sans font-medium text-sm text-muted-foreground leading-none truncate shrink-0">{p.name}</span>
+                <div className="w-[140px] flex items-center gap-2 shrink-0 min-w-0">
+                  <img src={p.image} alt={p.name} className="size-[31px] rounded object-cover shrink-0" />
+                  <span className="font-sans font-medium text-sm text-muted-foreground leading-none truncate">{p.name}</span>
+                </div>
                 <span className="w-[81px] font-sans font-medium text-sm text-green leading-none shrink-0">{p.price}</span>
                 <span className={cn('w-[104px] font-sans font-medium text-sm leading-none shrink-0', p.priceDown ? 'text-[var(--red,#f91616)]' : 'text-muted-foreground')}>
                   {p.salePrice}

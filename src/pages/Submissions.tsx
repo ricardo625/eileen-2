@@ -928,16 +928,7 @@ export function SubmissionsPage() {
 
     // --- Signals ---
     if (activeSignals.length > 0) {
-      const matches = activeSignals.some(sig => {
-        if (sig === 'Flagged')              return s.badges.includes('flagged')
-        if (sig === 'Out of Stock')         return s.badges.includes('no-stock')
-        if (sig === 'Low Stock')            return s.badges.includes('low-stock')
-        if (sig === 'Good Stock')           return !s.badges.includes('no-stock') && !s.badges.includes('low-stock')
-        if (sig === 'Notes')               return s.badges.includes('notes')
-        if (sig === 'Missing Product')      return cardExtraSignals(s.id).includes('Missing Product')
-        if (sig === 'Promotional Pricing')  return cardExtraSignals(s.id).includes('Promotional Pricing')
-        return false
-      })
+      const matches = activeSignals.some(sig => signalMatches(sig, s))
       if (!matches) return false
     }
 

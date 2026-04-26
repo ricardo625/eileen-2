@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
+import { STORE_RISK_MAP } from '@/lib/storeRiskMap'
 import { createPortal } from 'react-dom'
 import {
   Archive, ChevronDown, CircleCheck, ChevronsDown, CircleDashed, FileDown,
@@ -584,13 +585,6 @@ const RISK_OPTIONS = ['Low Risk', 'Medium Risk', 'High Risk']
 
 const ALL_SIGNAL_OPTIONS = [...SIGNAL_OPTIONS, ...RISK_OPTIONS]
 
-function cardRisk(id: string): 'Low Risk' | 'Medium Risk' | 'High Risk' {
-  const n = parseInt(id)
-  if (n % 3 === 0) return 'High Risk'
-  if (n % 3 === 1) return 'Medium Risk'
-  return 'Low Risk'
-}
-
 function signalMatches(sig: string, s: Submission): boolean {
   if (sig === 'Flagged')             return s.badges.includes('flagged')
   if (sig === 'Out of Stock')        return s.badges.includes('no-stock')
@@ -599,9 +593,9 @@ function signalMatches(sig: string, s: Submission): boolean {
   if (sig === 'Notes')               return s.badges.includes('notes')
   if (sig === 'Missing Product')     return cardExtraSignals(s.id).includes('Missing Product')
   if (sig === 'Promotional Pricing') return cardExtraSignals(s.id).includes('Promotional Pricing')
-  if (sig === 'Low Risk')            return cardRisk(s.id) === 'Low Risk'
-  if (sig === 'Medium Risk')         return cardRisk(s.id) === 'Medium Risk'
-  if (sig === 'High Risk')           return cardRisk(s.id) === 'High Risk'
+  if (sig === 'Low Risk')            return STORE_RISK_MAP[s.id] === 'Low'
+  if (sig === 'Medium Risk')         return STORE_RISK_MAP[s.id] === 'Medium'
+  if (sig === 'High Risk')           return STORE_RISK_MAP[s.id] === 'High'
   return false
 }
 

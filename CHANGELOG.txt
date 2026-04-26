@@ -8,6 +8,12 @@ Changes are appended here after every user-requested modification.
 - [Global] clarity.ts: warns if window.clarity is unavailable (helps diagnose script-load failures)
 - Logs are stripped automatically in production builds (import.meta.env.DEV guard)
 
+[2026-04-25] Stores: 20 new map pins matching shelf cards
+- [Stores] Added pins for all 20 new shelf stores (ids 6–25)
+- [Stores] Each pin has accurate signals, risk level, and submissionId linked to its shelf card
+- [Stores] Learn More on any pin opens the shelf with that store's drawer active
+- [Stores] Added StickyNote icon import for Notes signals
+
 [2026-04-25] Stores: Learn More opens shelf drawer for that store
 - [Stores] Added submissionId to each StoreDot mapping to the corresponding shelf submission
 - [Stores] Learn More button navigates to /shelf/detail/:submissionId, opening the drawer directly

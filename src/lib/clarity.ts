@@ -4,11 +4,13 @@ declare global {
   }
 }
 
+const DEV = import.meta.env.DEV
+
 function clarityCall(method: string, ...args: unknown[]) {
   if (typeof window !== 'undefined' && typeof window.clarity === 'function') {
     window.clarity(method, ...args)
-    console.log('[Clarity ✓]', method, ...args)
-  } else {
+    if (DEV) console.log('[Clarity ✓]', method, ...args)
+  } else if (DEV) {
     console.warn('[Clarity ✗] window.clarity not available —', method, ...args)
   }
 }

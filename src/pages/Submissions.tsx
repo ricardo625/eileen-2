@@ -1175,7 +1175,7 @@ export function SubmissionsPage() {
                     <span className="flex-1 font-poppins font-medium text-sm text-sidebar-primary-foreground">
                       {option}
                     </span>
-                    <span className="font-poppins text-xs text-sidebar-primary-foreground shrink-0">
+                    <span className="font-poppins text-sm text-sidebar-primary-foreground/40 shrink-0">
                       {SIGNAL_PCT[option]}%
                     </span>
                   </button>

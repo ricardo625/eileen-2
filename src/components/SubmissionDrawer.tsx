@@ -69,6 +69,27 @@ const NOTE_OPTIONS: Record<string, string[]> = {
   'Action Items':         ['Additional SKU Found', 'Behind Counter', 'Behind Glass', 'Display Not Found', 'Locked Case', 'Promotional Pricing'],
 }
 
+function initNotes(s: SubmissionData | null | undefined): Record<string, string[]> {
+  const empty = { 'Account Management': [], 'Internal Store Notes': [], 'Action Items': [] }
+  if (!s) return empty
+  const n = parseInt(s.id)
+  const accOpts  = NOTE_OPTIONS['Account Management']
+  const noteOpts = NOTE_OPTIONS['Internal Store Notes']
+  const accMgr   = [accOpts[(n - 1) % accOpts.length]]
+  const storeNotes: string[] = []
+  if (s.noteCount && s.noteCount > 0) {
+    const i = n - 1
+    storeNotes.push(noteOpts[i % noteOpts.length])
+    if (s.noteCount > 1) storeNotes.push(noteOpts[(i + 2) % noteOpts.length])
+    if (s.noteCount > 3) storeNotes.push(noteOpts[(i + 4) % noteOpts.length])
+  }
+  const actionItems: string[] = []
+  if (s.badges.includes('flagged') && s.noteCount && s.noteCount > 2) {
+    actionItems.push(noteOpts[(n + 3) % noteOpts.length])
+  }
+  return { 'Account Management': accMgr, 'Internal Store Notes': storeNotes, 'Action Items': actionItems }
+}
+
 export interface SubmissionData {
   id: string
   storeName: string
@@ -92,11 +113,9 @@ interface Props {
 export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission }: Props) {
   const [openSection, setOpenSection]   = useState<string | null>(null)
   const [noteSearch, setNoteSearch]     = useState('')
-  const [selectedNotes, setSelectedNotes] = useState<Record<string, string[]>>({
-    'Account Management':   [],
-    'Internal Store Notes': [],
-    'Action Items':         [],
-  })
+  const [selectedNotes, setSelectedNotes] = useState<Record<string, string[]>>(
+    () => initNotes(submission)
+  )
   const [creatingNote, setCreatingNote] = useState(false)
   const [newNoteName, setNewNoteName]   = useState('')
   const [lightboxOpen, setLightboxOpen] = useState(false)
@@ -109,9 +128,10 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
   const sendDropdownRef  = useRef<HTMLDivElement>(null)
   const sectionRefs      = useRef<Map<string, HTMLDivElement>>(new Map())
 
-  // Reset flagged state when a different card is opened
+  // Reset per-card state when a different card is opened
   useEffect(() => {
     setFlagged(submission?.badges.includes('flagged') ?? false)
+    setSelectedNotes(initNotes(submission))
   }, [submission?.id])
 
   useEffect(() => {

@@ -599,6 +599,29 @@ const FILTER_OPTIONS: Record<string, string[]> = {
   'Display Status': ['All', 'Found', 'Not Found', 'Archived'],
 }
 
+// Deterministic per-card metadata derived from submission id
+const BANNERS    = FILTER_OPTIONS['Banner']
+const ACC_MGRS   = FILTER_OPTIONS['Acc Manager']
+const NOTE_TYPES = FILTER_OPTIONS['Notes']
+
+function cardBanner(id: string)      { return BANNERS[(parseInt(id) - 1) % BANNERS.length] }
+function cardAccManager(id: string)  { return ACC_MGRS[(parseInt(id) - 1) % ACC_MGRS.length] }
+function cardNoteTypes(id: string, noteCount?: number): string[] {
+  if (!noteCount) return []
+  const i = parseInt(id) - 1
+  return [NOTE_TYPES[i % NOTE_TYPES.length], NOTE_TYPES[(i + 2) % NOTE_TYPES.length]]
+}
+function cardDisplayStatus(id: string): 'Found' | 'Not Found' {
+  return parseInt(id) % 3 === 0 ? 'Not Found' : 'Found'
+}
+function cardExtraSignals(id: string): string[] {
+  const n = parseInt(id)
+  const out: string[] = []
+  if (n % 5 === 0) out.push('Missing Product')
+  if (n % 7 === 0) out.push('Promotional Pricing')
+  return out
+}
+
 function SubmissionCard({ submission, selected, onToggle, onOpen }: {
   submission: Submission
   selected: boolean
@@ -819,14 +842,56 @@ export function SubmissionsPage() {
     navigate('/shelf')
   }
 
-  const showArchived = filterSelections['Display Status']?.includes('Archived') ?? false
   const filteredSubmissions = submissions.filter(s => {
-    if (s.archived && !showArchived) return false
-    if (!search.trim()) return true
-    return (
-      s.storeName.toLowerCase().includes(search.toLowerCase()) ||
-      s.address.toLowerCase().includes(search.toLowerCase())
-    )
+    // --- Display Status ---
+    const dsFilter = filterSelections['Display Status'] ?? []
+    if (dsFilter.length === 0) {
+      if (s.archived) return false
+    } else if (!dsFilter.includes('All')) {
+      const status = s.archived ? 'Archived' : cardDisplayStatus(s.id)
+      if (!dsFilter.includes(status)) return false
+    }
+
+    // --- Search ---
+    if (search.trim()) {
+      const q = search.toLowerCase()
+      if (!s.storeName.toLowerCase().includes(q) && !s.address.toLowerCase().includes(q)) return false
+    }
+
+    // --- Banner ---
+    const bannerFilter = filterSelections['Banner'] ?? []
+    if (bannerFilter.length > 0 && !bannerFilter.includes(cardBanner(s.id))) return false
+
+    // --- Notes ---
+    const notesFilter = filterSelections['Notes'] ?? []
+    if (notesFilter.length > 0) {
+      const types = cardNoteTypes(s.id, s.noteCount)
+      if (!notesFilter.some(n => types.includes(n))) return false
+    }
+
+    // --- Acc Manager ---
+    const accFilter = filterSelections['Acc Manager'] ?? []
+    if (accFilter.length > 0 && !accFilter.includes(cardAccManager(s.id))) return false
+
+    // --- Campaign (all cards belong to 'Your Shelf Check') ---
+    const campFilter = filterSelections['Campaign'] ?? []
+    if (campFilter.length > 0 && !campFilter.includes('Your Shelf Check')) return false
+
+    // --- Signals ---
+    if (activeSignals.length > 0) {
+      const matches = activeSignals.some(sig => {
+        if (sig === 'Flagged')              return s.badges.includes('flagged')
+        if (sig === 'Out of Stock')         return s.badges.includes('no-stock')
+        if (sig === 'Low Stock')            return s.badges.includes('low-stock')
+        if (sig === 'Good Stock')           return !s.badges.includes('no-stock') && !s.badges.includes('low-stock')
+        if (sig === 'Missing Product')      return cardExtraSignals(s.id).includes('Missing Product')
+        if (sig === 'Promotional Pricing')  return cardExtraSignals(s.id).includes('Promotional Pricing')
+        return false
+      })
+      if (!matches) return false
+    }
+
+    return true
   })
   const visibleSubmissions = filteredSubmissions.slice(0, visibleCount)
   const hasMore = visibleCount < filteredSubmissions.length

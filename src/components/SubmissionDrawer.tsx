@@ -474,7 +474,7 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
           <div className="flex flex-col min-w-max">
             <div className="flex items-center gap-6 px-6 py-5 bg-accent border border-border-alpha">
               <span className="w-[67px] font-sans font-medium text-sm text-foreground leading-none underline decoration-dotted underline-offset-4 shrink-0">Status</span>
-              <span className="w-[140px] font-sans font-medium text-sm text-muted-foreground leading-none shrink-0">Item</span>
+              <span className="w-[220px] font-sans font-medium text-sm text-muted-foreground leading-none shrink-0">Item</span>
               <span className="w-[81px] font-sans font-medium text-sm text-muted-foreground leading-none shrink-0">Price</span>
               <span className="w-[104px] font-sans font-medium text-sm text-muted-foreground leading-none shrink-0">Sale Price</span>
               <span className="w-[86px] font-sans font-medium text-sm text-muted-foreground leading-none shrink-0">Inventory</span>
@@ -493,9 +493,9 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
                     <span className="inline-flex">{STATUS_ICON[p.status]}</span>
                   </Tooltip>
                 </div>
-                <div className="w-[140px] flex items-center gap-2 shrink-0 min-w-0">
+                <div className="w-[220px] flex items-center gap-2 shrink-0 min-w-0">
                   <img src={p.image} alt={p.name} className="size-[31px] rounded object-cover shrink-0" />
-                  <span className="font-sans font-medium text-sm text-muted-foreground leading-none truncate">{p.name}</span>
+                  <span className="font-sans font-medium text-sm text-muted-foreground leading-none">{p.name}</span>
                 </div>
                 <span className="w-[81px] font-sans font-medium text-sm text-green leading-none shrink-0">{p.price}</span>
                 <span className={cn('w-[104px] font-sans font-medium text-sm leading-none shrink-0', p.priceDown ? 'text-[var(--red,#f91616)]' : 'text-muted-foreground')}>

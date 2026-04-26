@@ -6,6 +6,7 @@ import { Tooltip } from '@/components/ui/Tooltip'
 import { AiLeanPage } from '@/pages/AiLean'
 import { SubmissionsPage } from '@/pages/Submissions'
 import { StoresPage, SHELF_SIGNAL_TOTAL } from '@/pages/Stores'
+import { DesignAssetsPage } from '@/pages/DesignAssets'
 
 type Theme = 'theme-4' | 'dark'
 
@@ -27,14 +28,14 @@ export default function App() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const activePage = getActivePage(location.pathname)
+  const activePage = location.pathname === '/design-assets' ? 'design-assets' : getActivePage(location.pathname)
 
   useEffect(() => {
     document.body.className = theme
   }, [theme])
 
   const isDark = theme === 'dark'
-  const isFullPage = activePage === 'submissions' || activePage === 'stores'
+  const isFullPage = activePage === 'submissions' || activePage === 'stores' || activePage === 'design-assets'
 
   function handleLearnMore(submissionId: string) {
     navigate(`/shelf/detail/${submissionId}`)
@@ -74,6 +75,7 @@ export default function App() {
           <Route path="/shelf/detail/:submissionId" element={<SubmissionsPage />} />
           <Route path="/stores"  element={<StoresPage onLearnMore={handleLearnMore} onNavigateToShelf={() => navigate('/shelf')} />} />
           <Route path="/ai-lean" element={<AiLeanPage />} />
+          <Route path="/design-assets" element={<DesignAssetsPage />} />
           <Route path="*"        element={<Navigate to="/shelf" replace />} />
         </Routes>
       </main>

@@ -580,6 +580,24 @@ const SIGNAL_OPTIONS = [
   'Promotional Pricing',
 ]
 
+function signalMatches(sig: string, s: Submission): boolean {
+  if (sig === 'Flagged')             return s.badges.includes('flagged')
+  if (sig === 'Out of Stock')        return s.badges.includes('no-stock')
+  if (sig === 'Low Stock')           return s.badges.includes('low-stock')
+  if (sig === 'Good Stock')          return !s.badges.includes('no-stock') && !s.badges.includes('low-stock')
+  if (sig === 'Notes')               return s.badges.includes('notes')
+  if (sig === 'Missing Product')     return cardExtraSignals(s.id).includes('Missing Product')
+  if (sig === 'Promotional Pricing') return cardExtraSignals(s.id).includes('Promotional Pricing')
+  return false
+}
+
+const SIGNAL_PCT: Record<string, number> = Object.fromEntries(
+  SIGNAL_OPTIONS.map(sig => {
+    const count = INITIAL_SUBMISSIONS.filter(s => signalMatches(sig, s)).length
+    return [sig, Math.round((count / INITIAL_SUBMISSIONS.length) * 100)]
+  })
+)
+
 const DATE_OPTIONS = [
   'Today',
   'Last 7 Days',
@@ -1154,8 +1172,11 @@ export function SubmissionsPage() {
                     )}>
                       {isActive && <Check className="size-3 text-brighter" />}
                     </div>
-                    <span className="font-poppins font-medium text-sm text-sidebar-primary-foreground">
+                    <span className="flex-1 font-poppins font-medium text-sm text-sidebar-primary-foreground">
                       {option}
+                    </span>
+                    <span className="font-poppins text-xs text-muted-foreground shrink-0">
+                      {SIGNAL_PCT[option]}%
                     </span>
                   </button>
                 )

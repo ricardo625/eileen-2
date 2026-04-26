@@ -580,6 +580,17 @@ const SIGNAL_OPTIONS = [
   'Promotional Pricing',
 ]
 
+const RISK_OPTIONS = ['Low Risk', 'Medium Risk', 'High Risk']
+
+const ALL_SIGNAL_OPTIONS = [...SIGNAL_OPTIONS, ...RISK_OPTIONS]
+
+function cardRisk(id: string): 'Low Risk' | 'Medium Risk' | 'High Risk' {
+  const n = parseInt(id)
+  if (n % 3 === 0) return 'High Risk'
+  if (n % 3 === 1) return 'Medium Risk'
+  return 'Low Risk'
+}
+
 function signalMatches(sig: string, s: Submission): boolean {
   if (sig === 'Flagged')             return s.badges.includes('flagged')
   if (sig === 'Out of Stock')        return s.badges.includes('no-stock')
@@ -588,6 +599,9 @@ function signalMatches(sig: string, s: Submission): boolean {
   if (sig === 'Notes')               return s.badges.includes('notes')
   if (sig === 'Missing Product')     return cardExtraSignals(s.id).includes('Missing Product')
   if (sig === 'Promotional Pricing') return cardExtraSignals(s.id).includes('Promotional Pricing')
+  if (sig === 'Low Risk')            return cardRisk(s.id) === 'Low Risk'
+  if (sig === 'Medium Risk')         return cardRisk(s.id) === 'Medium Risk'
+  if (sig === 'High Risk')           return cardRisk(s.id) === 'High Risk'
   return false
 }
 
@@ -598,8 +612,8 @@ export const SHELF_SIGNAL_COUNTS: Record<string, number> = Object.fromEntries(
 export const SHELF_SUBMISSION_TOTAL = INITIAL_SUBMISSIONS.length
 
 const SIGNAL_PCT: Record<string, number> = Object.fromEntries(
-  SIGNAL_OPTIONS.map(sig => {
-    const count = SHELF_SIGNAL_COUNTS[sig]
+  ALL_SIGNAL_OPTIONS.map(sig => {
+    const count = INITIAL_SUBMISSIONS.filter(s => signalMatches(sig, s)).length
     return [sig, Math.round((count / INITIAL_SUBMISSIONS.length) * 100)]
   })
 )
@@ -1148,7 +1162,7 @@ export function SubmissionsPage() {
           >
             <span className="shrink-0">Signal:</span>
             <span className="size-6 flex items-center justify-center bg-darker text-brighter rounded-full text-xs font-medium shrink-0">
-              {activeSignals.length === SIGNAL_OPTIONS.length ? SIGNAL_OPTIONS.length : activeSignals.length}
+              {activeSignals.length === ALL_SIGNAL_OPTIONS.length ? ALL_SIGNAL_OPTIONS.length : activeSignals.length}
             </span>
           </button>
           {signalOpen && (
@@ -1156,37 +1170,43 @@ export function SubmissionsPage() {
               ref={signalDropdownRef}
               className="absolute top-full left-0 mt-2 w-[260px] bg-card dark:bg-muted border border-sidebar-border rounded-2xl shadow-[0px_4px_28px_0px_var(--shadow)] p-0.5 z-50"
             >
-              {SIGNAL_OPTIONS.map((option, i) => {
-                const isActive = activeSignals.includes(option)
-                return (
-                  <button
-                    key={option}
-                    onClick={() => {
-                      const isActive = activeSignals.includes(option)
-                      setActiveSignals(prev => isActive ? prev.filter(x => x !== option) : [...prev, option])
-                      // track signal filter toggle
-                      trackEvent('select_filter_shelf', { filter_type: 'signal', value: option, action: isActive ? 'deselect' : 'select' })
-                    }}
-                    className={cn(
-                      'w-full flex items-center gap-3 h-11 px-4 text-left transition-colors whitespace-nowrap',
-                      i === 0 ? 'rounded-[14px] bg-accent' : 'rounded-full hover:bg-accent',
-                    )}
-                  >
-                    <div className={cn(
-                      'size-4 rounded-[4px] flex items-center justify-center shrink-0 transition-colors',
-                      isActive ? 'bg-darker shadow-sm' : 'border border-darker/30',
-                    )}>
-                      {isActive && <Check className="size-3 text-brighter" />}
-                    </div>
-                    <span className="flex-1 font-poppins font-medium text-sm text-sidebar-primary-foreground">
-                      {option}
-                    </span>
-                    <span className="font-poppins text-sm text-muted-foreground shrink-0">
-                      {SIGNAL_PCT[option]}%
-                    </span>
-                  </button>
-                )
-              })}
+              {[SIGNAL_OPTIONS, RISK_OPTIONS].map((group, groupIdx) => (
+                <div key={groupIdx}>
+                  {groupIdx > 0 && (
+                    <div className="my-1 mx-3 border-t border-dashed border-border" />
+                  )}
+                  {group.map((option, i) => {
+                    const isActive = activeSignals.includes(option)
+                    return (
+                      <button
+                        key={option}
+                        onClick={() => {
+                          const isActive = activeSignals.includes(option)
+                          setActiveSignals(prev => isActive ? prev.filter(x => x !== option) : [...prev, option])
+                          trackEvent('select_filter_shelf', { filter_type: 'signal', value: option, action: isActive ? 'deselect' : 'select' })
+                        }}
+                        className={cn(
+                          'w-full flex items-center gap-3 h-11 px-4 text-left transition-colors whitespace-nowrap',
+                          groupIdx === 0 && i === 0 ? 'rounded-[14px] bg-accent' : 'rounded-full hover:bg-accent',
+                        )}
+                      >
+                        <div className={cn(
+                          'size-4 rounded-[4px] flex items-center justify-center shrink-0 transition-colors',
+                          isActive ? 'bg-darker shadow-sm' : 'border border-darker/30',
+                        )}>
+                          {isActive && <Check className="size-3 text-brighter" />}
+                        </div>
+                        <span className="flex-1 font-poppins font-medium text-sm text-sidebar-primary-foreground">
+                          {option}
+                        </span>
+                        <span className="font-poppins text-sm text-muted-foreground shrink-0">
+                          {SIGNAL_PCT[option]}%
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+              ))}
             </div>
           )}
         </div>

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { trackEvent } from '@/lib/clarity'
 import {
   MoveDown, CircleDashed, Check, FlagTriangleRight, StickyNote,
@@ -676,7 +677,17 @@ const RECENT_SEARCHES = [
   "Raley's Sacramento",
 ]
 
+const STORE_SIGNAL_TO_SHELF: Record<string, string> = {
+  'Flagged':   'Flagged',
+  'No Stock':  'Out of Stock',
+  'Low Stock': 'Low Stock',
+  'Good Stock':'Good Stock',
+  'Notes':     'Notes',
+  'Promotion': 'Promotional Pricing',
+}
+
 export function StoresPage({ onLearnMore, onNavigateToShelf }: { onLearnMore?: (submissionId: string) => void; onNavigateToShelf?: () => void }) {
+  const navigate = useNavigate()
   const [search, setSearch] = useState('')
   const [searchFocused, setSearchFocused] = useState(false)
   const searchWrapperRef = useRef<HTMLDivElement>(null)
@@ -799,9 +810,9 @@ export function StoresPage({ onLearnMore, onNavigateToShelf }: { onLearnMore?: (
           <button
             key={label}
             onClick={() => {
-              // track signal card click — aggregate view, no single store_id
               trackEvent('interact_signal_store', { store_id: null, signal_type: label, severity: count })
-              onNavigateToShelf?.()
+              const shelfSignal = STORE_SIGNAL_TO_SHELF[label]
+              navigate(shelfSignal ? `/shelf?signal=${encodeURIComponent(shelfSignal)}` : '/shelf')
             }}
             className="relative flex flex-col justify-between h-[113px] p-4 bg-card border border-border rounded-2xl shadow-[0px_2px_2px_0px_var(--shadow)] text-left hover:bg-accent transition-colors"
           >

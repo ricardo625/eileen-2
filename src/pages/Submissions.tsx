@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { createPortal } from 'react-dom'
 import {
   Archive, ChevronDown, CircleCheck, ChevronsDown, CircleDashed, FileDown,
@@ -575,6 +575,7 @@ const SIGNAL_OPTIONS = [
   'Out of Stock',
   'Low Stock',
   'Good Stock',
+  'Notes',
   'Missing Product',
   'Promotional Pricing',
 ]
@@ -810,6 +811,7 @@ const RECENT_SEARCHES = [
 export function SubmissionsPage() {
   const { submissionId } = useParams<{ submissionId: string }>()
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [search, setSearch] = useState('')
   const [searchFocused, setSearchFocused] = useState(false)
   const searchWrapperRef = useRef<HTMLDivElement>(null)
@@ -828,13 +830,23 @@ export function SubmissionsPage() {
   const [visibleCount, setVisibleCount] = useState(12)
   const [batchOpen, setBatchOpen] = useState(false)
   const [signalOpen, setSignalOpen] = useState(false)
-  const [activeSignals, setActiveSignals] = useState<string[]>([])
+  const [activeSignals, setActiveSignals] = useState<string[]>(() => {
+    const sig = searchParams.get('signal')
+    return sig && SIGNAL_OPTIONS.includes(sig) ? [sig] : []
+  })
   const [islandSendOpen, setIslandSendOpen] = useState(false)
   const [toasts, setToasts] = useState<ToastItem[]>([])
   const [shareOpen, setShareOpen] = useState(false)
   const batchBtnRef = useRef<HTMLButtonElement>(null)
   const batchDropdownRef = useRef<HTMLDivElement>(null)
   const sentinelRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (searchParams.has('signal')) {
+      setSearchParams(p => { p.delete('signal'); return p }, { replace: true })
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const drawerOpen = !!submissionId
 
@@ -889,6 +901,7 @@ export function SubmissionsPage() {
         if (sig === 'Out of Stock')         return s.badges.includes('no-stock')
         if (sig === 'Low Stock')            return s.badges.includes('low-stock')
         if (sig === 'Good Stock')           return !s.badges.includes('no-stock') && !s.badges.includes('low-stock')
+        if (sig === 'Notes')               return s.badges.includes('notes')
         if (sig === 'Missing Product')      return cardExtraSignals(s.id).includes('Missing Product')
         if (sig === 'Promotional Pricing')  return cardExtraSignals(s.id).includes('Promotional Pricing')
         return false

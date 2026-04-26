@@ -2,6 +2,13 @@
 
 ---
 
+[2026-04-26] Stores: signal cards open Shelf pre-filtered by signal
+- [Stores] Clicking a signal card navigates to /shelf?signal=<name> using STORE_SIGNAL_TO_SHELF mapping
+- [Stores] Added useNavigate; removed dependency on onNavigateToShelf prop for signal card clicks
+- [Shelf] useSearchParams reads ?signal= on mount and seeds activeSignals
+- [Shelf] Added "Notes" to SIGNAL_OPTIONS + filter logic (matches cards with notes badge)
+- [Shelf] ?signal= query param is stripped from URL after being applied (replace: true)
+
 [2026-04-25] Sidebar: shelf badge counts all 6 signal types from store dot data
 - [Sidebar] "The Shelf" SubNavItem badge now shows combined total of Flagged + No Stock + Low Stock + Good Stock + Notes + Promotion
 - [Stores] Exported SHELF_SIGNAL_TOTAL computed from SIGNAL_CARDS reduce

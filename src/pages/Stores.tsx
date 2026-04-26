@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { trackEvent } from '@/lib/clarity'
 import {
-  MoveDown, CircleDashed, Check, FlagTriangleRight, Ban, StickyNote,
+  MoveDown, CircleDashed, Check, FlagTriangleRight, StickyNote,
   ChevronDown, Search, Tags, Upload, TableProperties, Map,
   ChevronRight, Sparkles, Plus, Minus, ArrowUpRight,
 } from 'lucide-react'
@@ -482,13 +482,17 @@ function MapView({ onLearnMore }: { onLearnMore: (submissionId: string) => void 
   )
 }
 
+function countDotSignal(label: string) {
+  return STORE_DOTS.filter(d => d.signals.some(s => s.label === label)).length
+}
+
 const SIGNAL_CARDS = [
-  { label: 'Flagged',    count: '12', Icon: FlagTriangleRight, iconClass: 'text-orange-400'       },
-  { label: 'No Stock',   count: '6',  Icon: CircleDashed,      iconClass: 'text-muted-foreground' },
-  { label: 'Low Stock',  count: '1',  Icon: MoveDown,          iconClass: 'text-red'              },
-  { label: 'Good Stock', count: '8',  Icon: Check,             iconClass: 'text-green'            },
-  { label: 'Missing',    count: '12', Icon: Ban,               iconClass: 'text-muted-foreground' },
-  { label: 'Promotion',  count: '-',  Icon: Tags,              iconClass: 'text-orange-400'       },
+  { label: 'Flagged',    count: countDotSignal('Flagged'),    Icon: FlagTriangleRight, iconClass: 'text-orange-400'       },
+  { label: 'No Stock',   count: countDotSignal('No Stock'),   Icon: CircleDashed,      iconClass: 'text-muted-foreground' },
+  { label: 'Low Stock',  count: countDotSignal('Low Stock'),  Icon: MoveDown,          iconClass: 'text-red'              },
+  { label: 'Good Stock', count: countDotSignal('Good Stock'), Icon: Check,             iconClass: 'text-green'            },
+  { label: 'Notes',      count: countDotSignal('Notes'),      Icon: StickyNote,        iconClass: 'text-muted-foreground' },
+  { label: 'Promotion',  count: countDotSignal('Promotion'),  Icon: Tags,              iconClass: 'text-orange-400'       },
 ]
 
 const COLUMNS = [

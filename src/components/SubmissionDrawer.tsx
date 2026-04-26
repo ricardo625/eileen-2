@@ -17,6 +17,13 @@ const STATUS_ICON: Record<StatusType, React.ReactNode> = {
   out:  <CircleDashed className="size-4 text-muted-foreground shrink-0" />,
 }
 
+const STATUS_LABEL: Record<StatusType, string> = {
+  good: 'Good Stock',
+  low:  'Low Stock',
+  none: 'No Stock',
+  out:  'Out of Stock',
+}
+
 const PRODUCT_POOL = [
   'Mango Bliss - Glass Bottles',
   'Tropical Punch - Plastic Jugs',
@@ -467,7 +474,11 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
                   i === products.length - 1 && 'border-b',
                 )}
               >
-                <div className="w-[67px] shrink-0">{STATUS_ICON[p.status]}</div>
+                <div className="w-[67px] shrink-0">
+                  <Tooltip label={STATUS_LABEL[p.status]}>
+                    <span className="inline-flex">{STATUS_ICON[p.status]}</span>
+                  </Tooltip>
+                </div>
                 <span className="w-[140px] font-sans font-medium text-sm text-muted-foreground leading-none truncate shrink-0">{p.name}</span>
                 <span className="w-[81px] font-sans font-medium text-sm text-green leading-none shrink-0">{p.price}</span>
                 <span className={cn('w-[104px] font-sans font-medium text-sm leading-none shrink-0', p.priceDown ? 'text-[var(--red,#f91616)]' : 'text-muted-foreground')}>

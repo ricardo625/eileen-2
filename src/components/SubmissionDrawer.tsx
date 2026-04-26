@@ -484,7 +484,7 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
               <div
                 key={i}
                 className={cn(
-                  'flex items-center gap-6 px-6 py-5 border-border-alpha border-l border-r border-t',
+                  'flex items-center gap-6 px-6 py-7 border-border-alpha border-l border-r border-t',
                   i === products.length - 1 && 'border-b',
                 )}
               >

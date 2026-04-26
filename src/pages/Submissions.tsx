@@ -1205,6 +1205,11 @@ export function SubmissionsPage() {
         )}
       </div>
 
+      {/* Results count */}
+      <p className="text-sm text-muted-foreground -mt-3">
+        There {filteredSubmissions.length === 1 ? 'is' : 'are'} <span className="font-medium text-foreground">{filteredSubmissions.length}</span> {filteredSubmissions.length === 1 ? 'result' : 'results'} found
+      </p>
+
       {/* Cards / List */}
       {filteredSubmissions.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-3 flex-1 min-h-[400px]">

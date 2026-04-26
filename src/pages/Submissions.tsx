@@ -1148,7 +1148,7 @@ export function SubmissionsPage() {
           {signalOpen && (
             <div
               ref={signalDropdownRef}
-              className="absolute top-full left-0 mt-2 w-[209px] bg-card dark:bg-muted border border-sidebar-border rounded-2xl shadow-[0px_4px_28px_0px_var(--shadow)] p-0.5 z-50"
+              className="absolute top-full left-0 mt-2 w-[260px] bg-card dark:bg-muted border border-sidebar-border rounded-2xl shadow-[0px_4px_28px_0px_var(--shadow)] p-0.5 z-50"
             >
               {SIGNAL_OPTIONS.map((option, i) => {
                 const isActive = activeSignals.includes(option)
@@ -1162,7 +1162,7 @@ export function SubmissionsPage() {
                       trackEvent('select_filter_shelf', { filter_type: 'signal', value: option, action: isActive ? 'deselect' : 'select' })
                     }}
                     className={cn(
-                      'w-full flex items-center gap-3 h-11 px-4 text-left transition-colors',
+                      'w-full flex items-center gap-3 h-11 px-4 text-left transition-colors whitespace-nowrap',
                       i === 0 ? 'rounded-[14px] bg-accent' : 'rounded-full hover:bg-accent',
                     )}
                   >
@@ -1175,7 +1175,7 @@ export function SubmissionsPage() {
                     <span className="flex-1 font-poppins font-medium text-sm text-sidebar-primary-foreground">
                       {option}
                     </span>
-                    <span className="font-poppins text-xs text-muted-foreground shrink-0">
+                    <span className="font-poppins text-xs text-sidebar-primary-foreground shrink-0">
                       {SIGNAL_PCT[option]}%
                     </span>
                   </button>

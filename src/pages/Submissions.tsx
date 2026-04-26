@@ -801,8 +801,11 @@ export function SubmissionsPage() {
   const [submissions, setSubmissions] = useState<Submission[]>(INITIAL_SUBMISSIONS)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [activeSubmissionId, setActiveSubmissionId] = useState<string | null>(submissionId ?? null)
-  const BATCH = 12
-  const [visibleCount, setVisibleCount] = useState(BATCH)
+  const [batch, setBatch] = useState(12)
+  const [visibleCount, setVisibleCount] = useState(12)
+  const [batchOpen, setBatchOpen] = useState(false)
+  const batchBtnRef = useRef<HTMLButtonElement>(null)
+  const batchDropdownRef = useRef<HTMLDivElement>(null)
   const sentinelRef = useRef<HTMLDivElement>(null)
 
   const drawerOpen = !!submissionId
@@ -872,8 +875,8 @@ export function SubmissionsPage() {
   const islandSendBtnRef = useRef<HTMLButtonElement>(null)
   const islandSendDropdownRef = useRef<HTMLDivElement>(null)
 
-  // Reset visible count when filters or search change
-  useEffect(() => { setVisibleCount(BATCH) }, [search, filterSelections, activeSignals])
+  // Reset visible count when filters, search, or batch size change
+  useEffect(() => { setVisibleCount(batch) }, [search, filterSelections, activeSignals, batch])
 
   // Infinite scroll: load next batch when sentinel enters viewport
   useEffect(() => {
@@ -881,7 +884,7 @@ export function SubmissionsPage() {
     if (!el) return
     const observer = new IntersectionObserver(entries => {
       if (entries[0].isIntersecting && hasMore) {
-        setVisibleCount(c => c + BATCH)
+        setVisibleCount(c => c + batch)
       }
     }, { threshold: 0.1 })
     observer.observe(el)
@@ -909,6 +912,12 @@ export function SubmissionsPage() {
         islandSendBtnRef.current && !islandSendBtnRef.current.contains(t)
       ) {
         setIslandSendOpen(false)
+      }
+      if (
+        batchDropdownRef.current && !batchDropdownRef.current.contains(t) &&
+        batchBtnRef.current && !batchBtnRef.current.contains(t)
+      ) {
+        setBatchOpen(false)
       }
       if (searchWrapperRef.current && !searchWrapperRef.current.contains(t)) {
         setSearchFocused(false)
@@ -951,6 +960,35 @@ export function SubmissionsPage() {
               <Upload className="size-4 text-foreground" />
             </button>
           </Tooltip>
+          <div className="relative">
+            <button
+              ref={batchBtnRef}
+              onClick={() => setBatchOpen(o => !o)}
+              className="h-9 flex items-center gap-2 px-3 bg-background border border-input rounded-full shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] text-sm text-foreground hover:bg-accent transition-colors"
+            >
+              <span>{batch} per scroll</span>
+              <ChevronDown className="size-4 text-muted-foreground" />
+            </button>
+            {batchOpen && (
+              <div
+                ref={batchDropdownRef}
+                className="absolute right-0 top-full mt-1 w-[160px] bg-card border border-border rounded-2xl shadow-[0px_4px_28px_0px_var(--shadow)] p-0.5 z-50 flex flex-col"
+              >
+                {[10, 12, 25, 50].map(size => (
+                  <button
+                    key={size}
+                    onClick={() => { setBatch(size); setBatchOpen(false) }}
+                    className={cn(
+                      'flex items-center h-9 px-4 rounded-xl text-sm transition-colors text-left',
+                      batch === size ? 'text-foreground font-medium' : 'text-muted-foreground hover:bg-accent',
+                    )}
+                  >
+                    {size} per scroll
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           <div className="flex items-center p-0.5 bg-secondary rounded-full">
             <Tooltip label="Grid view">
               <button onClick={() => setView('grid')} className={cn('size-8 flex items-center justify-center rounded-full transition-colors', view === 'grid' ? 'bg-brighter shadow-sm' : 'hover:bg-accent')}>

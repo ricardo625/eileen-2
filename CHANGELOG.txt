@@ -8,6 +8,11 @@ Changes are appended here after every user-requested modification.
 - [Global] clarity.ts: warns if window.clarity is unavailable (helps diagnose script-load failures)
 - Logs are stripped automatically in production builds (import.meta.env.DEV guard)
 
+[2026-04-25] Stores: Learn More opens shelf drawer for that store
+- [Stores] Added submissionId to each StoreDot mapping to the corresponding shelf submission
+- [Stores] Learn More button navigates to /shelf/detail/:submissionId, opening the drawer directly
+- [App] handleLearnMore now accepts submissionId and navigates to the drawer URL
+
 [2026-04-25] Fix Clarity tracking to match official API
 - [Global] clarity.ts: events now use clarity("event", name) per the Clarity Events API
 - [Global] clarity.ts: tags use clarity("set", key, String(value)) — strings only, no objects

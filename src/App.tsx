@@ -36,8 +36,8 @@ export default function App() {
   const isDark = theme === 'dark'
   const isFullPage = activePage === 'submissions' || activePage === 'stores'
 
-  function handleLearnMore() {
-    navigate('/shelf')
+  function handleLearnMore(submissionId: string) {
+    navigate(`/shelf/detail/${submissionId}`)
   }
 
   return (

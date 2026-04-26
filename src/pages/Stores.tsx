@@ -25,6 +25,7 @@ type StoreDot = {
   bannerLogo?: string
   signals: { label: string; Icon: React.ElementType; variant: 'red' | 'default' }[]
   risk: { label: string; percent: number }
+  submissionId: string
 }
 
 const STORE_DOTS: StoreDot[] = [
@@ -39,6 +40,7 @@ const STORE_DOTS: StoreDot[] = [
       { label: 'No Stock', Icon: CircleDashed,      variant: 'default' },
     ],
     risk: { label: 'High', percent: 68 },
+    submissionId: '1',
   },
   {
     id: 2, x: 17.4, y: 20.2, color: '#f91616', ring: false,
@@ -47,6 +49,7 @@ const STORE_DOTS: StoreDot[] = [
     banner: 'VONS',
     signals: [{ label: 'No Stock', Icon: CircleDashed, variant: 'red' }],
     risk: { label: 'Medium', percent: 42 },
+    submissionId: '2',
   },
   {
     id: 3, x: 8.7, y: 41.8, color: '#519249', ring: false,
@@ -56,6 +59,7 @@ const STORE_DOTS: StoreDot[] = [
     bannerLogo: albertsonsLogo,
     signals: [{ label: 'Good Stock', Icon: Check, variant: 'default' }],
     risk: { label: 'Low', percent: 15 },
+    submissionId: '5',
   },
   {
     id: 4, x: 18.0, y: 63.8, color: '#519249', ring: false,
@@ -65,6 +69,7 @@ const STORE_DOTS: StoreDot[] = [
     bannerLogo: pavilionsLogo,
     signals: [{ label: 'Good Stock', Icon: Check, variant: 'default' }],
     risk: { label: 'Low', percent: 10 },
+    submissionId: '3',
   },
   {
     id: 5, x: 71.3, y: 84.4, color: '#f59e0b', ring: false,
@@ -74,6 +79,7 @@ const STORE_DOTS: StoreDot[] = [
     bannerLogo: raleysLogo,
     signals: [{ label: 'Promotion', Icon: Tags, variant: 'default' }],
     risk: { label: 'Medium', percent: 42 },
+    submissionId: '4',
   },
 ]
 
@@ -87,7 +93,7 @@ function StoreMapPopover({ store, anchorEl, onClose, onLearnMore }: {
   store: StoreDot
   anchorEl: HTMLElement
   onClose: () => void
-  onLearnMore: () => void
+  onLearnMore: (submissionId: string) => void
 }) {
   const popoverRef = useRef<HTMLDivElement>(null)
   const [barFilled, setBarFilled] = useState(false)
@@ -211,7 +217,7 @@ function StoreMapPopover({ store, anchorEl, onClose, onLearnMore }: {
           onClick={() => {
             // track learn more click from the map popover card
             trackEvent('click_learn_more_store_popover', { store_id: store.id, source: 'popover' })
-            onLearnMore()
+            onLearnMore(store.submissionId)
           }}
           className="w-full h-9 flex items-center justify-center gap-2 border border-black/5 rounded-md shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] text-sm font-medium text-card-foreground hover:bg-accent transition-colors"
         >
@@ -223,7 +229,7 @@ function StoreMapPopover({ store, anchorEl, onClose, onLearnMore }: {
   )
 }
 
-function MapView({ onLearnMore }: { onLearnMore: () => void }) {
+function MapView({ onLearnMore }: { onLearnMore: (submissionId: string) => void }) {
   const [selected, setSelected] = useState<{ store: StoreDot; el: HTMLElement } | null>(null)
 
   function handleDotClick(e: React.MouseEvent<HTMLButtonElement>, store: StoreDot) {
@@ -484,7 +490,7 @@ const RECENT_SEARCHES = [
   "Raley's Sacramento",
 ]
 
-export function StoresPage({ onLearnMore, onNavigateToShelf }: { onLearnMore?: () => void; onNavigateToShelf?: () => void }) {
+export function StoresPage({ onLearnMore, onNavigateToShelf }: { onLearnMore?: (submissionId: string) => void; onNavigateToShelf?: () => void }) {
   const [search, setSearch] = useState('')
   const [searchFocused, setSearchFocused] = useState(false)
   const searchWrapperRef = useRef<HTMLDivElement>(null)
@@ -623,7 +629,7 @@ export function StoresPage({ onLearnMore, onNavigateToShelf }: { onLearnMore?: (
       </div>
 
       {view === 'map' ? (
-        <MapView onLearnMore={() => onLearnMore?.()} />
+        <MapView onLearnMore={id => onLearnMore?.(id)} />
       ) : (
         <>
           {/* Table */}

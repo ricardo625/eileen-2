@@ -19,6 +19,7 @@ const imgStore3 = 'https://www.figma.com/api/mcp/asset/8373099e-bda5-4eaa-91b1-4
 
 // Unsplash store shelf photography
 const imgU01 = 'https://images.unsplash.com/photo-1506617420156-8e4536971650?w=800&auto=format&fit=crop'
+
 const imgU02 = 'https://images.unsplash.com/photo-1556767576-cf0a4a80e5b8?w=800&auto=format&fit=crop'
 const imgU03 = 'https://images.unsplash.com/photo-1526152505827-d2f3b5b4a52a?w=800&auto=format&fit=crop'
 const imgU04 = 'https://images.unsplash.com/photo-1646668947240-a154d4d6c766?w=800&auto=format&fit=crop'
@@ -33,6 +34,26 @@ const imgU12 = 'https://images.unsplash.com/photo-1722639096482-4e1a805f9b0b?w=8
 const imgU13 = 'https://images.unsplash.com/photo-1722639096485-7f48cae22a87?w=800&auto=format&fit=crop'
 const imgU14 = 'https://images.unsplash.com/photo-1651488201726-bbb9577778ef?w=800&auto=format&fit=crop'
 const imgU15 = 'https://images.unsplash.com/photo-1722639096454-1fc2448e5c15?w=800&auto=format&fit=crop'
+
+// Unsplash grocery store photography
+const imgG01 = 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=800&auto=format&fit=crop'
+const imgG02 = 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&auto=format&fit=crop'
+const imgG03 = 'https://images.unsplash.com/photo-1583258292688-d0213dc5a3a8?w=800&auto=format&fit=crop'
+const imgG04 = 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=800&auto=format&fit=crop'
+const imgG05 = 'https://images.unsplash.com/photo-1601598851547-4302969d0614?w=800&auto=format&fit=crop'
+const imgG06 = 'https://images.unsplash.com/photo-1607349913338-fca6f7fc42d0?w=800&auto=format&fit=crop'
+const imgG07 = 'https://images.unsplash.com/photo-1584771145729-0bd9fda6529b?w=800&auto=format&fit=crop'
+const imgG08 = 'https://images.unsplash.com/photo-1540340061722-9293d5163008?w=800&auto=format&fit=crop'
+const imgG09 = 'https://images.unsplash.com/photo-1670684684445-a4504dca0bbc?w=800&auto=format&fit=crop'
+const imgG10 = 'https://images.unsplash.com/photo-1601599561213-832382fd07ba?w=800&auto=format&fit=crop'
+const imgG11 = 'https://images.unsplash.com/photo-1545186182-9faaf78480b8?w=800&auto=format&fit=crop'
+const imgG12 = 'https://images.unsplash.com/photo-1628102491629-778571d893a3?w=800&auto=format&fit=crop'
+const imgG13 = 'https://images.unsplash.com/photo-1550989460-0adf9ea622e2?w=800&auto=format&fit=crop'
+const imgG14 = 'https://images.unsplash.com/photo-1534723452862-4c874018d66d?w=800&auto=format&fit=crop'
+const imgG15 = 'https://images.unsplash.com/photo-1601600576337-c1d8a0d1373c?w=800&auto=format&fit=crop'
+const imgG16 = 'https://images.unsplash.com/photo-1553531889-56cc480ac5cb?w=800&auto=format&fit=crop'
+const imgG17 = 'https://images.unsplash.com/photo-1515706886582-54c73c5eaf41?w=800&auto=format&fit=crop'
+const imgG18 = 'https://images.unsplash.com/photo-1521566652839-697aa473761a?w=800&auto=format&fit=crop'
 
 type BadgeVariant = 'flagged' | 'notes' | 'no-stock' | 'low-stock'
 const BADGE_ORDER: BadgeVariant[] = ['flagged', 'notes', 'no-stock', 'low-stock']
@@ -338,6 +359,215 @@ const INITIAL_SUBMISSIONS: Submission[] = [
     completedAt: 'Mar 27, 2026',
     completedBy: 'Lisa',
   },
+  {
+    id: '24',
+    storeName: 'Kroger Riverside',
+    address: '3400 Central Ave, Riverside, CA, USA 92506',
+    image: imgG01,
+    badges: ['flagged', 'notes'],
+    noteCount: 3,
+    imageCount: 10,
+    completedAt: 'Mar 26, 2026',
+    completedBy: 'Maria',
+  },
+  {
+    id: '25',
+    storeName: 'Whole Foods Westwood',
+    address: '1050 Gayley Ave, Los Angeles, CA, USA 90024',
+    image: imgG02,
+    badges: [],
+    imageCount: 6,
+    completedAt: 'Mar 25, 2026',
+    completedBy: 'David',
+  },
+  {
+    id: '26',
+    storeName: "Trader Joe's South Pasadena",
+    address: '1000 Fremont Ave, South Pasadena, CA, USA 91030',
+    image: imgG03,
+    badges: ['low-stock'],
+    imageCount: 7,
+    completedAt: 'Mar 24, 2026',
+    completedBy: 'Thomas',
+  },
+  {
+    id: '27',
+    storeName: 'Safeway Woodland Hills',
+    address: '21035 Clarendon St, Woodland Hills, CA, USA 91367',
+    image: imgG04,
+    badges: ['notes', 'no-stock'],
+    noteCount: 2,
+    imageCount: 9,
+    completedAt: 'Mar 23, 2026',
+    completedBy: 'Emma',
+  },
+  {
+    id: '28',
+    storeName: 'Target Glendale',
+    address: '201 E Magnolia Blvd, Burbank, CA, USA 91502',
+    image: imgG05,
+    badges: ['flagged'],
+    imageCount: 5,
+    completedAt: 'Mar 22, 2026',
+    completedBy: 'Carlos',
+  },
+  {
+    id: '29',
+    storeName: "Ralph's Mar Vista",
+    address: '12035 Venice Blvd, Los Angeles, CA, USA 90066',
+    image: imgG06,
+    badges: ['no-stock', 'low-stock'],
+    imageCount: 8,
+    completedAt: 'Mar 21, 2026',
+    completedBy: 'Ashley',
+  },
+  {
+    id: '30',
+    storeName: 'Pavilions Arcadia',
+    address: '400 N Santa Anita Ave, Arcadia, CA, USA 91006',
+    image: imgG07,
+    badges: ['notes'],
+    noteCount: 1,
+    imageCount: 6,
+    completedAt: 'Mar 20, 2026',
+    completedBy: 'Jordan',
+  },
+  {
+    id: '31',
+    storeName: 'Albertsons Downey',
+    address: '9001 Firestone Blvd, Downey, CA, USA 90241',
+    image: imgG08,
+    badges: ['flagged', 'notes', 'no-stock'],
+    noteCount: 4,
+    imageCount: 12,
+    completedAt: 'Mar 19, 2026',
+    completedBy: 'Priya',
+  },
+  {
+    id: '32',
+    storeName: 'Smart & Final Hawthorne',
+    address: '4601 W El Segundo Blvd, Hawthorne, CA, USA 90250',
+    image: imgG09,
+    badges: ['low-stock'],
+    imageCount: 5,
+    completedAt: 'Mar 18, 2026',
+    completedBy: 'Kevin',
+  },
+  {
+    id: '33',
+    storeName: 'Sprouts Sherman Oaks',
+    address: '14919 Ventura Blvd, Sherman Oaks, CA, USA 91403',
+    image: imgG10,
+    badges: [],
+    imageCount: 4,
+    completedAt: 'Mar 17, 2026',
+    completedBy: 'Lisa',
+  },
+  {
+    id: '34',
+    storeName: 'Food 4 Less Bell Gardens',
+    address: '6400 Eastern Ave, Bell Gardens, CA, USA 90201',
+    image: imgG11,
+    badges: ['no-stock', 'flagged'],
+    archived: true,
+    imageCount: 7,
+    completedAt: 'Mar 16, 2026',
+    completedBy: 'Maria',
+  },
+  {
+    id: '35',
+    storeName: 'Vons Chatsworth',
+    address: '21821 Devonshire St, Chatsworth, CA, USA 91311',
+    image: imgG12,
+    badges: ['notes'],
+    noteCount: 2,
+    imageCount: 6,
+    completedAt: 'Mar 15, 2026',
+    completedBy: 'David',
+  },
+  {
+    id: '36',
+    storeName: 'Stater Bros Rialto',
+    address: '285 W Foothill Blvd, Rialto, CA, USA 92376',
+    image: imgG13,
+    badges: ['low-stock', 'notes'],
+    noteCount: 1,
+    imageCount: 8,
+    completedAt: 'Mar 14, 2026',
+    completedBy: 'Thomas',
+  },
+  {
+    id: '37',
+    storeName: 'WinCo Foods Ontario',
+    address: '1225 W Holt Blvd, Ontario, CA, USA 91762',
+    image: imgG14,
+    badges: ['flagged'],
+    imageCount: 9,
+    completedAt: 'Mar 13, 2026',
+    completedBy: 'Emma',
+  },
+  {
+    id: '38',
+    storeName: 'Bristol Farms Palos Verdes',
+    address: '2545 Pacific Coast Hwy, Torrance, CA, USA 90505',
+    image: imgG15,
+    badges: [],
+    imageCount: 5,
+    completedAt: 'Mar 12, 2026',
+    completedBy: 'Carlos',
+  },
+  {
+    id: '39',
+    storeName: "Gelson's Pacific Palisades",
+    address: '15424 Sunset Blvd, Pacific Palisades, CA, USA 90272',
+    image: imgG16,
+    badges: ['notes', 'no-stock'],
+    noteCount: 3,
+    imageCount: 10,
+    completedAt: 'Mar 11, 2026',
+    completedBy: 'Ashley',
+  },
+  {
+    id: '40',
+    storeName: 'Cardenas Commerce',
+    address: '2600 E Olympic Blvd, Los Angeles, CA, USA 90023',
+    image: imgG17,
+    badges: ['flagged', 'low-stock'],
+    imageCount: 7,
+    completedAt: 'Mar 10, 2026',
+    completedBy: 'Jordan',
+  },
+  {
+    id: '41',
+    storeName: 'Smart & Final Covina',
+    address: '1175 N Azusa Ave, Covina, CA, USA 91722',
+    image: imgG18,
+    badges: ['no-stock'],
+    imageCount: 6,
+    completedAt: 'Mar 9, 2026',
+    completedBy: 'Priya',
+  },
+  {
+    id: '42',
+    storeName: "Ralph's Northridge",
+    address: '19340 Rinaldi St, Northridge, CA, USA 91326',
+    image: imgG03,
+    badges: ['notes'],
+    noteCount: 2,
+    imageCount: 7,
+    completedAt: 'Mar 8, 2026',
+    completedBy: 'Kevin',
+  },
+  {
+    id: '43',
+    storeName: 'Safeway Monrovia',
+    address: '711 E Huntington Dr, Monrovia, CA, USA 91016',
+    image: imgG07,
+    badges: ['low-stock', 'flagged'],
+    imageCount: 8,
+    completedAt: 'Mar 7, 2026',
+    completedBy: 'Lisa',
+  },
 ]
 
 const SIGNAL_OPTIONS = [
@@ -571,7 +801,9 @@ export function SubmissionsPage() {
   const [submissions, setSubmissions] = useState<Submission[]>(INITIAL_SUBMISSIONS)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [activeSubmissionId, setActiveSubmissionId] = useState<string | null>(submissionId ?? null)
-  const [pageSize, setPageSize] = useState(25)
+  const BATCH = 12
+  const [visibleCount, setVisibleCount] = useState(BATCH)
+  const sentinelRef = useRef<HTMLDivElement>(null)
 
   const drawerOpen = !!submissionId
 
@@ -592,7 +824,9 @@ export function SubmissionsPage() {
       s.storeName.toLowerCase().includes(search.toLowerCase()) ||
       s.address.toLowerCase().includes(search.toLowerCase())
     )
-  }).slice(0, pageSize)
+  })
+  const visibleSubmissions = filteredSubmissions.slice(0, visibleCount)
+  const hasMore = visibleCount < filteredSubmissions.length
 
   const toggleFilterOption = (select: string, option: string) =>
     setFilterSelections(prev => {
@@ -637,9 +871,22 @@ export function SubmissionsPage() {
   const signalDropdownRef = useRef<HTMLDivElement>(null)
   const islandSendBtnRef = useRef<HTMLButtonElement>(null)
   const islandSendDropdownRef = useRef<HTMLDivElement>(null)
-  const pageSizeBtnRef = useRef<HTMLButtonElement>(null)
-  const pageSizeDropdownRef = useRef<HTMLDivElement>(null)
-  const [pageSizeOpen, setPageSizeOpen] = useState(false)
+
+  // Reset visible count when filters or search change
+  useEffect(() => { setVisibleCount(BATCH) }, [search, filterSelections, activeSignals])
+
+  // Infinite scroll: load next batch when sentinel enters viewport
+  useEffect(() => {
+    const el = sentinelRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore) {
+        setVisibleCount(c => c + BATCH)
+      }
+    }, { threshold: 0.1 })
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [hasMore])
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -665,12 +912,6 @@ export function SubmissionsPage() {
       }
       if (searchWrapperRef.current && !searchWrapperRef.current.contains(t)) {
         setSearchFocused(false)
-      }
-      if (
-        pageSizeDropdownRef.current && !pageSizeDropdownRef.current.contains(t) &&
-        pageSizeBtnRef.current && !pageSizeBtnRef.current.contains(t)
-      ) {
-        setPageSizeOpen(false)
       }
     }
     document.addEventListener('mousedown', handler)
@@ -710,35 +951,6 @@ export function SubmissionsPage() {
               <Upload className="size-4 text-foreground" />
             </button>
           </Tooltip>
-          <div className="relative">
-            <button
-              ref={pageSizeBtnRef}
-              onClick={() => setPageSizeOpen(o => !o)}
-              className="h-9 flex items-center gap-2 px-3 bg-background border border-input rounded-full shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] text-sm text-foreground hover:bg-accent transition-colors"
-            >
-              <span>{pageSize} per page</span>
-              <ChevronDown className="size-4 text-muted-foreground" />
-            </button>
-            {pageSizeOpen && (
-              <div
-                ref={pageSizeDropdownRef}
-                className="absolute right-0 top-full mt-1 w-[160px] bg-card border border-border rounded-2xl shadow-[0px_4px_28px_0px_var(--shadow)] p-0.5 z-50 flex flex-col"
-              >
-                {[10, 25, 50].map(size => (
-                  <button
-                    key={size}
-                    onClick={() => { setPageSize(size); setPageSizeOpen(false) }}
-                    className={cn(
-                      'flex items-center h-9 px-4 rounded-xl text-sm transition-colors text-left',
-                      pageSize === size ? 'text-foreground font-medium' : 'text-muted-foreground hover:bg-accent',
-                    )}
-                  >
-                    {size} per page
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
           <div className="flex items-center p-0.5 bg-secondary rounded-full">
             <Tooltip label="Grid view">
               <button onClick={() => setView('grid')} className={cn('size-8 flex items-center justify-center rounded-full transition-colors', view === 'grid' ? 'bg-brighter shadow-sm' : 'hover:bg-accent')}>
@@ -964,35 +1176,35 @@ export function SubmissionsPage() {
         </div>
       ) : view === 'grid' ? (
         <div className="grid grid-cols-3 gap-3 pb-24">
-          {filteredSubmissions.map((s, index) => (
+          {visibleSubmissions.map((s, index) => (
             <SubmissionCard
               key={s.id}
               submission={s}
               selected={selectedIds.has(s.id)}
               onToggle={() => toggleSelected(s.id)}
               onOpen={() => {
-                // track card click position in the current filtered set
                 trackEvent('click_card_shelf', { card_id: s.id, card_type: 'submission', position: index })
                 openDrawerFor(s.id)
               }}
             />
           ))}
+          {hasMore && <div ref={sentinelRef} className="h-1 col-span-3" />}
         </div>
       ) : (
         <div className="flex flex-col gap-3 pb-24">
-          {filteredSubmissions.map((s, index) => (
+          {visibleSubmissions.map((s, index) => (
             <SubmissionListRow
               key={s.id}
               submission={s}
               selected={selectedIds.has(s.id)}
               onToggle={() => toggleSelected(s.id)}
               onOpen={() => {
-                // track card click position in the current filtered set
                 trackEvent('click_card_shelf', { card_id: s.id, card_type: 'submission', position: index })
                 openDrawerFor(s.id)
               }}
             />
           ))}
+          {hasMore && <div ref={sentinelRef} className="h-1" />}
         </div>
       )}
 

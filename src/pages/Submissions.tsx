@@ -1319,6 +1319,7 @@ export function SubmissionsPage() {
       <SubmissionDrawer
         open={drawerOpen}
         cardId={activeSubmissionId}
+        submission={submissions.find(s => s.id === activeSubmissionId) ?? null}
         onClose={closeDrawer}
         onArchive={() => {
           if (activeSubmissionId) {

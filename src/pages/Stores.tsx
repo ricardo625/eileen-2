@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { trackEvent } from '@/lib/clarity'
+import { SHELF_SIGNAL_COUNTS, SHELF_SUBMISSION_TOTAL } from '@/pages/Submissions'
 import {
   MoveDown, CircleDashed, Check, FlagTriangleRight, StickyNote,
   ChevronDown, Search, Tags, Upload, TableProperties, Map,
@@ -488,12 +489,12 @@ function countDotSignal(label: string) {
 }
 
 const SIGNAL_CARDS = [
-  { label: 'Flagged',    count: countDotSignal('Flagged'),    Icon: FlagTriangleRight, iconClass: 'text-orange-400'       },
-  { label: 'No Stock',   count: countDotSignal('No Stock'),   Icon: CircleDashed,      iconClass: 'text-muted-foreground' },
-  { label: 'Low Stock',  count: countDotSignal('Low Stock'),  Icon: MoveDown,          iconClass: 'text-red'              },
-  { label: 'Good Stock', count: countDotSignal('Good Stock'), Icon: Check,             iconClass: 'text-green'            },
-  { label: 'Notes',      count: countDotSignal('Notes'),      Icon: StickyNote,        iconClass: 'text-muted-foreground' },
-  { label: 'Promotion',  count: countDotSignal('Promotion'),  Icon: Tags,              iconClass: 'text-orange-400'       },
+  { label: 'Flagged',    count: SHELF_SIGNAL_COUNTS['Flagged']            ?? 0, Icon: FlagTriangleRight, iconClass: 'text-orange-400'       },
+  { label: 'No Stock',   count: SHELF_SIGNAL_COUNTS['Out of Stock']       ?? 0, Icon: CircleDashed,      iconClass: 'text-muted-foreground' },
+  { label: 'Low Stock',  count: SHELF_SIGNAL_COUNTS['Low Stock']          ?? 0, Icon: MoveDown,          iconClass: 'text-red'              },
+  { label: 'Good Stock', count: SHELF_SIGNAL_COUNTS['Good Stock']         ?? 0, Icon: Check,             iconClass: 'text-green'            },
+  { label: 'Notes',      count: SHELF_SIGNAL_COUNTS['Notes']              ?? 0, Icon: StickyNote,        iconClass: 'text-muted-foreground' },
+  { label: 'Promotion',  count: SHELF_SIGNAL_COUNTS['Promotional Pricing'] ?? 0, Icon: Tags,             iconClass: 'text-orange-400'       },
 ]
 
 export const SHELF_SIGNAL_TOTAL = SIGNAL_CARDS.reduce((sum, c) => sum + c.count, 0)
@@ -807,7 +808,7 @@ export function StoresPage({ onLearnMore, onNavigateToShelf }: { onLearnMore?: (
       {/* Signal cards */}
       <div className="grid grid-cols-6 gap-4">
         {SIGNAL_CARDS.map(({ label, count, Icon, iconClass }) => {
-          const pct = Math.round((count / STORE_DOTS.length) * 100)
+          const pct = Math.round((count / SHELF_SUBMISSION_TOTAL) * 100)
           return (
             <button
               key={label}

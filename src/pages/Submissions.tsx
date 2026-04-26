@@ -591,9 +591,15 @@ function signalMatches(sig: string, s: Submission): boolean {
   return false
 }
 
+export const SHELF_SIGNAL_COUNTS: Record<string, number> = Object.fromEntries(
+  SIGNAL_OPTIONS.map(sig => [sig, INITIAL_SUBMISSIONS.filter(s => signalMatches(sig, s)).length])
+)
+
+export const SHELF_SUBMISSION_TOTAL = INITIAL_SUBMISSIONS.length
+
 const SIGNAL_PCT: Record<string, number> = Object.fromEntries(
   SIGNAL_OPTIONS.map(sig => {
-    const count = INITIAL_SUBMISSIONS.filter(s => signalMatches(sig, s)).length
+    const count = SHELF_SIGNAL_COUNTS[sig]
     return [sig, Math.round((count / INITIAL_SUBMISSIONS.length) * 100)]
   })
 )

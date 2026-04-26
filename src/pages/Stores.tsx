@@ -806,23 +806,29 @@ export function StoresPage({ onLearnMore, onNavigateToShelf }: { onLearnMore?: (
 
       {/* Signal cards */}
       <div className="grid grid-cols-6 gap-4">
-        {SIGNAL_CARDS.map(({ label, count, Icon, iconClass }) => (
-          <button
-            key={label}
-            onClick={() => {
-              trackEvent('interact_signal_store', { store_id: null, signal_type: label, severity: count })
-              const shelfSignal = STORE_SIGNAL_TO_SHELF[label]
-              navigate(shelfSignal ? `/shelf?signal=${encodeURIComponent(shelfSignal)}` : '/shelf')
-            }}
-            className="relative flex flex-col justify-between h-[113px] p-4 bg-card border border-border rounded-2xl shadow-[0px_2px_2px_0px_var(--shadow)] text-left hover:bg-accent transition-colors"
-          >
-            <div className="flex flex-col flex-1 justify-between">
-              <span className="font-sans font-light text-xs text-foreground leading-none">{label}</span>
-              <span className="font-sans font-medium text-xl leading-7 text-foreground">{count}</span>
-            </div>
-            <Icon className={cn('absolute top-4 right-4 size-4', iconClass)} />
-          </button>
-        ))}
+        {SIGNAL_CARDS.map(({ label, count, Icon, iconClass }) => {
+          const pct = Math.round((count / STORE_DOTS.length) * 100)
+          return (
+            <button
+              key={label}
+              onClick={() => {
+                trackEvent('interact_signal_store', { store_id: null, signal_type: label, severity: count })
+                const shelfSignal = STORE_SIGNAL_TO_SHELF[label]
+                navigate(shelfSignal ? `/shelf?signal=${encodeURIComponent(shelfSignal)}` : '/shelf')
+              }}
+              className="relative flex flex-col justify-between h-[113px] p-4 bg-card border border-border rounded-2xl shadow-[0px_2px_2px_0px_var(--shadow)] text-left hover:bg-accent transition-colors"
+            >
+              <div className="flex flex-col flex-1 justify-between">
+                <span className="font-sans font-light text-xs text-foreground leading-none">{label}</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-sans font-medium text-xl leading-7 text-foreground">{count}</span>
+                  <span className="font-sans text-sm text-green leading-none">({pct}%)</span>
+                </div>
+              </div>
+              <Icon className={cn('absolute top-4 right-4 size-4', iconClass)} />
+            </button>
+          )
+        })}
       </div>
 
       {view === 'map' ? (

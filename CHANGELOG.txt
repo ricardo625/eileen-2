@@ -1,4 +1,21 @@
 # Eileen Changelog
+
+---
+
+[2026-04-25] Sidebar: shelf badge counts all 6 signal types from store dot data
+- [Sidebar] "The Shelf" SubNavItem badge now shows combined total of Flagged + No Stock + Low Stock + Good Stock + Notes + Promotion
+- [Stores] Exported SHELF_SIGNAL_TOTAL computed from SIGNAL_CARDS reduce
+- [App] Passes SHELF_SIGNAL_TOTAL as shelfBadge prop to Sidebar
+- [Sidebar] Added shelfBadge prop to SidebarProps; falls back to 39 if undefined
+
+---
+
+[2026-04-25] Shelf: 20 new grocery-store cards + infinite scroll
+- [Shelf] Added imgG01–imgG18 Unsplash grocery-store image constants
+- [Shelf] Added 20 new submissions (IDs 24–43): Kroger Riverside, Whole Foods Westwood, Trader Joe's South Pasadena, Safeway Woodland Hills, Target Glendale, Ralph's Mar Vista, Pavilions Arcadia, Albertsons Downey, Smart & Final Hawthorne, Sprouts Sherman Oaks, Food 4 Less Bell Gardens, Vons Chatsworth, Stater Bros Rialto, WinCo Foods Ontario, Bristol Farms Palos Verdes, Gelson's Pacific Palisades, Cardenas Commerce, Smart & Final Covina, Ralph's Northridge, Safeway Monrovia
+- [Shelf] Replaced per-page selector with infinite scroll (BATCH=12, IntersectionObserver on sentinel div)
+- [Shelf] visibleCount resets to BATCH on search/filter/signal change
+- [Shelf] Sentinel div placed at bottom of both grid and list containers
 Changes are appended here after every user-requested modification.
 
 ---

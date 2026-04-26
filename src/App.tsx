@@ -5,7 +5,7 @@ import { Sidebar } from '@/components/layout/Sidebar'
 import { Tooltip } from '@/components/ui/Tooltip'
 import { AiLeanPage } from '@/pages/AiLean'
 import { SubmissionsPage } from '@/pages/Submissions'
-import { StoresPage } from '@/pages/Stores'
+import { StoresPage, SHELF_SIGNAL_TOTAL } from '@/pages/Stores'
 
 type Theme = 'theme-4' | 'dark'
 
@@ -47,6 +47,7 @@ export default function App() {
           collapsed={sidebarCollapsed}
           onToggle={() => setSidebarCollapsed(c => !c)}
           activePage={activePage}
+          shelfBadge={SHELF_SIGNAL_TOTAL}
           onNavigate={page => {
             const path = Object.entries(PATH_TO_PAGE).find(([, p]) => p === page)?.[0] ?? '/shelf'
             navigate(path)

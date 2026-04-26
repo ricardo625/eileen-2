@@ -495,6 +495,8 @@ const SIGNAL_CARDS = [
   { label: 'Promotion',  count: countDotSignal('Promotion'),  Icon: Tags,              iconClass: 'text-orange-400'       },
 ]
 
+export const SHELF_SIGNAL_TOTAL = SIGNAL_CARDS.reduce((sum, c) => sum + c.count, 0)
+
 const COLUMNS = [
   { key: 'banner',          label: 'Banner'            },
   { key: 'checked',         label: 'Checked'           },

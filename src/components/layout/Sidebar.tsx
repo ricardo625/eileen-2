@@ -20,6 +20,7 @@ interface SidebarProps {
   onToggle: () => void
   activePage?: string
   onNavigate?: (page: string) => void
+  shelfBadge?: number
 }
 
 function EileenLogogram({ className }: { className?: string }) {
@@ -250,7 +251,7 @@ function SubNavItem({
   )
 }
 
-export function Sidebar({ collapsed, onToggle, activePage, onNavigate }: SidebarProps) {
+export function Sidebar({ collapsed, onToggle, activePage, onNavigate, shelfBadge }: SidebarProps) {
   const [storeInsightsExpanded, setStoreInsightsExpanded] = useState(true)
   const [planProgress, setPlanProgress] = useState(0)
 
@@ -334,7 +335,7 @@ export function Sidebar({ collapsed, onToggle, activePage, onNavigate }: Sidebar
                     label="The Shelf"
                     active={activePage === 'submissions'}
                     collapsed={collapsed}
-                    badge={39}
+                    badge={shelfBadge ?? 39}
                     onClick={() => onNavigate?.('submissions')}
                   />
                   <SubNavItem

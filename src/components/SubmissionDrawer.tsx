@@ -146,6 +146,7 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
   const [shareOpen, setShareOpen]       = useState(false)
   const sendBtnRef       = useRef<HTMLButtonElement>(null)
   const sendDropdownRef  = useRef<HTMLDivElement>(null)
+  const searchInputRefs  = useRef<Record<string, HTMLInputElement | null>>({})
 
   // Reset per-card state when a different card is opened
   useEffect(() => {
@@ -357,6 +358,7 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
                     )}>
                       <Search className="size-5 text-muted-foreground shrink-0" />
                       <input
+                        ref={el => { searchInputRefs.current[title] = el }}
                         type="text"
                         value={search}
                         onChange={e => setSectionSearches(prev => ({ ...prev, [title]: e.target.value }))}
@@ -444,6 +446,13 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
                     {allOpts.length === 0 && (
                       <span className="px-6 py-3 font-sans text-sm text-muted-foreground">No items added.</span>
                     )}
+                    <button
+                      onClick={() => searchInputRefs.current[title]?.focus()}
+                      className="flex items-center gap-2 h-10 px-6 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <Plus className="size-3.5 shrink-0" />
+                      <span className="font-poppins font-medium text-sm leading-none">Add item</span>
+                    </button>
                   </div>
                 </div>
               )

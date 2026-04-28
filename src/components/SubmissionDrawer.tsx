@@ -1,4 +1,4 @@
-import { Archive, Check, ChevronsDown, ChevronLeft, ChevronRight, CircleDashed, FileDown, FlagTriangleRight, Forward, Link, Plus, Search, Sheet, X, XCircle } from 'lucide-react'
+import { Archive, Check, ChevronsDown, ChevronLeft, ChevronRight, CircleDashed, FileDown, FlagTriangleRight, Forward, Link, Plus, Search, Sheet, Trash2, XCircle } from 'lucide-react'
 import { ToastStack, type ToastItem } from '@/components/ui/Toast'
 import { ShareDialog } from '@/components/ShareDialog'
 import { Tooltip } from '@/components/ui/Tooltip'
@@ -79,9 +79,9 @@ function generateProducts(id: string, badges: string[]) {
 }
 
 const SECTIONS = [
-  { title: 'Account Management',   empty: 'No account management notes added.' },
-  { title: 'Internal Store Notes', empty: 'No store notes added.' },
   { title: 'Action Items',         empty: 'No action items added.' },
+  { title: 'Internal Store Notes', empty: 'No store notes added.' },
+  { title: 'Account Management',   empty: 'No account management notes added.' },
 ]
 
 const NOTE_OPTIONS: Record<string, string[]> = {
@@ -132,13 +132,11 @@ interface Props {
 }
 
 export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission }: Props) {
-  const [openSection, setOpenSection]   = useState<string | null>(null)
-  const [noteSearch, setNoteSearch]     = useState('')
+  const [sectionSearches, setSectionSearches] = useState<Record<string, string>>({})
+  const [focusedSection, setFocusedSection]   = useState<string | null>(null)
   const [selectedNotes, setSelectedNotes] = useState<Record<string, string[]>>(
     () => initNotes(submission)
   )
-  const [creatingNote, setCreatingNote] = useState(false)
-  const [newNoteName, setNewNoteName]   = useState('')
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
   const [flagged, setFlagged]           = useState(submission?.badges.includes('flagged') ?? false)
@@ -147,28 +145,14 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
   const [shareOpen, setShareOpen]       = useState(false)
   const sendBtnRef       = useRef<HTMLButtonElement>(null)
   const sendDropdownRef  = useRef<HTMLDivElement>(null)
-  const sectionRefs      = useRef<Map<string, HTMLDivElement>>(new Map())
 
   // Reset per-card state when a different card is opened
   useEffect(() => {
     setFlagged(submission?.badges.includes('flagged') ?? false)
     setSelectedNotes(initNotes(submission))
+    setSectionSearches({})
+    setFocusedSection(null)
   }, [submission?.id])
-
-  useEffect(() => {
-    if (!openSection) return
-    function handleClick(e: MouseEvent) {
-      const ref = sectionRefs.current.get(openSection!)
-      if (ref && !ref.contains(e.target as Node)) {
-        setOpenSection(null)
-        setNoteSearch('')
-        setCreatingNote(false)
-        setNewNoteName('')
-      }
-    }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [openSection])
 
   useEffect(() => {
     if (!sendOpen) return
@@ -188,9 +172,6 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
   const images   = Array.from({ length: Math.min(submission?.imageCount ?? 1, 5) }, () => submission?.image ?? '')
   const products = submission ? generateProducts(submission.id, submission.badges) : []
 
-  const sectionOptions = openSection ? (NOTE_OPTIONS[openSection] ?? []) : []
-  const filteredNotes  = sectionOptions.filter(n => n.toLowerCase().includes(noteSearch.toLowerCase()))
-
   const toggleNote = (section: string, note: string) => {
     const isAdding = !(selectedNotes[section] ?? []).includes(note)
     if (isAdding) trackEvent('select_tag_shelf_drawer', { card_id: cardId ?? null, tag_name: note, is_new: false })
@@ -203,11 +184,6 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
   const removeNote = (section: string, note: string) =>
     setSelectedNotes(prev => ({ ...prev, [section]: (prev[section] ?? []).filter(n => n !== note) }))
 
-  const BADGE_STYLE: Record<string, { bg: string; text: string }> = {
-    'Account Management':   { bg: 'from-soft-rose to-brighter',  text: 'text-soft-rose-foreground' },
-    'Internal Store Notes': { bg: 'from-soft-indigo to-brighter', text: 'text-soft-indigo-foreground' },
-    'Action Items':         { bg: 'from-soft-lime to-brighter',   text: 'text-soft-lime-foreground' },
-  }
 
   return (
     <>
@@ -333,134 +309,134 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
 
           {/* Info sections */}
           <div className="flex flex-col">
-            {SECTIONS.map(({ title, empty }) => {
-              const tags  = selectedNotes[title] ?? []
-              const badge = BADGE_STYLE[title] ?? BADGE_STYLE['Internal Store Notes']
+            {SECTIONS.map(({ title }) => {
+              const tags     = selectedNotes[title] ?? []
+              const search   = sectionSearches[title] ?? ''
+              const baseOpts = NOTE_OPTIONS[title] ?? []
+              const customOpts = tags.filter(t => !baseOpts.includes(t))
+              const allOpts  = [...baseOpts, ...customOpts]
+              // Dropdown: suggestions from base options filtered by search
+              const suggestions = search
+                ? baseOpts.filter(n => n.toLowerCase().includes(search.toLowerCase()))
+                : []
+              const isDropdownOpen = focusedSection === title && search.length > 0
+              const exactMatch = allOpts.some(n => n.toLowerCase() === search.toLowerCase())
+
+              const commitSearch = () => {
+                const name = search.trim()
+                if (!name) return
+                if (exactMatch) {
+                  const match = allOpts.find(n => n.toLowerCase() === name.toLowerCase())!
+                  toggleNote(title, match)
+                } else {
+                  trackEvent('select_tag_shelf_drawer', { card_id: cardId ?? null, tag_name: name, is_new: true })
+                  setSelectedNotes(prev => ({ ...prev, [title]: [...(prev[title] ?? []), name] }))
+                }
+                setSectionSearches(prev => ({ ...prev, [title]: '' }))
+                setFocusedSection(null)
+              }
+
               return (
-                <div key={title} className="flex items-center justify-between gap-4 px-6 py-5 border-b border-dashed border-border">
-                  <div className="flex flex-col gap-2.5 min-w-0">
+                <div key={title} className="flex flex-col gap-0 border-b border-dashed border-border">
+                  {/* Title row */}
+                  <div className="flex items-center justify-between px-6 pt-5 pb-2.5">
                     <span className="font-sans font-medium text-lg text-foreground leading-none">{title}</span>
-                    {tags.length > 0 ? (
-                      <div className="flex flex-wrap gap-2.5">
-                        {tags.map(tag => (
-                          <span
-                            key={tag}
-                            className={cn(
-                              'inline-flex items-center gap-1 px-3 py-1.5 rounded-md border border-border bg-gradient-to-r text-xs font-semibold font-sans whitespace-nowrap',
-                              badge.bg, badge.text,
-                            )}
-                          >
-                            {tag}
+                  </div>
+
+                  {/* Inline search + dropdown */}
+                  <div className="relative mx-6">
+                    <div className={cn(
+                      'flex items-center gap-2.5 py-2 border-b transition-colors',
+                      focusedSection === title ? 'border-[#eb978a]' : 'border-border',
+                    )}>
+                      <Search className="size-5 text-muted-foreground shrink-0" />
+                      <input
+                        type="text"
+                        value={search}
+                        onChange={e => setSectionSearches(prev => ({ ...prev, [title]: e.target.value }))}
+                        onFocus={() => setFocusedSection(title)}
+                        onBlur={() => setTimeout(() => setFocusedSection(null), 150)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') { e.preventDefault(); commitSearch() }
+                          if (e.key === 'Escape') { setSectionSearches(prev => ({ ...prev, [title]: '' })); setFocusedSection(null) }
+                        }}
+                        placeholder={`Search ${title.toLowerCase()}`}
+                        className="flex-1 text-base bg-transparent outline-none text-foreground placeholder:text-muted-foreground"
+                      />
+                    </div>
+
+                    {/* Suggestions dropdown */}
+                    {isDropdownOpen && (
+                      <div className="absolute left-0 right-0 top-full mt-1 bg-card border border-border rounded-xl shadow-[0px_4px_28px_0px_var(--shadow)] z-[60] overflow-hidden flex flex-col">
+                        {suggestions.map(note => {
+                          const checked = tags.includes(note)
+                          return (
                             <button
-                              onClick={() => removeNote(title, tag)}
-                              className="size-4 flex items-center justify-center opacity-60 hover:opacity-100 transition-opacity shrink-0"
+                              key={note}
+                              onMouseDown={e => e.preventDefault()}
+                              onClick={() => { toggleNote(title, note); setSectionSearches(prev => ({ ...prev, [title]: '' })) }}
+                              className="flex items-center gap-3 h-10 px-4 hover:bg-accent transition-colors text-left"
                             >
-                              <X className="size-3" />
+                              <div className={cn(
+                                'size-4 rounded-[4px] shrink-0 flex items-center justify-center',
+                                checked
+                                  ? 'bg-darker shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1)]'
+                                  : 'border border-dashed border-darker/20',
+                              )}>
+                                {checked && <Check className="size-2.5 text-background stroke-[2.5]" />}
+                              </div>
+                              <span className="flex-1 font-poppins font-medium text-sm text-sidebar-foreground leading-5 truncate">{note}</span>
                             </button>
-                          </span>
-                        ))}
+                          )
+                        })}
+                        {!exactMatch && (
+                          <button
+                            onMouseDown={e => e.preventDefault()}
+                            onClick={commitSearch}
+                            className="flex items-center gap-3 h-10 px-4 hover:bg-accent transition-colors text-left border-t border-border"
+                          >
+                            <Plus className="size-4 text-muted-foreground shrink-0" />
+                            <span className="font-poppins font-medium text-sm text-muted-foreground leading-5">Add "{search}"</span>
+                          </button>
+                        )}
+                        {suggestions.length === 0 && exactMatch && (
+                          <span className="px-4 py-2.5 text-sm text-muted-foreground font-sans">Press Enter to toggle</span>
+                        )}
                       </div>
-                    ) : (
-                      <span className="font-sans text-sm text-muted-foreground">{empty}</span>
                     )}
                   </div>
 
-                  {/* + button with dropdown */}
-                  <div
-                    className="relative shrink-0"
-                    ref={el => {
-                      if (el) sectionRefs.current.set(title, el)
-                      else sectionRefs.current.delete(title)
-                    }}
-                  >
-                    <Tooltip label={`Add ${title}`}>
-                      <button
-                        className="size-9 flex items-center justify-center rounded-full bg-background border border-input shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] hover:bg-accent transition-colors"
-                        onClick={() => {
-                          const isOpening = openSection !== title
-                          if (isOpening) trackEvent('click_add_tag_shelf_drawer', { card_id: cardId ?? null, existing_tags_count: tags.length, source: 'drawer' })
-                          setOpenSection(openSection === title ? null : title)
-                          setNoteSearch('')
-                          setCreatingNote(false)
-                          setNewNoteName('')
-                        }}
-                      >
-                        <Plus className="size-4 text-foreground" />
-                      </button>
-                    </Tooltip>
-
-                    {openSection === title && (
-                      <div className="absolute right-0 bottom-full mb-2 w-[258px] bg-background border border-sidebar-border rounded-2xl shadow-[0px_4px_28px_0px_var(--shadow)] p-0.5 z-[60] flex flex-col overflow-hidden">
-                        <div className="p-2 pb-0">
-                          <div className="flex items-center gap-2 h-9 px-3 bg-background border border-input rounded-full shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] overflow-hidden">
-                            <Search className="size-4 text-muted-foreground shrink-0" />
-                            <input
-                              type="text"
-                              value={noteSearch}
-                              onChange={e => setNoteSearch(e.target.value)}
-                              placeholder="Search"
-                              className="flex-1 text-sm bg-transparent outline-none text-foreground placeholder:text-muted-foreground min-w-0"
-                              autoFocus
-                            />
+                  {/* List */}
+                  <div className="flex flex-col pb-2">
+                    {allOpts.map(note => {
+                      const checked = tags.includes(note)
+                      return (
+                        <button
+                          key={note}
+                          onClick={() => toggleNote(title, note)}
+                          className="group/row flex items-center gap-3 h-11 px-6 border-b border-border-alpha overflow-hidden hover:bg-accent transition-colors text-left"
+                        >
+                          <div className={cn(
+                            'size-4 rounded-[4px] shrink-0 flex items-center justify-center',
+                            checked
+                              ? 'bg-darker shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)]'
+                              : 'border border-dashed border-darker/20',
+                          )}>
+                            {checked && <Check className="size-2.5 text-background stroke-[2.5]" />}
                           </div>
-                        </div>
-                        <div className="p-2">
-                          {!creatingNote && (
-                            <button
-                              onClick={() => setCreatingNote(true)}
-                              className="w-full h-9 flex items-center justify-center px-3 bg-background border border-dashed border-input rounded-full text-sm text-foreground hover:bg-accent transition-colors"
-                            >
-                              Create Custom Note
-                            </button>
-                          )}
-                        </div>
-                        {creatingNote && (
-                          <form
-                            onSubmit={e => {
-                              e.preventDefault()
-                              const name = newNoteName.trim()
-                              if (name && openSection) {
-                                trackEvent('select_tag_shelf_drawer', { card_id: cardId ?? null, tag_name: name, is_new: true })
-                                setSelectedNotes(prev => ({ ...prev, [openSection]: [...(prev[openSection] ?? []), name] }))
-                              }
-                              setCreatingNote(false)
-                              setNewNoteName('')
-                            }}
-                            className="flex items-center gap-3 h-11 px-4 border-b border-border-alpha shrink-0"
+                          <span className="flex-1 font-poppins font-medium text-sm text-sidebar-foreground leading-5 truncate">{note}</span>
+                          <span
+                            role="button"
+                            onClick={e => { e.stopPropagation(); removeNote(title, note) }}
+                            className="size-4 flex items-center justify-center opacity-0 group-hover/row:opacity-60 hover:!opacity-100 transition-opacity shrink-0"
                           >
-                            <div className="size-4 rounded-[4px] shrink-0 border border-darker/40" />
-                            <input
-                              type="text"
-                              value={newNoteName}
-                              onChange={e => setNewNoteName(e.target.value)}
-                              placeholder="Note name..."
-                              className="flex-1 font-poppins font-medium text-sm text-sidebar-foreground bg-transparent outline-none placeholder:text-muted-foreground min-w-0"
-                              autoFocus
-                              onKeyDown={e => { if (e.key === 'Escape') { setCreatingNote(false); setNewNoteName('') } }}
-                            />
-                          </form>
-                        )}
-                        <div className={cn(filteredNotes.length > 5 ? 'overflow-y-auto max-h-[220px] hover-scroll' : '', 'pr-3')}>
-                          {filteredNotes.map(note => {
-                            const checked = (selectedNotes[openSection!] ?? []).includes(note)
-                            return (
-                              <button
-                                key={note}
-                                className="w-full flex items-center gap-3 h-11 px-4 text-left hover:bg-accent transition-colors rounded-xl"
-                                onClick={() => toggleNote(openSection!, note)}
-                              >
-                                <div className={cn(
-                                  'size-4 rounded-[4px] shrink-0 flex items-center justify-center',
-                                  checked ? 'bg-darker shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)]' : 'border border-darker/40',
-                                )}>
-                                  {checked && <Check className="size-2.5 text-background stroke-[2.5]" />}
-                                </div>
-                                <span className="font-poppins font-medium text-sm text-sidebar-foreground leading-5 truncate">{note}</span>
-                              </button>
-                            )
-                          })}
-                        </div>
-                      </div>
+                            <Trash2 className="size-4 text-muted-foreground" />
+                          </span>
+                        </button>
+                      )
+                    })}
+                    {allOpts.length === 0 && (
+                      <span className="px-6 py-3 font-sans text-sm text-muted-foreground">No items added.</span>
                     )}
                   </div>
                 </div>

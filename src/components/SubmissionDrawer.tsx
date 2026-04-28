@@ -137,6 +137,7 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
   const [selectedNotes, setSelectedNotes] = useState<Record<string, string[]>>(
     () => initNotes(submission)
   )
+  const [deletedOptions, setDeletedOptions] = useState<Record<string, string[]>>({})
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
   const [flagged, setFlagged]           = useState(submission?.badges.includes('flagged') ?? false)
@@ -150,6 +151,7 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
   useEffect(() => {
     setFlagged(submission?.badges.includes('flagged') ?? false)
     setSelectedNotes(initNotes(submission))
+    setDeletedOptions({})
     setSectionSearches({})
     setFocusedSection(null)
   }, [submission?.id])
@@ -181,8 +183,10 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
     })
   }
 
-  const removeNote = (section: string, note: string) =>
+  const deleteItem = (section: string, note: string, isBase: boolean) => {
     setSelectedNotes(prev => ({ ...prev, [section]: (prev[section] ?? []).filter(n => n !== note) }))
+    if (isBase) setDeletedOptions(prev => ({ ...prev, [section]: [...(prev[section] ?? []), note] }))
+  }
 
 
   return (
@@ -313,11 +317,13 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
               const tags     = selectedNotes[title] ?? []
               const search   = sectionSearches[title] ?? ''
               const baseOpts = NOTE_OPTIONS[title] ?? []
+              const deleted  = deletedOptions[title] ?? []
+              const visibleBase = baseOpts.filter(n => !deleted.includes(n))
               const customOpts = tags.filter(t => !baseOpts.includes(t))
-              const allOpts  = [...baseOpts, ...customOpts]
+              const allOpts  = [...visibleBase, ...customOpts]
               // Dropdown: suggestions from base options filtered by search
               const suggestions = search
-                ? baseOpts.filter(n => n.toLowerCase().includes(search.toLowerCase()))
+                ? visibleBase.filter(n => n.toLowerCase().includes(search.toLowerCase()))
                 : []
               const isDropdownOpen = focusedSection === title && search.length > 0
               const exactMatch = allOpts.some(n => n.toLowerCase() === search.toLowerCase())
@@ -427,7 +433,7 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
                           <span className="flex-1 font-poppins font-medium text-sm text-sidebar-foreground leading-5 truncate">{note}</span>
                           <span
                             role="button"
-                            onClick={e => { e.stopPropagation(); removeNote(title, note) }}
+                            onClick={e => { e.stopPropagation(); deleteItem(title, note, baseOpts.includes(note)) }}
                             className="size-4 flex items-center justify-center opacity-0 group-hover/row:opacity-60 hover:!opacity-100 transition-opacity shrink-0"
                           >
                             <Trash2 className="size-4 text-muted-foreground" />

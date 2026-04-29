@@ -306,13 +306,13 @@ export function Sidebar({ collapsed, onToggle, activePage, onNavigate, shelfBadg
               hasRedDot
               collapsed={collapsed}
             />
-            <NavItem
+            {/* <NavItem
               icon={<Bot className="size-5" />}
               label="Ai.Lean"
               active={activePage === 'ai-lean'}
               collapsed={collapsed}
               onClick={() => onNavigate?.('ai-lean')}
-            />
+            /> */}
 
             {/* Store Insights expandable group */}
             <div className="flex flex-col gap-1">
@@ -366,10 +366,10 @@ export function Sidebar({ collapsed, onToggle, activePage, onNavigate, shelfBadg
           {/* Divider */}
           <div className="border-t border-dashed border-sidebar-border shrink-0" />
 
-          {/* Secondary nav */}
+          {/* Secondary nav — hidden for now
           <nav className={cn('flex flex-col gap-1', collapsed ? 'px-3' : 'px-6')}>
             <NavItem icon={<Settings className="size-5" />} label="Settings" collapsed={collapsed} />
-          </nav>
+          </nav> */}
 
           {/* Spacer */}
           <div className="flex-1" />

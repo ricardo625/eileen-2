@@ -3,9 +3,10 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { STORE_RISK_MAP } from '@/lib/storeRiskMap'
 import { createPortal } from 'react-dom'
 import {
-  Archive, ChevronDown, CircleCheck, ChevronsDown, CircleDashed, FileDown,
-  FlagTriangleRight, Forward, LayoutGrid, LayoutList, Check, Link,
-  Search, Sheet, SlidersHorizontal, StickyNote, Upload, X,
+  Archive, BarChart3, Barcode, Calendar, ChevronDown, CircleCheck,
+  FileDown, FlagTriangleRight, Forward,
+  LayoutGrid, LayoutList, Check, Link, Package, Search, Sheet,
+  SlidersHorizontal, StickyNote, Truck, Upload, X,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { trackEvent } from '@/lib/clarity'
@@ -56,50 +57,7 @@ const imgG16 = 'https://images.unsplash.com/photo-1553531889-56cc480ac5cb?w=800&
 const imgG17 = 'https://images.unsplash.com/photo-1515706886582-54c73c5eaf41?w=800&auto=format&fit=crop'
 const imgG18 = 'https://images.unsplash.com/photo-1521566652839-697aa473761a?w=800&auto=format&fit=crop'
 
-type BadgeVariant = 'flagged' | 'notes' | 'no-stock' | 'low-stock'
-const BADGE_ORDER: BadgeVariant[] = ['flagged', 'notes', 'no-stock', 'low-stock']
-const sortBadges = (badges: BadgeVariant[]) =>
-  [...badges].sort((a, b) => BADGE_ORDER.indexOf(a) - BADGE_ORDER.indexOf(b))
-
-const BADGE_CONFIG: Record<BadgeVariant, {
-  label: string
-  wrapperClass: string
-  Icon: React.ElementType
-}> = {
-  flagged: {
-    label: 'Flagged',
-    wrapperClass: 'bg-gradient-to-r from-soft-red to-brighter text-soft-red-foreground',
-    Icon: FlagTriangleRight,
-  },
-  notes: {
-    label: 'Notes',
-    wrapperClass: 'bg-gradient-to-r from-soft-indigo to-brighter text-soft-indigo-foreground',
-    Icon: StickyNote,
-  },
-  'no-stock': {
-    label: 'No Stock',
-    wrapperClass: 'bg-card text-foreground',
-    Icon: CircleDashed,
-  },
-  'low-stock': {
-    label: 'Low Stock',
-    wrapperClass: 'bg-gradient-to-r from-soft-amber to-brighter text-soft-amber-foreground',
-    Icon: ChevronsDown,
-  },
-}
-
-function Badge({ variant }: { variant: BadgeVariant }) {
-  const { label, wrapperClass, Icon } = BADGE_CONFIG[variant]
-  return (
-    <div className={cn(
-      'flex items-center gap-1 px-3 py-2.5 rounded-md border border-border text-xs font-semibold whitespace-nowrap shrink-0',
-      wrapperClass,
-    )}>
-      <Icon className="size-4 opacity-40 shrink-0" />
-      <span>{label}</span>
-    </div>
-  )
-}
+import { SignalBadge, type BadgeVariant, sortBadges } from '@/components/SignalBadge'
 
 interface Submission {
   id: string
@@ -124,7 +82,7 @@ const INITIAL_SUBMISSIONS: Submission[] = [
     badges: ['flagged', 'notes', 'no-stock'],
     noteCount: 4,
     imageCount: 13,
-    completedAt: 'Apr 18, 2026',
+    completedAt: 'Apr 28, 2026',
     completedBy: 'Jaqueline',
   },
   {
@@ -136,7 +94,7 @@ const INITIAL_SUBMISSIONS: Submission[] = [
     noteCount: 2,
     archived: true,
     imageCount: 7,
-    completedAt: 'Apr 17, 2026',
+    completedAt: 'Apr 27, 2026',
     completedBy: 'Marcus',
   },
   {
@@ -146,7 +104,7 @@ const INITIAL_SUBMISSIONS: Submission[] = [
     image: imgStore3,
     badges: ['no-stock'],
     imageCount: 5,
-    completedAt: 'Apr 16, 2026',
+    completedAt: 'Apr 26, 2026',
     completedBy: 'Sara',
   },
   {
@@ -157,7 +115,7 @@ const INITIAL_SUBMISSIONS: Submission[] = [
     badges: ['flagged', 'notes'],
     noteCount: 2,
     imageCount: 9,
-    completedAt: 'Apr 15, 2026',
+    completedAt: 'Apr 25, 2026',
     completedBy: 'Maria',
   },
   {
@@ -167,7 +125,7 @@ const INITIAL_SUBMISSIONS: Submission[] = [
     image: imgU02,
     badges: ['no-stock'],
     imageCount: 6,
-    completedAt: 'Apr 14, 2026',
+    completedAt: 'Apr 24, 2026',
     completedBy: 'David',
   },
   {
@@ -178,7 +136,7 @@ const INITIAL_SUBMISSIONS: Submission[] = [
     badges: ['low-stock', 'notes'],
     noteCount: 3,
     imageCount: 11,
-    completedAt: 'Apr 13, 2026',
+    completedAt: 'Apr 23, 2026',
     completedBy: 'Thomas',
   },
   {
@@ -188,7 +146,7 @@ const INITIAL_SUBMISSIONS: Submission[] = [
     image: imgU04,
     badges: ['flagged'],
     imageCount: 4,
-    completedAt: 'Apr 12, 2026',
+    completedAt: 'Apr 22, 2026',
     completedBy: 'Emma',
   },
   {
@@ -624,7 +582,7 @@ const DATE_OPTIONS = [
   'All Time',
 ]
 
-const FILTER_SELECTS = ['State', 'Banner', 'Notes', 'Acc Manager', 'Campaign', 'Display Status']
+const FILTER_SELECTS = ['State', 'Acc Manager']
 
 const FILTER_OPTIONS: Record<string, string[]> = {
   'State':          ['CA'],
@@ -646,6 +604,10 @@ function cardNoteTypes(id: string, noteCount?: number): string[] {
   if (!noteCount) return []
   const i = parseInt(id) - 1
   return [NOTE_TYPES[i % NOTE_TYPES.length], NOTE_TYPES[(i + 2) % NOTE_TYPES.length]]
+}
+function cardSkuCount(id: string): number {
+  const n = parseInt(id)
+  return 4 + (n % 9)
 }
 function cardDisplayStatus(id: string): 'Found' | 'Not Found' {
   return parseInt(id) % 3 === 0 ? 'Not Found' : 'Found'
@@ -744,11 +706,17 @@ function SubmissionCard({ submission, selected, onToggle, onOpen }: {
           </div>
         )}
 
+        {/* SKUs row */}
+        <div className="flex items-center gap-2 px-4 py-2 border border-border rounded-md text-sm text-foreground">
+          <span className="flex-1">SKUs</span>
+          <span className="text-right">{cardSkuCount(submission.id)}</span>
+        </div>
+
         <div className="flex items-center gap-1.5 pt-4">
           {sortBadges(submission.badges).map(b => (
             b === 'notes' && submission.noteCount
-              ? <Tooltip key={b} label={`${submission.noteCount} note${submission.noteCount !== 1 ? 's' : ''}`}><Badge variant={b} /></Tooltip>
-              : <Badge key={b} variant={b} />
+              ? <Tooltip key={b} label={`${submission.noteCount} note${submission.noteCount !== 1 ? 's' : ''}`}><SignalBadge variant={b} /></Tooltip>
+              : <SignalBadge key={b} variant={b} />
           ))}
           <div className="flex-1 flex items-center justify-end min-w-0">
             <div
@@ -826,8 +794,8 @@ function SubmissionListRow({ submission, selected, onToggle, onOpen }: {
         <div className="flex-1 flex items-center justify-end gap-1.5 min-w-0">
           {sortBadges(submission.badges).map(b => (
             b === 'notes' && submission.noteCount
-              ? <Tooltip key={b} label={`${submission.noteCount} note${submission.noteCount !== 1 ? 's' : ''}`}><Badge variant={b} /></Tooltip>
-              : <Badge key={b} variant={b} />
+              ? <Tooltip key={b} label={`${submission.noteCount} note${submission.noteCount !== 1 ? 's' : ''}`}><SignalBadge variant={b} /></Tooltip>
+              : <SignalBadge key={b} variant={b} />
           ))}
         </div>
       </div>
@@ -843,6 +811,51 @@ const RECENT_SEARCHES = [
   'Safeway Long Beach',
 ]
 
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December']
+const DAY_HEADERS = ['Su','Mo','Tu','We','Th','Fr','Sa']
+
+function isSameDay(a: Date, b: Date) {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
+}
+
+function getCalDays(year: number, month: number): { date: Date; outOfMonth: boolean }[] {
+  const firstDay = new Date(year, month, 1).getDay()
+  const daysInMonth = new Date(year, month + 1, 0).getDate()
+  const daysInPrevMonth = new Date(year, month, 0).getDate()
+  const days: { date: Date; outOfMonth: boolean }[] = []
+  for (let i = firstDay - 1; i >= 0; i--) days.push({ date: new Date(year, month - 1, daysInPrevMonth - i), outOfMonth: true })
+  for (let d = 1; d <= daysInMonth; d++) days.push({ date: new Date(year, month, d), outOfMonth: false })
+  const rem = days.length % 7
+  if (rem > 0) for (let d = 1; d <= 7 - rem; d++) days.push({ date: new Date(year, month + 1, d), outOfMonth: true })
+  return days
+}
+
+function addMonth(ym: { year: number; month: number }, delta: number) {
+  let m = ym.month + delta
+  let y = ym.year
+  while (m > 11) { m -= 12; y++ }
+  while (m < 0) { m += 12; y-- }
+  return { year: y, month: m }
+}
+
+function isInRange(date: Date, start: Date | null, end: Date | null, hover: Date | null) {
+  if (!start) return false
+  const eff = end ?? hover
+  if (!eff || isSameDay(start, eff)) return false
+  const lo = start < eff ? start : eff
+  const hi = start < eff ? eff : start
+  return date > lo && date < hi
+}
+
+function isRangeEdge(date: Date, start: Date | null, end: Date | null, hover: Date | null, side: 'start' | 'end') {
+  if (!start) return false
+  const eff = end ?? hover
+  const lo = eff && start > eff ? eff : start
+  const hi = eff && start > eff ? start : eff
+  if (side === 'start') return isSameDay(date, lo)
+  return !!hi && !isSameDay(start, hi) && isSameDay(date, hi)
+}
+
 export function SubmissionsPage() {
   const { submissionId } = useParams<{ submissionId: string }>()
   const navigate = useNavigate()
@@ -853,7 +866,12 @@ export function SubmissionsPage() {
   const [view, setView] = useState<'grid' | 'list'>('grid')
   const [filterOpen, setFilterOpen] = useState(false)
 
-  const [activeDateRange, setActiveDateRange] = useState('Today')
+  const [activeDateRange, setActiveDateRange] = useState('Last 30 Days')
+  const [datePickerOpen, setDatePickerOpen] = useState(false)
+  const [customRange, setCustomRange] = useState<{ start: Date | null; end: Date | null }>({ start: null, end: null })
+  const [hoverDate, setHoverDate] = useState<Date | null>(null)
+  const [cal1, setCal1] = useState(() => { const now = new Date(); return { year: now.getFullYear(), month: now.getMonth() } })
+  const [cal2, setCal2] = useState(() => { const now = new Date(); return addMonth({ year: now.getFullYear(), month: now.getMonth() }, 1) })
   const [openFilterSelect, setOpenFilterSelect] = useState<string | null>(null)
   const [filterSelections, setFilterSelections] = useState<Record<string, string[]>>(
     Object.fromEntries(FILTER_SELECTS.map(k => [k, []]))
@@ -864,16 +882,17 @@ export function SubmissionsPage() {
   const [batch, setBatch] = useState(12)
   const [visibleCount, setVisibleCount] = useState(12)
   const [batchOpen, setBatchOpen] = useState(false)
-  const [signalOpen, setSignalOpen] = useState(false)
   const [activeSignals, setActiveSignals] = useState<string[]>(() => {
     const sig = searchParams.get('signal')
     return sig && SIGNAL_OPTIONS.includes(sig) ? [sig] : []
   })
+  const [openPillDropdown, setOpenPillDropdown] = useState<string | null>(null)
   const [islandSendOpen, setIslandSendOpen] = useState(false)
   const [toasts, setToasts] = useState<ToastItem[]>([])
   const [shareOpen, setShareOpen] = useState(false)
   const batchBtnRef = useRef<HTMLButtonElement>(null)
   const batchDropdownRef = useRef<HTMLDivElement>(null)
+  const pillDropdownRef = useRef<HTMLDivElement>(null)
   const sentinelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -935,6 +954,38 @@ export function SubmissionsPage() {
       if (!matches) return false
     }
 
+    // --- Date Range ---
+    if (activeDateRange !== 'All Time') {
+      const now = new Date()
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      const submDate = s.completedAt ? (() => { const d = new Date(s.completedAt); return new Date(d.getFullYear(), d.getMonth(), d.getDate()) })() : null
+      if (!submDate) return false
+      if (activeDateRange === 'Today') {
+        if (submDate.getTime() !== today.getTime()) return false
+      } else if (activeDateRange === 'Last 7 Days') {
+        const cutoff = new Date(today); cutoff.setDate(today.getDate() - 6)
+        if (submDate < cutoff || submDate > today) return false
+      } else if (activeDateRange === 'Last 30 Days') {
+        const cutoff = new Date(today); cutoff.setDate(today.getDate() - 29)
+        if (submDate < cutoff || submDate > today) return false
+      } else if (activeDateRange === 'Month to Date') {
+        const start = new Date(today.getFullYear(), today.getMonth(), 1)
+        if (submDate < start || submDate > today) return false
+      } else if (activeDateRange === 'Year to Date') {
+        const start = new Date(today.getFullYear(), 0, 1)
+        if (submDate < start || submDate > today) return false
+      } else if (activeDateRange === 'Custom') {
+        if (customRange.start) {
+          const start = new Date(customRange.start.getFullYear(), customRange.start.getMonth(), customRange.start.getDate())
+          if (submDate < start) return false
+        }
+        if (customRange.end) {
+          const end = new Date(customRange.end.getFullYear(), customRange.end.getMonth(), customRange.end.getDate())
+          if (submDate > end) return false
+        }
+      }
+    }
+
     return true
   })
   const visibleSubmissions = filteredSubmissions.slice(0, visibleCount)
@@ -942,7 +993,7 @@ export function SubmissionsPage() {
 
   const toggleFilterOption = (select: string, option: string) =>
     setFilterSelections(prev => {
-      const cur = prev[select]
+      const cur = prev[select] ?? []
       return {
         ...prev,
         [select]: cur.includes(option) ? cur.filter(x => x !== option) : [...cur, option],
@@ -972,8 +1023,8 @@ export function SubmissionsPage() {
   }
   const filterBtnRef = useRef<HTMLButtonElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
-  const signalBtnRef = useRef<HTMLButtonElement>(null)
-  const signalDropdownRef = useRef<HTMLDivElement>(null)
+  const datePillRef = useRef<HTMLButtonElement>(null)
+  const datePickerRef = useRef<HTMLDivElement>(null)
   const islandSendBtnRef = useRef<HTMLButtonElement>(null)
   const islandSendDropdownRef = useRef<HTMLDivElement>(null)
 
@@ -1004,12 +1055,6 @@ export function SubmissionsPage() {
         setOpenFilterSelect(null)
       }
       if (
-        signalDropdownRef.current && !signalDropdownRef.current.contains(t) &&
-        signalBtnRef.current && !signalBtnRef.current.contains(t)
-      ) {
-        setSignalOpen(false)
-      }
-      if (
         islandSendDropdownRef.current && !islandSendDropdownRef.current.contains(t) &&
         islandSendBtnRef.current && !islandSendBtnRef.current.contains(t)
       ) {
@@ -1020,6 +1065,15 @@ export function SubmissionsPage() {
         batchBtnRef.current && !batchBtnRef.current.contains(t)
       ) {
         setBatchOpen(false)
+      }
+      if (pillDropdownRef.current && !pillDropdownRef.current.contains(t)) {
+        setOpenPillDropdown(null)
+      }
+      if (
+        datePickerRef.current && !datePickerRef.current.contains(t) &&
+        datePillRef.current && !datePillRef.current.contains(t)
+      ) {
+        setDatePickerOpen(false)
       }
       if (searchWrapperRef.current && !searchWrapperRef.current.contains(t)) {
         setSearchFocused(false)
@@ -1035,6 +1089,9 @@ export function SubmissionsPage() {
       <div className="flex items-center justify-between">
         <h1 className="font-sans font-medium text-2xl leading-8 text-foreground">The Shelf</h1>
         <div className="flex items-center gap-2">
+          {selectedIds.size > 0 && (
+            <span className="text-sm text-muted-foreground whitespace-nowrap">Selected {selectedIds.size}</span>
+          )}
           <Tooltip label="Select all">
             <button
               onClick={() =>
@@ -1106,154 +1163,383 @@ export function SubmissionsPage() {
         </div>
       </div>
 
-      {/* Search + Filters */}
-      <div className="relative flex items-center gap-3">
-        <div ref={searchWrapperRef} className="flex-1 relative">
-          <div className="flex items-center gap-1 h-9 px-3 bg-background border border-input rounded-full shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] overflow-hidden">
-            <Search className="size-5 text-muted-foreground shrink-0" />
-            <input
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              onFocus={() => setSearchFocused(true)}
-              placeholder="Search by store name, banner, city and state."
-              className="flex-1 text-sm bg-transparent outline-none text-foreground placeholder:text-muted-foreground min-w-0"
-            />
-          </div>
-          {searchFocused && (() => {
-            const q = search.trim().toLowerCase()
-            const items = q
-              ? RECENT_SEARCHES.filter(r => r.toLowerCase().includes(q))
-              : RECENT_SEARCHES
-            if (items.length === 0) return null
-            return (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-2xl shadow-[0px_4px_28px_0px_var(--shadow)] overflow-hidden z-50">
-                <p className="px-4 pt-3 pb-1 text-xs font-medium text-muted-foreground uppercase tracking-wide">Recent searches</p>
-                {items.map(item => (
-                  <button
-                    key={item}
-                    onMouseDown={e => { e.preventDefault(); setSearch(item); setSearchFocused(false) }}
-                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors text-left"
-                  >
-                    <Search className="size-3.5 text-muted-foreground shrink-0" />
-                    {item}
-                  </button>
-                ))}
-              </div>
-            )
-          })()}
+      {/* Search */}
+      <div ref={searchWrapperRef} className="relative">
+        <div className="flex items-center gap-1 h-9 px-3 bg-background border border-input rounded-full shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] overflow-hidden">
+          <Search className="size-5 text-muted-foreground shrink-0" />
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            onFocus={() => setSearchFocused(true)}
+            placeholder="Search by store name, banner, city and state."
+            className="flex-1 text-sm bg-transparent outline-none text-foreground placeholder:text-muted-foreground min-w-0"
+          />
         </div>
-        <div className="relative shrink-0">
-          <button
-            ref={signalBtnRef}
-            onClick={() => setSignalOpen(o => !o)}
-            className="h-9 flex items-center gap-2 pl-3 pr-2 py-2 bg-background border border-input rounded-full shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] text-sm text-foreground hover:bg-accent transition-colors"
-          >
-            <span className="shrink-0">Signal:</span>
-            <span className="size-6 flex items-center justify-center bg-darker text-brighter rounded-full text-xs font-medium shrink-0">
-              {activeSignals.length === ALL_SIGNAL_OPTIONS.length ? ALL_SIGNAL_OPTIONS.length : activeSignals.length}
-            </span>
-          </button>
-          {signalOpen && (
-            <div
-              ref={signalDropdownRef}
-              className="absolute top-full left-0 mt-2 w-[260px] bg-card dark:bg-muted border border-sidebar-border rounded-2xl shadow-[0px_4px_28px_0px_var(--shadow)] p-0.5 z-50"
-            >
-              {[SIGNAL_OPTIONS, RISK_OPTIONS].map((group, groupIdx) => (
-                <div key={groupIdx}>
-                  {groupIdx > 0 && (
-                    <div className="my-1 mx-3 border-t border-dashed border-border" />
-                  )}
-                  {group.map((option, i) => {
-                    const isActive = activeSignals.includes(option)
-                    return (
-                      <button
-                        key={option}
-                        onClick={() => {
-                          const isActive = activeSignals.includes(option)
-                          setActiveSignals(prev => isActive ? prev.filter(x => x !== option) : [...prev, option])
-                          trackEvent('select_filter_shelf', { filter_type: 'signal', value: option, action: isActive ? 'deselect' : 'select' })
-                        }}
-                        className={cn(
-                          'w-full flex items-center gap-3 h-11 px-4 text-left transition-colors whitespace-nowrap',
-                          groupIdx === 0 && i === 0 ? 'rounded-[14px] bg-accent' : 'rounded-full hover:bg-accent',
-                        )}
-                      >
-                        <div className={cn(
-                          'size-4 rounded-[4px] flex items-center justify-center shrink-0 transition-colors',
-                          isActive ? 'bg-darker shadow-sm' : 'border border-darker/30',
-                        )}>
-                          {isActive && <Check className="size-3 text-brighter" />}
-                        </div>
-                        <span className="flex-1 font-poppins font-medium text-sm text-sidebar-primary-foreground">
-                          {option}
-                        </span>
-                        <span className="font-poppins text-sm text-muted-foreground shrink-0">
-                          {SIGNAL_PCT[option]}%
-                        </span>
-                      </button>
-                    )
-                  })}
-                </div>
+        {searchFocused && (() => {
+          const q = search.trim().toLowerCase()
+          const items = q
+            ? RECENT_SEARCHES.filter(r => r.toLowerCase().includes(q))
+            : RECENT_SEARCHES
+          if (items.length === 0) return null
+          return (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-2xl shadow-[0px_4px_28px_0px_var(--shadow)] overflow-hidden z-50">
+              <p className="px-4 pt-3 pb-1 text-xs font-medium text-muted-foreground uppercase tracking-wide">Recent searches</p>
+              {items.map(item => (
+                <button
+                  key={item}
+                  onMouseDown={e => { e.preventDefault(); setSearch(item); setSearchFocused(false) }}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors text-left"
+                >
+                  <Search className="size-3.5 text-muted-foreground shrink-0" />
+                  {item}
+                </button>
               ))}
             </div>
-          )}
-        </div>
-        <button
-          ref={filterBtnRef}
-          onClick={() => setFilterOpen(o => !o)}
-          className="h-9 flex items-center gap-2 px-3 bg-background border border-input rounded-full shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] shrink-0 hover:bg-accent transition-colors"
-        >
-          <SlidersHorizontal className="size-4 text-foreground" />
-          <span className="size-6 flex items-center justify-center bg-darker text-brighter rounded-full text-xs font-medium shrink-0">
-            {Object.values(filterSelections).reduce((sum, arr) => sum + arr.length, 0)}
-          </span>
-        </button>
+          )
+        })()}
+      </div>
+
+      {/* Filter pills */}
+      <div className="relative flex items-center gap-2.5">
+        {/* All */}
         <button
           onClick={() => {
             setSearch('')
             setFilterSelections(Object.fromEntries(FILTER_SELECTS.map(k => [k, []])))
             setActiveSignals([])
+            setActiveDateRange('Today')
+            setCustomRange({ start: null, end: null })
           }}
-          className="h-9 flex items-center px-3 text-sm text-foreground underline hover:opacity-70 transition-opacity shrink-0"
+          className={cn(
+            'h-10 flex items-center px-3.5 rounded-full text-sm font-semibold whitespace-nowrap transition-colors shrink-0',
+            activeSignals.length === 0 && Object.values(filterSelections).every(a => a.length === 0)
+              ? 'bg-darker text-brighter'
+              : 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+          )}
         >
-          Clear
+          All
         </button>
 
-        {/* Filter dropdown */}
-        {filterOpen && (
-          <div
-            ref={dropdownRef}
-            className="absolute top-full right-0 mt-2 bg-card border border-sidebar-border rounded-2xl shadow-[0px_4px_28px_0px_var(--shadow)] p-3 flex gap-3 z-50"
+        {/* Date range picker */}
+        <div className="relative shrink-0">
+          <button
+            ref={datePillRef}
+            onClick={() => setDatePickerOpen(o => !o)}
+            className={cn(
+              'h-10 flex items-center gap-2 px-3 rounded-full text-sm whitespace-nowrap transition-colors',
+              activeDateRange !== 'All Time'
+                ? 'bg-darker text-brighter'
+                : 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+            )}
           >
-            {/* Left: date range */}
-            <div className="flex flex-col p-0.5 w-[174px]">
-              {DATE_OPTIONS.map((option, i) => (
-                <button
-                  key={option}
-                  onClick={() => {
-                    if (activeDateRange !== option) {
-                      // track date range filter change
-                      trackEvent('select_filter_shelf', { filter_type: 'date_range', value: option })
-                    }
-                    setActiveDateRange(option)
-                  }}
-                  className={cn(
-                    'flex items-center h-11 px-4 gap-3 w-full text-left transition-colors',
-                    i === 0 ? 'rounded-[14px]' : 'rounded-full',
-                    activeDateRange === option ? 'bg-accent' : 'hover:bg-accent',
-                  )}
-                >
-                  <span className="flex-1 font-poppins font-medium text-sm text-sidebar-primary-foreground whitespace-nowrap">
-                    {option}
-                  </span>
-                  {activeDateRange === option && (
-                    <Check className="size-5 text-sidebar-primary-foreground shrink-0" />
-                  )}
-                </button>
-              ))}
-            </div>
+            <Calendar className="size-4 shrink-0" />
+            {activeDateRange === 'Custom' && customRange.start
+              ? customRange.end
+                ? `${customRange.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${customRange.end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+                : customRange.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+              : activeDateRange}
+          </button>
 
-            {/* Right: filter selects */}
+          {datePickerOpen && (
+            <div
+              ref={datePickerRef}
+              className="absolute top-full left-0 mt-2 bg-card border border-sidebar-border rounded-2xl shadow-[0px_4px_28px_0px_var(--shadow)] p-3 flex gap-3 z-50"
+            >
+              {/* Preset list */}
+              <div className="flex flex-col p-0.5 w-[180px] drop-shadow-[0px_4px_14px_var(--shadow)]">
+                {DATE_OPTIONS.map((option, i) => (
+                  <button
+                    key={option}
+                    onClick={() => {
+                      setActiveDateRange(option)
+                      setCustomRange({ start: null, end: null })
+                      trackEvent('select_filter_shelf', { filter_type: 'date_range', value: option })
+                    }}
+                    className={cn(
+                      'flex items-center h-11 px-4 gap-3 w-full text-left transition-colors',
+                      i === 0 ? 'rounded-[14px]' : 'rounded-full',
+                      activeDateRange === option ? 'bg-accent' : 'hover:bg-accent',
+                    )}
+                  >
+                    <span className="flex-1 font-poppins font-medium text-sm text-sidebar-primary-foreground whitespace-nowrap">
+                      {option}
+                    </span>
+                    {activeDateRange === option && (
+                      <Check className="size-5 text-sidebar-primary-foreground shrink-0" />
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              {/* Dual-month calendar */}
+              <div className="flex gap-4 py-3">
+                {[cal1, cal2].map((ym, calIdx) => {
+                  const days = getCalDays(ym.year, ym.month)
+                  const weeks: typeof days[] = []
+                  for (let i = 0; i < days.length; i += 7) weeks.push(days.slice(i, i + 7))
+
+                  return (
+                    <div key={calIdx} className="flex flex-col gap-4">
+                      {/* Calendar header */}
+                      <div className="relative flex items-center justify-between">
+                        {calIdx === 0 && (
+                          <button
+                            onClick={() => { setCal1(p => addMonth(p, -1)); setCal2(p => addMonth(p, -1)) }}
+                            className="absolute left-0 size-8 flex items-center justify-center rounded-md bg-card opacity-50 hover:opacity-100 transition-opacity"
+                          >
+                            <ChevronDown className="size-4 rotate-90" />
+                          </button>
+                        )}
+                        <div className={cn('flex gap-1.5 items-center', calIdx === 0 ? 'pl-10' : 'pr-10')}>
+                          <select
+                            value={ym.month}
+                            onChange={e => {
+                              const m = parseInt(e.target.value)
+                              if (calIdx === 0) { setCal1({ year: ym.year, month: m }); setCal2(addMonth({ year: ym.year, month: m }, 1)) }
+                              else { setCal2({ year: ym.year, month: m }); setCal1(addMonth({ year: ym.year, month: m }, -1)) }
+                            }}
+                            className="h-[34px] px-2 py-1.5 bg-card border border-input rounded-md text-sm text-foreground shadow-xs appearance-none pr-6 cursor-pointer"
+                          >
+                            {MONTHS.map((mn, mi) => <option key={mn} value={mi}>{mn.slice(0, 3)}</option>)}
+                          </select>
+                          <select
+                            value={ym.year}
+                            onChange={e => {
+                              const y = parseInt(e.target.value)
+                              if (calIdx === 0) { setCal1({ year: y, month: ym.month }); setCal2(addMonth({ year: y, month: ym.month }, 1)) }
+                              else { setCal2({ year: y, month: ym.month }); setCal1(addMonth({ year: y, month: ym.month }, -1)) }
+                            }}
+                            className="h-[34px] px-2 py-1.5 bg-card border border-input rounded-md text-sm text-foreground shadow-xs appearance-none pr-6 cursor-pointer"
+                          >
+                            {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - 2 + i).map(y => (
+                              <option key={y} value={y}>{y}</option>
+                            ))}
+                          </select>
+                        </div>
+                        {calIdx === 1 && (
+                          <button
+                            onClick={() => { setCal1(p => addMonth(p, 1)); setCal2(p => addMonth(p, 1)) }}
+                            className="absolute right-0 size-8 flex items-center justify-center rounded-md bg-card opacity-50 hover:opacity-100 transition-opacity"
+                          >
+                            <ChevronDown className="size-4 -rotate-90" />
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Day headers */}
+                      <div className="flex flex-col gap-2">
+                        <div className="flex">
+                          {DAY_HEADERS.map(h => (
+                            <div key={h} className="size-8 flex items-center justify-center">
+                              <span className="text-xs text-muted-foreground">{h}</span>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Day rows */}
+                        {weeks.map((week, wi) => (
+                          <div key={wi} className="flex">
+                            {week.map((cell, di) => {
+                              const { date, outOfMonth } = cell
+                              const isStart = isRangeEdge(date, customRange.start, customRange.end, hoverDate, 'start')
+                              const isEnd = isRangeEdge(date, customRange.start, customRange.end, hoverDate, 'end')
+                              const inRange = isInRange(date, customRange.start, customRange.end, hoverDate)
+                              const isToday = isSameDay(date, new Date())
+
+                              return (
+                                <button
+                                  key={di}
+                                  onClick={() => {
+                                    if (!customRange.start || (customRange.start && customRange.end)) {
+                                      setCustomRange({ start: date, end: null })
+                                      setActiveDateRange('Custom')
+                                    } else {
+                                      const s = customRange.start
+                                      const e = date
+                                      setCustomRange(s <= e ? { start: s, end: e } : { start: e, end: s })
+                                      setActiveDateRange('Custom')
+                                    }
+                                  }}
+                                  onMouseEnter={() => setHoverDate(date)}
+                                  onMouseLeave={() => setHoverDate(null)}
+                                  className={cn(
+                                    'size-8 flex items-center justify-center text-sm transition-colors',
+                                    outOfMonth && 'opacity-50',
+                                    (isStart || isEnd) && 'rounded-md',
+                                    inRange && !isStart && !isEnd && 'bg-accent',
+                                    isStart && 'rounded-l-md',
+                                    isEnd && 'rounded-r-md',
+                                    !isStart && !isEnd && !inRange && !outOfMonth && 'hover:bg-accent rounded-md',
+                                    isToday && !isStart && !isEnd && 'font-medium',
+                                    outOfMonth ? 'text-muted-foreground' : 'text-foreground',
+                                  )}
+                                >
+                                  {(isStart || isEnd) ? (
+                                    <span className="size-8 flex items-center justify-center bg-darker text-brighter rounded-md text-sm">
+                                      {date.getDate()}
+                                    </span>
+                                  ) : date.getDate()}
+                                </button>
+                              )
+                            })}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Flagged */}
+        <button
+          onClick={() => {
+            const isActive = activeSignals.includes('Flagged')
+            setActiveSignals(prev => isActive ? prev.filter(x => x !== 'Flagged') : [...prev, 'Flagged'])
+            trackEvent('select_filter_shelf', { filter_type: 'signal', value: 'Flagged', action: isActive ? 'deselect' : 'select' })
+          }}
+          className={cn(
+            'h-10 flex items-center gap-2 px-3 rounded-full text-sm whitespace-nowrap transition-colors shrink-0',
+            activeSignals.includes('Flagged')
+              ? 'bg-darker text-brighter'
+              : 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+          )}
+        >
+          <FlagTriangleRight className="size-4 shrink-0" />
+          Flagged
+        </button>
+
+        {/* Notes */}
+        <button
+          onClick={() => {
+            const isActive = activeSignals.includes('Notes')
+            setActiveSignals(prev => isActive ? prev.filter(x => x !== 'Notes') : [...prev, 'Notes'])
+            trackEvent('select_filter_shelf', { filter_type: 'signal', value: 'Notes', action: isActive ? 'deselect' : 'select' })
+          }}
+          className={cn(
+            'h-10 flex items-center gap-2 px-3 rounded-full text-sm whitespace-nowrap transition-colors shrink-0',
+            activeSignals.includes('Notes')
+              ? 'bg-darker text-brighter'
+              : 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+          )}
+        >
+          <StickyNote className="size-4 shrink-0" />
+          Notes
+        </button>
+
+        {/* Stock dropdown */}
+        {(['Stock', 'Low Risk', 'Campaign', "Sku's"] as const).map(pill => {
+          const pillConfig: Record<string, { icon: React.ElementType; signals: string[] }> = {
+            'Stock':    { icon: Package,    signals: ['Out of Stock', 'Low Stock', 'Good Stock'] },
+            'Low Risk': { icon: BarChart3,  signals: ['Low Risk', 'Medium Risk', 'High Risk'] },
+            'Campaign': { icon: Truck,      signals: [] },
+            "Sku's":    { icon: Barcode,    signals: [] },
+          }
+          const cfg = pillConfig[pill]
+          const PillIcon = cfg.icon
+          const pillSignals = cfg.signals
+          const campaignSel = filterSelections['Campaign'] ?? []
+          const skuSel = filterSelections['Display Status'] ?? []
+          const isActive = pill === 'Campaign'
+            ? campaignSel.length > 0
+            : pill === "Sku's"
+              ? skuSel.length > 0
+              : pillSignals.some(s => activeSignals.includes(s))
+          const isOpen = openPillDropdown === pill
+
+          return (
+            <div key={pill} className="relative shrink-0">
+              <button
+                onClick={() => setOpenPillDropdown(o => o === pill ? null : pill)}
+                className={cn(
+                  'h-10 flex items-center gap-2 px-3 rounded-full text-sm whitespace-nowrap transition-colors',
+                  isActive
+                    ? 'bg-darker text-brighter'
+                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+                )}
+              >
+                <PillIcon className="size-4 shrink-0" />
+                {pill}
+                <ChevronDown className="size-4 shrink-0" />
+              </button>
+
+              {isOpen && (
+                <div
+                  ref={pillDropdownRef}
+                  className="absolute top-full left-0 mt-2 w-[200px] bg-card border border-sidebar-border rounded-2xl shadow-[0px_4px_28px_0px_var(--shadow)] p-0.5 z-50"
+                >
+                  {pill === 'Campaign'
+                    ? (FILTER_OPTIONS['Campaign'] ?? []).map((opt, i) => {
+                        const sel = (filterSelections['Campaign'] ?? []).includes(opt)
+                        return (
+                          <button key={opt} onClick={() => toggleFilterOption('Campaign', opt)}
+                            className={cn('w-full flex items-center gap-3 h-11 px-4 text-left transition-colors', i === 0 ? 'rounded-[14px] bg-accent' : 'rounded-full hover:bg-accent')}
+                          >
+                            <div className={cn('size-4 rounded-[4px] flex items-center justify-center shrink-0', sel ? 'bg-darker shadow-sm' : 'border border-darker/30')}>
+                              {sel && <Check className="size-3 text-brighter" />}
+                            </div>
+                            <span className="font-poppins font-medium text-sm text-sidebar-primary-foreground">{opt}</span>
+                          </button>
+                        )
+                      })
+                    : pill === "Sku's"
+                      ? (FILTER_OPTIONS['Display Status'] ?? []).map((opt, i) => {
+                          const sel = (filterSelections['Display Status'] ?? []).includes(opt)
+                          return (
+                            <button key={opt} onClick={() => toggleFilterOption('Display Status', opt)}
+                              className={cn('w-full flex items-center gap-3 h-11 px-4 text-left transition-colors', i === 0 ? 'rounded-[14px] bg-accent' : 'rounded-full hover:bg-accent')}
+                            >
+                              <div className={cn('size-4 rounded-[4px] flex items-center justify-center shrink-0', sel ? 'bg-darker shadow-sm' : 'border border-darker/30')}>
+                                {sel && <Check className="size-3 text-brighter" />}
+                              </div>
+                              <span className="font-poppins font-medium text-sm text-sidebar-primary-foreground">{opt}</span>
+                            </button>
+                          )
+                        })
+                      : pillSignals.map((opt, i) => {
+                          const sel = activeSignals.includes(opt)
+                          return (
+                            <button key={opt}
+                              onClick={() => {
+                                setActiveSignals(prev => sel ? prev.filter(x => x !== opt) : [...prev, opt])
+                                trackEvent('select_filter_shelf', { filter_type: 'signal', value: opt, action: sel ? 'deselect' : 'select' })
+                              }}
+                              className={cn('w-full flex items-center gap-3 h-11 px-4 text-left transition-colors', i === 0 ? 'rounded-[14px] bg-accent' : 'rounded-full hover:bg-accent')}
+                            >
+                              <div className={cn('size-4 rounded-[4px] flex items-center justify-center shrink-0', sel ? 'bg-darker shadow-sm' : 'border border-darker/30')}>
+                                {sel && <Check className="size-3 text-brighter" />}
+                              </div>
+                              <span className="font-poppins font-medium text-sm text-sidebar-primary-foreground">{opt}</span>
+                              <span className="ml-auto font-poppins text-sm text-muted-foreground shrink-0">{SIGNAL_PCT[opt]}%</span>
+                            </button>
+                          )
+                        })
+                  }
+                </div>
+              )}
+            </div>
+          )
+        })}
+
+        {/* Full filter panel trigger */}
+        <div className="relative shrink-0">
+          <button
+            ref={filterBtnRef}
+            onClick={() => setFilterOpen(o => !o)}
+            className="h-9 w-9 flex items-center justify-center bg-background border border-input rounded-full shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] hover:bg-accent transition-colors"
+          >
+            <SlidersHorizontal className="size-4 text-foreground" />
+          </button>
+
+          {/* Full filter dropdown */}
+          {filterOpen && (
+            <div
+              ref={dropdownRef}
+              className="absolute top-full right-0 mt-2 bg-card border border-sidebar-border rounded-2xl shadow-[0px_4px_28px_0px_var(--shadow)] p-3 flex gap-3 z-50"
+            >
+            {/* Filter selects */}
             <div className="flex flex-col gap-2 w-[195px]">
               {FILTER_SELECTS.map(label => {
                 const opts = FILTER_OPTIONS[label] ?? []
@@ -1286,7 +1572,6 @@ export function SubmissionsPage() {
                                 e.stopPropagation()
                                 const isActive = selected.includes(option)
                                 toggleFilterOption(label, option)
-                                // track dropdown filter selection
                                 trackEvent('select_filter_shelf', { filter_type: label, value: option, action: isActive ? 'deselect' : 'select' })
                               }}
                               className={cn(
@@ -1313,7 +1598,21 @@ export function SubmissionsPage() {
               })}
             </div>
           </div>
-        )}
+          )}
+        </div>
+
+        {/* Clear */}
+        <button
+          onClick={() => {
+            setSearch('')
+            setFilterSelections(Object.fromEntries(FILTER_SELECTS.map(k => [k, []])))
+            setActiveSignals([])
+            setActiveDateRange('Today')
+          }}
+          className="h-9 flex items-center px-3 text-sm text-foreground underline hover:opacity-70 transition-opacity shrink-0"
+        >
+          Clear
+        </button>
       </div>
 
       {/* Results count */}

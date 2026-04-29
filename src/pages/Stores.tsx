@@ -5,10 +5,11 @@ import { SHELF_SIGNAL_COUNTS, SHELF_SUBMISSION_TOTAL } from '@/pages/Submissions
 import {
   MoveDown, CircleDashed, Check, FlagTriangleRight, StickyNote,
   ChevronDown, Search, Tags, Upload, TableProperties, Map,
-  ChevronRight, Sparkles, Plus, Minus, ArrowUpRight,
+  ChevronRight, Sparkles, Plus, Minus, ArrowUpRight, MapPin, Flame,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tooltip } from '@/components/ui/Tooltip'
+import heatMapImage from '@/assets/heat.png'
 import raleysLogo from '@/assets/logos/raleys.png'
 import pavilionsLogo from '@/assets/logos/pavilions.png'
 import albertsonsLogo from '@/assets/logos/albertsons.png'
@@ -265,10 +266,10 @@ const STORE_DOTS: StoreDot[] = [
   },
 ]
 
-const RISK_STYLES: Record<RiskLevel, { badgeFrom: string; badgeText: string; barColor: string }> = {
-  High:   { badgeFrom: 'from-soft-red',   badgeText: 'text-soft-red-foreground',   barColor: 'var(--red)'   },
-  Medium: { badgeFrom: 'from-soft-amber', badgeText: 'text-soft-amber-foreground', barColor: 'var(--amber)' },
-  Low:    { badgeFrom: 'from-soft-green', badgeText: 'text-soft-lime-foreground',  barColor: 'var(--green)' },
+const RISK_STYLES: Record<RiskLevel, { badgeFrom: string; badgeText: string; badgeBorder: string; barColor: string }> = {
+  High:   { badgeFrom: 'from-soft-red',   badgeText: 'text-soft-red-foreground',   badgeBorder: 'border-soft-red-border',   barColor: 'var(--red)'   },
+  Medium: { badgeFrom: 'from-soft-amber', badgeText: 'text-soft-amber-foreground', badgeBorder: 'border-soft-amber-border', barColor: 'var(--amber)' },
+  Low:    { badgeFrom: 'from-soft-green', badgeText: 'text-soft-lime-foreground',  badgeBorder: 'border-soft-lime-border',  barColor: 'var(--green)' },
 }
 
 function StoreMapPopover({ store, anchorEl, onClose, onLearnMore }: {
@@ -353,14 +354,14 @@ function StoreMapPopover({ store, anchorEl, onClose, onLearnMore }: {
             <div
               key={sig.label}
               className={cn(
-                'flex items-center gap-1 px-3 py-2 rounded-md border border-black/5 text-xs font-semibold',
+                'flex items-center gap-1 px-3 py-2.5 rounded-md border text-xs font-semibold whitespace-nowrap shrink-0',
                 sig.variant === 'red'
-                  ? 'bg-gradient-to-r from-soft-red to-brighter text-soft-red-foreground'
-                  : 'bg-card text-foreground',
+                  ? 'bg-gradient-to-r from-soft-red to-brighter text-soft-red-foreground border-soft-red-border'
+                  : 'bg-card text-foreground border-border',
               )}
             >
+              <sig.Icon className="size-3.5 opacity-40 shrink-0" />
               <span>{sig.label}</span>
-              <sig.Icon className="size-3.5 opacity-40" />
             </div>
           ))}
         </div>
@@ -370,7 +371,7 @@ function StoreMapPopover({ store, anchorEl, onClose, onLearnMore }: {
       <div className="flex flex-col gap-4 px-5 py-4 border-t border-border-alpha">
         <div className="flex items-center gap-4">
           <span className="flex-1 font-sans font-medium text-sm text-card-foreground leading-5">Risk</span>
-          <div className={cn('flex items-center px-3 py-1 rounded-md border border-black/5 bg-gradient-to-r to-brighter', riskStyle.badgeFrom)}>
+          <div className={cn('flex items-center px-3 py-1 rounded-md border bg-gradient-to-r to-brighter', riskStyle.badgeFrom, riskStyle.badgeBorder)}>
             <span className={cn('font-sans font-semibold text-xs leading-4 whitespace-nowrap', riskStyle.badgeText)}>
               {store.risk.label}
             </span>
@@ -411,8 +412,20 @@ function StoreMapPopover({ store, anchorEl, onClose, onLearnMore }: {
   )
 }
 
+const US_STATES = [
+  'Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware',
+  'Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky',
+  'Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi',
+  'Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico',
+  'New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania',
+  'Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont',
+  'Virginia','Washington','West Virginia','Wisconsin','Wyoming',
+]
+
 function MapView({ onLearnMore }: { onLearnMore: (submissionId: string) => void }) {
   const [selected, setSelected] = useState<{ store: StoreDot; el: HTMLElement } | null>(null)
+  const [selectedState, setSelectedState] = useState('California')
+  const [mapView, setMapView] = useState<'default' | 'heat'>('default')
 
   function handleDotClick(e: React.MouseEvent<HTMLButtonElement>, store: StoreDot) {
     e.stopPropagation()
@@ -427,11 +440,24 @@ function MapView({ onLearnMore }: { onLearnMore: (submissionId: string) => void 
 
   return (
     <div className="relative w-full rounded-2xl overflow-hidden border border-border" style={{ height: 580 }}>
-      <img
-        src={MAP_IMAGE}
-        alt="Anaheim area store map"
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{ filter: 'saturate(0)' }}
+      <div
+        className="absolute inset-0 transition-opacity duration-300"
+        style={{
+          backgroundImage: `url(${MAP_IMAGE})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          filter: 'saturate(0)',
+          opacity: mapView === 'default' ? 1 : 0,
+        }}
+      />
+      <div
+        className="absolute inset-0 transition-opacity duration-300"
+        style={{
+          backgroundImage: `url(${heatMapImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: mapView === 'heat' ? 1 : 0,
+        }}
       />
       {STORE_DOTS.map(dot => {
         const isSelected = selected?.store.id === dot.id
@@ -459,15 +485,49 @@ function MapView({ onLearnMore }: { onLearnMore: (submissionId: string) => void 
         )
       })}
       {/* Zoom controls */}
-      <div className="absolute top-4 right-4 bg-white rounded-lg shadow-md overflow-hidden flex flex-col w-9">
+      <div className="absolute top-[18px] right-5 w-9 bg-white rounded-lg shadow-[0px_2px_8px_0px_rgba(0,0,0,0.15)] overflow-hidden z-10">
         <Tooltip label="Zoom in">
-          <button className="h-9 flex items-center justify-center hover:bg-accent transition-colors border-b border-border w-full">
-            <Plus className="size-4 text-foreground" />
+          <button className="w-full h-9 flex items-center justify-center hover:bg-secondary/60 transition-colors">
+            <Plus className="size-6 text-foreground" />
           </button>
         </Tooltip>
+        <div className="h-px w-full bg-[#e0e0e5]" />
         <Tooltip label="Zoom out">
-          <button className="h-9 flex items-center justify-center hover:bg-accent transition-colors w-full">
-            <Minus className="size-4 text-foreground" />
+          <button className="w-full h-9 flex items-center justify-center hover:bg-secondary/60 transition-colors">
+            <Minus className="size-6 text-foreground" />
+          </button>
+        </Tooltip>
+      </div>
+
+      {/* State selector */}
+      <div className="absolute left-5 top-[18px] flex items-center gap-2 h-9 px-3 bg-background border border-input rounded-lg shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] z-10">
+        <MapPin className="size-4 text-muted-foreground shrink-0" />
+        <select
+          value={selectedState}
+          onChange={e => setSelectedState(e.target.value)}
+          className="appearance-none bg-transparent text-sm text-foreground outline-none cursor-pointer pr-4"
+        >
+          {US_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+        </select>
+        <ChevronDown className="size-4 text-muted-foreground shrink-0 -ml-3 pointer-events-none" />
+      </div>
+
+      {/* Map view mode */}
+      <div className="absolute bottom-5 right-5 flex flex-col items-center w-9 py-[6px] gap-[7px] bg-white rounded-lg shadow-[0px_2px_8px_0px_rgba(0,0,0,0.15)] overflow-hidden z-10">
+        {/* Active highlight */}
+        <div
+          className="absolute left-0 w-full h-[38px] bg-secondary transition-all duration-200"
+          style={{ top: mapView === 'default' ? 0 : 'auto', bottom: mapView === 'heat' ? 0 : 'auto' }}
+        />
+        <Tooltip label="Default view">
+          <button onClick={() => setMapView('default')} className="relative z-10 flex items-center justify-center size-6">
+            <MapPin className={cn('size-6 transition-colors', mapView === 'default' ? 'text-[var(--red)]' : 'text-foreground')} />
+          </button>
+        </Tooltip>
+        <div className="relative z-10 h-px w-full bg-[var(--soft-rose-border,#ffe4e6)] shrink-0" />
+        <Tooltip label="Heat map">
+          <button onClick={() => setMapView('heat')} className="relative z-10 flex items-center justify-center size-6">
+            <Flame className={cn('size-6 transition-colors', mapView === 'heat' ? 'text-[var(--red)]' : 'text-foreground')} />
           </button>
         </Tooltip>
       </div>
@@ -603,7 +663,7 @@ function RowPopover({ style, risk, signal, aiSuggestions }: {
       <div className="flex flex-col gap-4 px-5 py-4">
         <div className="flex items-center gap-4">
           <span className="flex-1 font-sans font-medium text-sm text-card-foreground leading-5">Risk</span>
-          <div className={cn('flex items-center gap-1 px-3 py-1 rounded-md border border-black/5 bg-gradient-to-r to-brighter', rs.badgeFrom)}>
+          <div className={cn('flex items-center gap-1 px-3 py-1 rounded-md border bg-gradient-to-r to-brighter', rs.badgeFrom, rs.badgeBorder)}>
             <span className={cn('font-sans font-semibold text-xs leading-4 whitespace-nowrap', rs.badgeText)}>{risk.label}</span>
           </div>
         </div>

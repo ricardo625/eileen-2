@@ -1,4 +1,5 @@
-import { Archive, Check, ChevronsDown, ChevronLeft, ChevronRight, CircleDashed, FileDown, FlagTriangleRight, Forward, Link, Plus, Search, Sheet, Trash2, XCircle } from 'lucide-react'
+import { Archive, Check, ChevronsDown, ChevronLeft, ChevronRight, CircleDashed, FlagTriangleRight, Forward, Plus, Search, Trash2, XCircle } from 'lucide-react'
+import { SignalBadge, type BadgeVariant } from '@/components/SignalBadge'
 import { ToastStack, type ToastItem } from '@/components/ui/Toast'
 import { ShareDialog } from '@/components/ShareDialog'
 import { Tooltip } from '@/components/ui/Tooltip'
@@ -90,25 +91,14 @@ const NOTE_OPTIONS: Record<string, string[]> = {
   'Action Items':         ['Additional SKU Found', 'Behind Counter', 'Behind Glass', 'Display Not Found', 'Locked Case', 'Promotional Pricing'],
 }
 
-function initNotes(s: SubmissionData | null | undefined): Record<string, string[]> {
-  const empty = { 'Account Management': [], 'Internal Store Notes': [], 'Action Items': [] }
-  if (!s) return empty
-  const n = parseInt(s.id)
-  const accOpts  = NOTE_OPTIONS['Account Management']
+function initNotes(_s: SubmissionData | null | undefined): Record<string, string[]> {
   const noteOpts = NOTE_OPTIONS['Internal Store Notes']
-  const accMgr   = [accOpts[(n - 1) % accOpts.length]]
-  const storeNotes: string[] = []
-  if (s.noteCount && s.noteCount > 0) {
-    const i = n - 1
-    storeNotes.push(noteOpts[i % noteOpts.length])
-    if (s.noteCount > 1) storeNotes.push(noteOpts[(i + 2) % noteOpts.length])
-    if (s.noteCount > 3) storeNotes.push(noteOpts[(i + 4) % noteOpts.length])
+  const actionOpts = NOTE_OPTIONS['Action Items']
+  return {
+    'Account Management':   [],
+    'Internal Store Notes': [noteOpts[0], noteOpts[1], noteOpts[2]],
+    'Action Items':         [actionOpts[3], actionOpts[4]],
   }
-  const actionItems: string[] = []
-  if (s.badges.includes('flagged') && s.noteCount && s.noteCount > 2) {
-    actionItems.push(noteOpts[(n + 3) % noteOpts.length])
-  }
-  return { 'Account Management': accMgr, 'Internal Store Notes': storeNotes, 'Action Items': actionItems }
 }
 
 export interface SubmissionData {
@@ -141,11 +131,8 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
   const [flagged, setFlagged]           = useState(submission?.badges.includes('flagged') ?? false)
-  const [sendOpen, setSendOpen]         = useState(false)
   const [toasts, setToasts]             = useState<ToastItem[]>([])
   const [shareOpen, setShareOpen]       = useState(false)
-  const sendBtnRef       = useRef<HTMLButtonElement>(null)
-  const sendDropdownRef  = useRef<HTMLDivElement>(null)
   const searchInputRefs  = useRef<Record<string, HTMLInputElement | null>>({})
 
   // Reset per-card state when a different card is opened
@@ -156,19 +143,6 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
     setSectionSearches({})
     setFocusedSection(null)
   }, [submission?.id])
-
-  useEffect(() => {
-    if (!sendOpen) return
-    function handleClick(e: MouseEvent) {
-      const t = e.target as Node
-      if (
-        sendDropdownRef.current && !sendDropdownRef.current.contains(t) &&
-        sendBtnRef.current && !sendBtnRef.current.contains(t)
-      ) setSendOpen(false)
-    }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [sendOpen])
 
   if (!open) return null
 
@@ -196,7 +170,9 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
       <div className="fixed inset-0 z-40 bg-black/20" onClick={onClose} />
 
       {/* Drawer */}
-      <div className="fixed right-0 top-0 h-full w-[640px] bg-card z-50 overflow-y-auto overflow-x-hidden scroll-parent shadow-2xl animate-in slide-in-from-right duration-300 ease-out flex flex-col gap-6 pb-6">
+      <div className="fixed right-0 top-0 h-full w-[640px] bg-card z-50 shadow-2xl animate-in slide-in-from-right duration-300 ease-out flex flex-col">
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden scroll-parent flex flex-col gap-6 pb-6">
 
         {/* Hero image */}
         <div className="relative shrink-0">
@@ -252,64 +228,14 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
               </div>
             )}
 
-            {/* Action buttons */}
-            <div className="absolute right-6 top-3.5 flex items-center gap-2">
-              <Tooltip label="Flag">
-                <button
-                  onClick={() => setFlagged(f => !f)}
-                  className={cn(
-                    'size-9 flex items-center justify-center rounded-full transition-colors',
-                    flagged ? 'bg-gradient-to-r from-soft-red to-brighter' : 'hover:bg-accent',
-                  )}
-                >
-                  <FlagTriangleRight className={cn('size-4 transition-colors', flagged ? 'text-[#f91616]' : 'text-foreground')} />
-                </button>
-              </Tooltip>
-              <Tooltip label="Archive">
-                <button
-                  onClick={() => { onArchive?.(); onClose() }}
-                  className="size-9 flex items-center justify-center rounded-full bg-secondary hover:bg-accent transition-colors"
-                >
-                  <Archive className="size-4 text-foreground" />
-                </button>
-              </Tooltip>
-              <div className="relative">
-                <Tooltip label="Send">
-                  <button
-                    ref={sendBtnRef}
-                    onClick={() => setSendOpen(o => !o)}
-                    className="size-9 flex items-center justify-center rounded-full bg-secondary hover:bg-accent transition-colors"
-                  >
-                    <Forward className="size-4 text-foreground" />
-                  </button>
-                </Tooltip>
-                {sendOpen && (
-                  <div
-                    ref={sendDropdownRef}
-                    className="absolute right-0 top-full mt-2 w-[180px] bg-card border border-border rounded-2xl shadow-[0px_4px_28px_0px_var(--shadow)] p-0.5 z-[70] flex flex-col"
-                  >
-                    {[
-                      { label: 'Export to PDF', Icon: FileDown, toast: 'Exported to PDF successfully' },
-                      { label: 'Export to CSV', Icon: Sheet,    toast: 'Exported to CSV successfully' },
-                      { label: 'Share URL',     Icon: Link,     toast: null },
-                    ].map(({ label, Icon, toast: msg }) => (
-                      <button
-                        key={label}
-                        onClick={() => {
-                          setSendOpen(false)
-                          if (msg) setToasts(prev => [...prev, { id: Date.now() + Math.random(), message: msg }])
-                          if (label === 'Share URL') setShareOpen(true)
-                        }}
-                        className="flex items-center gap-3 h-11 px-4 rounded-xl hover:bg-accent transition-colors text-left w-full"
-                      >
-                        <Icon className="size-4 text-muted-foreground shrink-0" />
-                        <span className="font-poppins font-medium text-sm text-foreground">{label}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
+            {/* Signal tags */}
+            {submission?.badges && submission.badges.length > 0 && (
+              <div className="absolute right-[19px] top-[14px] flex items-center gap-1.5">
+                {(submission.badges as BadgeVariant[])
+                  .map(b => <SignalBadge key={b} variant={b} />)
+                }
               </div>
-            </div>
+            )}
           </div>
 
           {/* Info sections */}
@@ -344,7 +270,7 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
               }
 
               return (
-                <div key={title} className="flex flex-col gap-0 border-b border-dashed border-border">
+                <div key={title} className="flex flex-col gap-0">
                   {/* Title row */}
                   <div className="flex items-center justify-between px-6 pt-5 pb-2.5">
                     <span className="font-sans font-medium text-lg text-foreground leading-none">{title}</span>
@@ -378,6 +304,7 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
                       <div className="absolute left-0 right-0 top-full mt-1 bg-card border border-border rounded-xl shadow-[0px_4px_28px_0px_var(--shadow)] z-[60] overflow-hidden flex flex-col">
                         {suggestions.map(note => {
                           const checked = tags.includes(note)
+                          const isActionItems = title === 'Action Items'
                           return (
                             <button
                               key={note}
@@ -385,14 +312,16 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
                               onClick={() => { toggleNote(title, note); setSectionSearches(prev => ({ ...prev, [title]: '' })) }}
                               className="flex items-center gap-3 h-10 px-4 hover:bg-accent transition-colors text-left"
                             >
-                              <div className={cn(
-                                'size-4 rounded-[4px] shrink-0 flex items-center justify-center',
-                                checked
-                                  ? 'bg-darker shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1)]'
-                                  : 'border border-dashed border-darker/20',
-                              )}>
-                                {checked && <Check className="size-2.5 text-background stroke-[2.5]" />}
-                              </div>
+                              {isActionItems && (
+                                <div className={cn(
+                                  'size-4 rounded-[4px] shrink-0 flex items-center justify-center',
+                                  checked
+                                    ? 'bg-darker shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1)]'
+                                    : 'border border-dashed border-darker/20',
+                                )}>
+                                  {checked && <Check className="size-2.5 text-background stroke-[2.5]" />}
+                                </div>
+                              )}
                               <span className="flex-1 font-poppins font-medium text-sm text-sidebar-foreground leading-5 truncate">{note}</span>
                             </button>
                           )
@@ -416,21 +345,16 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
 
                   {/* List */}
                   <div className="flex flex-col pb-2">
-                    {allOpts.map(note => {
-                      const checked = tags.includes(note)
-                      return (
+                    {tags.map(note => {
+                      const isActionItems = title === 'Action Items'
+                      return isActionItems ? (
                         <button
                           key={note}
                           onClick={() => toggleNote(title, note)}
                           className="group/row flex items-center gap-3 h-11 px-6 border-b border-border-alpha overflow-hidden hover:bg-accent transition-colors text-left"
                         >
-                          <div className={cn(
-                            'size-4 rounded-[4px] shrink-0 flex items-center justify-center',
-                            checked
-                              ? 'bg-darker shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)]'
-                              : 'border border-dashed border-darker/20',
-                          )}>
-                            {checked && <Check className="size-2.5 text-background stroke-[2.5]" />}
+                          <div className="size-4 rounded-[4px] shrink-0 flex items-center justify-center bg-darker shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)]">
+                            <Check className="size-2.5 text-background stroke-[2.5]" />
                           </div>
                           <span className="flex-1 font-poppins font-medium text-sm text-sidebar-foreground leading-5 truncate">{note}</span>
                           <span
@@ -441,18 +365,26 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
                             <Trash2 className="size-4 text-muted-foreground" />
                           </span>
                         </button>
+                      ) : (
+                        <div
+                          key={note}
+                          className="group/row flex items-center gap-3 h-11 px-6 border-b border-border-alpha overflow-hidden hover:bg-accent transition-colors"
+                        >
+                          <span className="flex-1 font-poppins font-medium text-sm text-sidebar-foreground leading-5 truncate">{note}</span>
+                          <span
+                            role="button"
+                            onClick={() => deleteItem(title, note, baseOpts.includes(note))}
+                            className="size-4 flex items-center justify-center opacity-0 group-hover/row:opacity-60 hover:!opacity-100 transition-opacity shrink-0"
+                          >
+                            <Trash2 className="size-4 text-muted-foreground" />
+                          </span>
+                        </div>
                       )
                     })}
-                    {allOpts.length === 0 && (
+                    {tags.length === 0 && (
                       <span className="px-6 py-3 font-sans text-sm text-muted-foreground">No items added.</span>
                     )}
-                    <button
-                      onClick={() => searchInputRefs.current[title]?.focus()}
-                      className="flex items-center gap-2 h-10 px-6 text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      <Plus className="size-3.5 shrink-0" />
-                      <span className="font-poppins font-medium text-sm leading-none">Add item</span>
-                    </button>
+
                   </div>
                 </div>
               )
@@ -499,7 +431,42 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
           </div>
         </div>
 
+      </div>{/* end scrollable */}
+
+      {/* Sticky bottom bar */}
+      <div className="shrink-0 flex items-center gap-[17px] px-4 py-4 bg-card border-t border-border shadow-[0px_-7px_7.5px_0px_var(--shadow)]">
+        {/* Archive */}
+        <button
+          onClick={() => { onArchive?.(); onClose() }}
+          className="size-12 flex items-center justify-center rounded-full border border-border hover:bg-accent transition-colors shrink-0"
+        >
+          <Archive className="size-4 text-foreground" />
+        </button>
+
+        {/* Flag */}
+        <button
+          onClick={() => setFlagged(f => !f)}
+          className={cn(
+            'size-12 flex items-center justify-center rounded-full border transition-colors shrink-0',
+            flagged
+              ? 'bg-gradient-to-r from-soft-red to-brighter border-soft-red-border'
+              : 'border-border hover:bg-accent',
+          )}
+        >
+          <FlagTriangleRight className={cn('size-4 transition-colors', flagged ? 'text-[var(--red)]' : 'text-foreground')} />
+        </button>
+
+        {/* Share */}
+        <button
+          onClick={() => setShareOpen(true)}
+          className="flex-1 h-[52px] flex items-center justify-center gap-2 bg-[#121217] border border-[rgba(35,31,32,0.32)] rounded-full hover:opacity-90 transition-opacity"
+        >
+          <Forward className="size-5 text-white" />
+          <span className="font-semibold text-[15px] text-white">Share</span>
+        </button>
       </div>
+
+      </div>{/* end drawer */}
 
       {/* Lightbox */}
       {lightboxOpen && (

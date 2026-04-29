@@ -88,20 +88,20 @@ const STATUS_ICONS = [
 // ─── Signal badges ───────────────────────────────────────────────────────────
 
 const SIGNAL_ITEMS = [
-  { Icon: FlagTriangleRight, label: 'Flagged',    cls: 'from-soft-red to-brighter text-soft-red-foreground',     variant: 'red' },
-  { Icon: CircleDashed,      label: 'No Stock',   cls: 'bg-card text-foreground border border-border',           variant: 'default' },
-  { Icon: MoveDown,          label: 'Low Stock',  cls: 'from-soft-amber to-brighter text-soft-amber-foreground', variant: 'default' },
-  { Icon: Check,             label: 'Good Stock', cls: 'from-soft-lime to-brighter text-soft-lime-foreground',   variant: 'default' },
-  { Icon: StickyNote,        label: 'Notes',      cls: 'from-soft-indigo to-brighter text-soft-indigo-foreground', variant: 'default' },
-  { Icon: Tags,              label: 'Promotion',  cls: 'from-soft-green to-brighter text-soft-green-foreground', variant: 'default' },
+  { Icon: FlagTriangleRight, label: 'Flagged',    cls: 'from-soft-red to-brighter text-soft-red-foreground',       border: 'border-soft-red-border' },
+  { Icon: CircleDashed,      label: 'No Stock',   cls: 'bg-card text-foreground',                                  border: 'border-border' },
+  { Icon: MoveDown,          label: 'Low Stock',  cls: 'from-soft-amber to-brighter text-soft-amber-foreground',   border: 'border-soft-amber-border' },
+  { Icon: Check,             label: 'Good Stock', cls: 'from-soft-lime to-brighter text-soft-lime-foreground',     border: 'border-soft-lime-border' },
+  { Icon: StickyNote,        label: 'Notes',      cls: 'from-soft-indigo to-brighter text-soft-indigo-foreground', border: 'border-soft-indigo-border' },
+  { Icon: Tags,              label: 'Promotion',  cls: 'from-soft-green to-brighter text-soft-green-foreground',   border: 'border-soft-green-border' },
 ]
 
 // ─── Risk badges ─────────────────────────────────────────────────────────────
 
 const RISK_ITEMS = [
-  { label: 'High',   from: 'from-soft-red',   text: 'text-soft-red-foreground',   bar: 'var(--red)',   pct: 68 },
-  { label: 'Medium', from: 'from-soft-amber', text: 'text-soft-amber-foreground', bar: 'var(--amber)', pct: 42 },
-  { label: 'Low',    from: 'from-soft-lime',  text: 'text-soft-lime-foreground',  bar: 'var(--green)', pct: 18 },
+  { label: 'High',   from: 'from-soft-red',   text: 'text-soft-red-foreground',   border: 'border-soft-red-border',   bar: 'var(--red)',   pct: 68 },
+  { label: 'Medium', from: 'from-soft-amber', text: 'text-soft-amber-foreground', border: 'border-soft-amber-border', bar: 'var(--amber)', pct: 42 },
+  { label: 'Low',    from: 'from-soft-lime',  text: 'text-soft-lime-foreground',  border: 'border-soft-lime-border',  bar: 'var(--green)', pct: 18 },
 ]
 
 // ─── Page ────────────────────────────────────────────────────────────────────
@@ -356,11 +356,12 @@ export function DesignAssetsPage() {
         {/* ── Signal Badges ── */}
         <Section title="Signal Badges" description="Store and shelf signal indicators shown on cards and map popovers.">
           <div className="flex flex-wrap gap-2 bg-card border border-border rounded-2xl p-8">
-            {SIGNAL_ITEMS.map(({ Icon, label, cls }) => (
+            {SIGNAL_ITEMS.map(({ Icon, label, cls, border }) => (
               <div
                 key={label}
                 className={cn(
-                  'flex items-center gap-1.5 px-3 py-2 rounded-md border border-black/5 text-xs font-semibold font-sans',
+                  'flex items-center gap-1.5 px-3 py-2 rounded-md border text-xs font-semibold font-sans',
+                  border,
                   cls.startsWith('bg-card') ? cls : `bg-gradient-to-r ${cls}`,
                 )}
               >
@@ -374,11 +375,11 @@ export function DesignAssetsPage() {
         {/* ── Risk Indicators ── */}
         <Section title="Risk Indicators" description="Risk badge + progress bar used on store map popovers.">
           <div className="flex gap-6 flex-wrap">
-            {RISK_ITEMS.map(({ label, from, text, bar, pct }) => (
+            {RISK_ITEMS.map(({ label, from, text, border, bar, pct }) => (
               <div key={label} className="flex-1 min-w-[200px] bg-card border border-border rounded-2xl p-5 flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                   <span className="font-sans font-medium text-sm text-foreground">Risk</span>
-                  <div className={cn('flex items-center px-3 py-1 rounded-md border border-black/5 bg-gradient-to-r to-brighter', from)}>
+                  <div className={cn('flex items-center px-3 py-1 rounded-md border bg-gradient-to-r to-brighter', from, border)}>
                     <span className={cn('font-sans font-semibold text-xs whitespace-nowrap', text)}>{label}</span>
                   </div>
                 </div>

@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
+@import "@fontsource-variable/rubik";
 @import "@fontsource/poppins/500.css";
 @import "@fontsource/poppins/600.css";
 
@@ -138,6 +139,7 @@
   --font-heading: var(--font-sans);
   --font-sans: 'Geist Variable', sans-serif;
   --font-poppins: 'Poppins', sans-serif;
+  --font-rubik: 'Rubik Variable', sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -176,6 +178,15 @@
   --color-neutral: var(--neutral);
   --color-neutral-foreground: var(--neutral-foreground);
   --color-border-alpha: var(--border-alpha);
+  --color-soft-red-border: var(--soft-red-border);
+  --color-soft-orangle-border: var(--soft-orangle-border);
+  --color-soft-amber-border: var(--soft-amber-border);
+  --color-soft-indigo-border: var(--soft-indigo-border);
+  --color-soft-fuchsia-border: var(--soft-fuchsia-border);
+  --color-soft-rose-border: var(--soft-rose-border);
+  --color-soft-lime-border: var(--soft-lime-border);
+  --color-soft-green-border: var(--soft-green-border);
+  --color-soft-salmon-border: var(--soft-salmon-border);
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
@@ -248,13 +259,34 @@
   --amber: #ffb900;
   --soft-red: #fef2f2;
   --soft-red-foreground: #460809;
+  --soft-orangle: #fff7ed;
+  --soft-orangle-foreground: #441306;
   --soft-amber: #fffbeb;
   --soft-amber-foreground: #461901;
+  --soft-indigo: #eef2ff;
+  --soft-indigo-foreground: #1e1a4d;
+  --soft-fuchsia: #fdf4ff;
+  --soft-fuchsia-foreground: #4b004f;
+  --soft-rose: #fff1f2;
+  --soft-rose-foreground: #4d0218;
   --soft-lime: #f7fee7;
   --soft-lime-foreground: #192e03;
   --soft-green: #f0fdf4;
   --soft-green-foreground: #032e15;
+  --soft-salmon: #fef8f7;
+  --soft-salmon-foreground: #322523;
+  --neutral: #ffffff;
+  --neutral-foreground: #0a0a0a;
   --border-alpha: #0000000d;
+  --soft-red-border: #ffe2e2;
+  --soft-orangle-border: #ffedd4;
+  --soft-amber-border: #fef3c6;
+  --soft-indigo-border: #e0e7ff;
+  --soft-fuchsia-border: #fae8ff;
+  --soft-rose-border: #ffe4e6;
+  --soft-lime-border: #e5f4c7;
+  --soft-green-border: #dcfce7;
+  --soft-salmon-border: #ffffff;
 }
 
 /* ─── Theme 2 ────────────────────────────────────────────────────────────── */
@@ -446,7 +478,22 @@
   --soft-indigo-foreground: #a5b4fc;
   --soft-fuchsia: #4b004f;
   --soft-fuchsia-foreground: #e879f9;
+  --soft-orangle: #2d1a00;
+  --soft-orangle-foreground: #fdba74;
+  --soft-salmon: #2d1a18;
+  --soft-salmon-foreground: #fca5a5;
+  --neutral: #1a1a1a;
+  --neutral-foreground: #ffffff;
   --border-alpha: #ffffff0d;
+  --soft-red-border: #4a2020;
+  --soft-amber-border: #4a3300;
+  --soft-lime-border: #2d4d00;
+  --soft-green-border: #154d28;
+  --soft-indigo-border: #2d2870;
+  --soft-fuchsia-border: #700070;
+  --soft-rose-border: #700028;
+  --soft-orangle-border: #4a2d00;
+  --soft-salmon-border: #4a2a28;
 }
 
 /* ─── Theme 5 (purple primary) ───────────────────────────────────────────── */

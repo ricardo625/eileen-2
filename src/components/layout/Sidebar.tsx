@@ -352,7 +352,9 @@ export function Sidebar({ collapsed, onToggle, activePage, onNavigate, shelfBadg
               icon={<Truck className="size-5" />}
               label="Campaign Hub"
               badge={1}
+              active={activePage === 'campaign-hub'}
               collapsed={collapsed}
+              onClick={() => onNavigate?.('campaign-hub')}
             />
             <NavItem
               icon={<Layers className="size-5" />}

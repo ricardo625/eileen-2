@@ -4,7 +4,7 @@ import { Copy, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tooltip } from '@/components/ui/Tooltip'
 
-const SHARE_URL = 'https://foundey.app.shopwitheileen.com/s/8a2hf6fi'
+const SHARE_URL = `${window.location.origin}/s/8a2hf6fi`
 
 interface ShareDialogProps {
   onClose: () => void

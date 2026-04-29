@@ -7,13 +7,17 @@ import { AiLeanPage } from '@/pages/AiLean'
 import { SubmissionsPage } from '@/pages/Submissions'
 import { StoresPage, SHELF_SIGNAL_TOTAL } from '@/pages/Stores'
 import { DesignAssetsPage } from '@/pages/DesignAssets'
+import { CampaignHubPage } from '@/pages/CampaignHub'
+import { CampaignDetailPage } from '@/pages/CampaignDetail'
+import { SharedLinkPage } from '@/pages/SharedLink'
 
 type Theme = 'theme-4' | 'dark'
 
 const PATH_TO_PAGE: Record<string, string> = {
-  '/shelf':   'submissions',
-  '/stores':  'stores',
-  '/ai-lean': 'ai-lean',
+  '/shelf':          'submissions',
+  '/stores':         'stores',
+  '/ai-lean':        'ai-lean',
+  '/campaign-hub':   'campaign-hub',
 }
 
 function getActivePage(pathname: string) {
@@ -28,24 +32,29 @@ export default function App() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const activePage = location.pathname === '/design-assets' ? 'design-assets' : getActivePage(location.pathname)
+  const activePage = location.pathname === '/design-assets'
+    ? 'design-assets'
+    : location.pathname.startsWith('/campaign-hub')
+      ? 'campaign-hub'
+      : getActivePage(location.pathname)
 
   useEffect(() => {
     document.body.className = theme
   }, [theme])
 
   const isDark = theme === 'dark'
-  const isFullPage = activePage === 'submissions' || activePage === 'stores' || activePage === 'design-assets'
+  const isFullPage = activePage === 'submissions' || activePage === 'stores' || activePage === 'design-assets' || activePage === 'campaign-hub'
 
   function handleLearnMore(submissionId: string) {
     navigate(`/shelf/detail/${submissionId}`)
   }
 
+  const isSharedLink = location.pathname.startsWith('/s/')
   const isDesignAssets = activePage === 'design-assets'
 
   return (
     <div className={`${theme} h-screen bg-background flex overflow-hidden`}>
-      {!isDesignAssets && (
+      {!isDesignAssets && !isSharedLink && (
         <div className="shrink-0 p-4 h-full">
           <Sidebar
             collapsed={sidebarCollapsed}
@@ -62,7 +71,7 @@ export default function App() {
 
       <main className={`relative flex-1 overflow-y-auto overflow-x-hidden always-scroll ${isFullPage ? '' : 'flex items-center justify-center'}`}>
         {/* Theme toggle */}
-        <Tooltip label={isDark ? 'Light mode' : 'Dark mode'} className="absolute top-4 right-4 z-10">
+        {!isSharedLink && <Tooltip label={isDark ? 'Light mode' : 'Dark mode'} className="absolute top-4 right-4 z-10">
           <button
             onClick={() => setTheme(isDark ? 'theme-4' : 'dark')}
             className="size-9 flex items-center justify-center rounded-full border border-border bg-background shadow-sm transition hover:bg-accent"
@@ -72,7 +81,7 @@ export default function App() {
               : <Moon className="size-4 text-foreground" />
             }
           </button>
-        </Tooltip>
+        </Tooltip>}
 
         <Routes>
           <Route path="/shelf"                    element={<SubmissionsPage />} />
@@ -80,6 +89,9 @@ export default function App() {
           <Route path="/stores"  element={<StoresPage onLearnMore={handleLearnMore} onNavigateToShelf={() => navigate('/shelf')} />} />
           <Route path="/ai-lean" element={<AiLeanPage />} />
           <Route path="/design-assets" element={<DesignAssetsPage />} />
+          <Route path="/campaign-hub" element={<CampaignHubPage />} />
+          <Route path="/campaign-hub/:id" element={<CampaignDetailPage />} />
+          <Route path="/s/:id"   element={<SharedLinkPage />} />
           <Route path="*"        element={<Navigate to="/shelf" replace />} />
         </Routes>
       </main>

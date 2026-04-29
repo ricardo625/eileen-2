@@ -304,7 +304,6 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
                       <div className="absolute left-0 right-0 top-full mt-1 bg-card border border-border rounded-xl shadow-[0px_4px_28px_0px_var(--shadow)] z-[60] overflow-hidden flex flex-col">
                         {suggestions.map(note => {
                           const checked = tags.includes(note)
-                          const isActionItems = title === 'Action Items'
                           return (
                             <button
                               key={note}
@@ -312,16 +311,14 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
                               onClick={() => { toggleNote(title, note); setSectionSearches(prev => ({ ...prev, [title]: '' })) }}
                               className="flex items-center gap-3 h-10 px-4 hover:bg-accent transition-colors text-left"
                             >
-                              {isActionItems && (
-                                <div className={cn(
-                                  'size-4 rounded-[4px] shrink-0 flex items-center justify-center',
-                                  checked
-                                    ? 'bg-darker shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1)]'
-                                    : 'border border-dashed border-darker/20',
-                                )}>
-                                  {checked && <Check className="size-2.5 text-background stroke-[2.5]" />}
-                                </div>
-                              )}
+                              <div className={cn(
+                                'size-4 rounded-[4px] shrink-0 flex items-center justify-center',
+                                checked
+                                  ? 'bg-darker shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1)]'
+                                  : 'border border-dashed border-darker/20',
+                              )}>
+                                {checked && <Check className="size-2.5 text-background stroke-[2.5]" />}
+                              </div>
                               <span className="flex-1 font-poppins font-medium text-sm text-sidebar-foreground leading-5 truncate">{note}</span>
                             </button>
                           )
@@ -345,42 +342,24 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
 
                   {/* List */}
                   <div className="flex flex-col pb-2">
-                    {tags.map(note => {
-                      const isActionItems = title === 'Action Items'
-                      return isActionItems ? (
-                        <button
-                          key={note}
-                          onClick={() => toggleNote(title, note)}
-                          className="group/row flex items-center gap-3 h-11 px-6 border-b border-border-alpha overflow-hidden hover:bg-accent transition-colors text-left"
+                    {tags.map(note => (
+                      <div
+                        key={note}
+                        className="group/row flex items-center gap-3 h-11 px-6 border-b border-border-alpha overflow-hidden"
+                      >
+                        {title === 'Action Items' && (
+                          <div className="size-4 rounded-[4px] shrink-0 flex items-center justify-center border border-dashed border-darker/30 opacity-50" />
+                        )}
+                        <span className="flex-1 font-poppins font-medium text-sm text-sidebar-foreground leading-5 truncate">{note}</span>
+                        <span
+                          role="button"
+                          onClick={() => deleteItem(title, note, baseOpts.includes(note))}
+                          className="size-4 flex items-center justify-center opacity-0 group-hover/row:opacity-60 hover:!opacity-100 transition-opacity shrink-0"
                         >
-                          <div className="size-4 rounded-[4px] shrink-0 flex items-center justify-center bg-darker shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)]">
-                            <Check className="size-2.5 text-background stroke-[2.5]" />
-                          </div>
-                          <span className="flex-1 font-poppins font-medium text-sm text-sidebar-foreground leading-5 truncate">{note}</span>
-                          <span
-                            role="button"
-                            onClick={e => { e.stopPropagation(); deleteItem(title, note, baseOpts.includes(note)) }}
-                            className="size-4 flex items-center justify-center opacity-0 group-hover/row:opacity-60 hover:!opacity-100 transition-opacity shrink-0"
-                          >
-                            <Trash2 className="size-4 text-muted-foreground" />
-                          </span>
-                        </button>
-                      ) : (
-                        <div
-                          key={note}
-                          className="group/row flex items-center gap-3 h-11 px-6 border-b border-border-alpha overflow-hidden hover:bg-accent transition-colors"
-                        >
-                          <span className="flex-1 font-poppins font-medium text-sm text-sidebar-foreground leading-5 truncate">{note}</span>
-                          <span
-                            role="button"
-                            onClick={() => deleteItem(title, note, baseOpts.includes(note))}
-                            className="size-4 flex items-center justify-center opacity-0 group-hover/row:opacity-60 hover:!opacity-100 transition-opacity shrink-0"
-                          >
-                            <Trash2 className="size-4 text-muted-foreground" />
-                          </span>
-                        </div>
-                      )
-                    })}
+                          <Trash2 className="size-4 text-muted-foreground" />
+                        </span>
+                      </div>
+                    ))}
                     {tags.length === 0 && (
                       <span className="px-6 py-3 font-sans text-sm text-muted-foreground">No items added.</span>
                     )}

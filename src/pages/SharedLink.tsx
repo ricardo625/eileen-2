@@ -68,12 +68,15 @@ const IMAGES = [
   'https://images.unsplash.com/photo-1556767576-cf0a4a80e5b8?w=800&auto=format&fit=crop',
   'https://images.unsplash.com/photo-1526152505827-d2f3b5b4a52a?w=800&auto=format&fit=crop',
 ]
-const TOTAL_IMAGES = 13
 
 const INITIAL_ITEMS = [
-  { id: 1, label: 'Additional SKU Found', checked: true },
-  { id: 2, label: 'Behind Counter',       checked: true },
-  { id: 3, label: 'Behind Glass',         checked: false },
+  { id: 1, label: 'Additional SKU Found',      checked: true  },
+  { id: 2, label: 'Behind Counter',            checked: true  },
+  { id: 3, label: 'Restock Mango Bliss',       checked: true  },
+  { id: 4, label: 'Fix Promotional Pricing',   checked: false },
+  { id: 5, label: 'Behind Glass',              checked: false },
+  { id: 6, label: 'Display Not Found',         checked: false },
+  { id: 7, label: 'Locked Case — Request Key', checked: false },
 ]
 
 export function SharedLinkPage() {
@@ -153,7 +156,7 @@ export function SharedLinkPage() {
           <div className="flex flex-col">
             {/* Image counter */}
             <p className="text-xs text-white text-center leading-none mb-2 opacity-0 select-none" aria-hidden>
-              {activeIdx + 1} of {TOTAL_IMAGES} images
+              {activeIdx + 1} of {IMAGES.length} images
             </p>
 
             {/* Main image */}
@@ -165,7 +168,7 @@ export function SharedLinkPage() {
               />
               <div className="absolute top-3 left-1/2 -translate-x-1/2 pointer-events-none">
                 <span className="text-xs text-white font-normal drop-shadow">
-                  {activeIdx + 1} of {TOTAL_IMAGES} images
+                  {activeIdx + 1} of {IMAGES.length} images
                 </span>
               </div>
               <button
@@ -237,7 +240,7 @@ export function SharedLinkPage() {
         >
           {/* Counter — top center */}
           <p className="text-xs text-white font-normal select-none mb-4">
-            {activeIdx + 1} of {TOTAL_IMAGES} images
+            {activeIdx + 1} of {IMAGES.length} images
           </p>
 
           {/* Image */}

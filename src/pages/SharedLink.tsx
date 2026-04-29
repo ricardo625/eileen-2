@@ -86,6 +86,7 @@ export function SharedLinkPage() {
   const [activeIdx, setActiveIdx] = useState(0)
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [items, setItems] = useState(INITIAL_ITEMS)
+  const [comment, setComment] = useState('')
   const [toasts, setToasts] = useState<ToastItem[]>([])
   const [nextId, setNextId] = useState(1)
 
@@ -196,6 +197,17 @@ export function SharedLinkPage() {
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Comments */}
+          <div className="flex flex-col gap-4">
+            <h2 className="font-medium text-lg leading-none" style={{ color: '#141417' }}>Comments</h2>
+            <textarea
+              value={comment}
+              onChange={e => setComment(e.target.value)}
+              placeholder="Add information about the Shelf"
+              className="w-full h-[74px] px-3 py-2 bg-background border border-input rounded-2xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-border resize-none"
+            />
           </div>
 
           {/* Action Items */}

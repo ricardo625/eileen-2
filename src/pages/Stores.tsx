@@ -507,13 +507,13 @@ function MapView({ onLearnMore }: { onLearnMore: (submissionId: string) => void 
       {/* Zoom controls */}
       <div className="absolute top-[18px] right-5 w-9 bg-white rounded-lg shadow-[0px_2px_8px_0px_rgba(0,0,0,0.15)] overflow-hidden z-10">
         <Tooltip label="Zoom in">
-          <button className="w-full h-9 flex items-center justify-center hover:bg-secondary/60 transition-colors">
+          <button className="w-full h-9 flex items-center justify-center hover:bg-[var(--secondary-hover)] transition-colors">
             <Plus className="size-6 text-foreground" />
           </button>
         </Tooltip>
         <div className="h-px w-full bg-[#e0e0e5]" />
         <Tooltip label="Zoom out">
-          <button className="w-full h-9 flex items-center justify-center hover:bg-secondary/60 transition-colors">
+          <button className="w-full h-9 flex items-center justify-center hover:bg-[var(--secondary-hover)] transition-colors">
             <Minus className="size-6 text-foreground" />
           </button>
         </Tooltip>

@@ -907,6 +907,12 @@ export function SubmissionsPage() {
   function openDrawerFor(id: string) {
     setActiveSubmissionId(id)
     navigate(`/shelf/detail/${id}`)
+    const submission = submissions.find(s => s.id === id)
+    trackEvent('open_shelf_drawer', {
+      card_id: id,
+      store_name: submission?.storeName ?? null,
+      badges: submission?.badges ?? [],
+    })
   }
 
   function closeDrawer() {
@@ -1215,7 +1221,7 @@ export function SubmissionsPage() {
             'h-10 flex items-center px-3.5 rounded-full text-sm font-semibold whitespace-nowrap transition-colors shrink-0',
             activeSignals.length === 0 && Object.values(filterSelections).every(a => a.length === 0)
               ? 'bg-darker text-brighter'
-              : 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+              : 'bg-secondary text-secondary-foreground hover:bg-[var(--secondary-hover)]',
           )}
         >
           All
@@ -1230,7 +1236,7 @@ export function SubmissionsPage() {
               'h-10 flex items-center gap-2 px-3 rounded-full text-sm whitespace-nowrap transition-colors',
               activeDateRange !== 'All Time'
                 ? 'bg-darker text-brighter'
-                : 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+                : 'bg-secondary text-secondary-foreground hover:bg-[var(--secondary-hover)]',
             )}
           >
             <Calendar className="size-4 shrink-0" />
@@ -1405,7 +1411,7 @@ export function SubmissionsPage() {
             'h-10 flex items-center gap-2 px-3 rounded-full text-sm whitespace-nowrap transition-colors shrink-0',
             activeSignals.includes('Flagged')
               ? 'bg-darker text-brighter'
-              : 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+              : 'bg-secondary text-secondary-foreground hover:bg-[var(--secondary-hover)]',
           )}
         >
           <FlagTriangleRight className="size-4 shrink-0" />
@@ -1423,7 +1429,7 @@ export function SubmissionsPage() {
             'h-10 flex items-center gap-2 px-3 rounded-full text-sm whitespace-nowrap transition-colors shrink-0',
             activeSignals.includes('Notes')
               ? 'bg-darker text-brighter'
-              : 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+              : 'bg-secondary text-secondary-foreground hover:bg-[var(--secondary-hover)]',
           )}
         >
           <StickyNote className="size-4 shrink-0" />
@@ -1458,7 +1464,7 @@ export function SubmissionsPage() {
                   'h-10 flex items-center gap-2 px-3 rounded-full text-sm whitespace-nowrap transition-colors',
                   isActive
                     ? 'bg-darker text-brighter'
-                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+                    : 'bg-secondary text-secondary-foreground hover:bg-[var(--secondary-hover)]',
                 )}
               >
                 <PillIcon className="size-4 shrink-0" />
@@ -1529,7 +1535,7 @@ export function SubmissionsPage() {
           <button
             ref={filterBtnRef}
             onClick={() => setFilterOpen(o => !o)}
-            className="h-9 w-9 flex items-center justify-center bg-secondary text-secondary-foreground rounded-full hover:bg-secondary/80 transition-colors"
+            className="h-9 w-9 flex items-center justify-center bg-secondary text-secondary-foreground rounded-full hover:bg-[var(--secondary-hover)] transition-colors"
           >
             <SlidersHorizontal className="size-4 text-foreground" />
           </button>

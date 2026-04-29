@@ -35,7 +35,7 @@ export const BADGE_CONFIG: Record<BadgeVariant, {
   },
 }
 
-export const BADGE_ORDER: BadgeVariant[] = ['flagged', 'notes', 'no-stock', 'low-stock']
+export const BADGE_ORDER: BadgeVariant[] = ['flagged', 'no-stock', 'low-stock', 'notes']
 
 export const sortBadges = (badges: BadgeVariant[]) =>
   [...badges].sort((a, b) => BADGE_ORDER.indexOf(a) - BADGE_ORDER.indexOf(b))

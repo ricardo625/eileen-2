@@ -51,7 +51,7 @@ interface ToastStackProps {
 export function ToastStack({ toasts, onDismiss, duration }: ToastStackProps) {
   if (!toasts.length) return null
   return createPortal(
-    <div className="fixed bottom-6 right-6 z-[200] flex flex-col gap-2 items-end">
+    <div className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-2 items-end">
       {toasts.map(item => (
         <Toast key={item.id} item={item} onDismiss={onDismiss} duration={duration} />
       ))}

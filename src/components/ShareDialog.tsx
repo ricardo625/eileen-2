@@ -65,12 +65,12 @@ export function ShareDialog({ onClose, onCopy, onExportPdf, onExportCsv }: Share
         </div>
 
         {/* URL input */}
-        <div className="relative flex items-center h-9 px-3 pr-10 bg-background border border-input rounded-full shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] overflow-hidden">
+        <div className="flex items-center gap-2 h-9 px-3 bg-background border border-input rounded-full shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)]">
           <a
             href={SHARE_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 font-sans text-sm text-muted-foreground truncate min-w-0 hover:text-foreground hover:underline transition-colors"
+            className="flex-1 min-w-0 font-sans text-sm text-muted-foreground truncate hover:text-foreground hover:underline transition-colors"
           >
             {SHARE_URL}
           </a>
@@ -78,7 +78,7 @@ export function ShareDialog({ onClose, onCopy, onExportPdf, onExportCsv }: Share
             <button
               onClick={handleCopy}
               className={cn(
-                'absolute right-3 size-4 flex items-center justify-center transition-colors',
+                'shrink-0 size-4 flex items-center justify-center transition-colors',
                 copied ? 'text-green' : 'text-muted-foreground hover:text-foreground',
               )}
             >

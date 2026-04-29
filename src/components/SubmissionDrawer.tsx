@@ -1,5 +1,5 @@
 import { Archive, Check, ChevronsDown, ChevronLeft, ChevronRight, CircleDashed, FlagTriangleRight, Forward, Plus, Search, Trash2, XCircle } from 'lucide-react'
-import { SignalBadge, type BadgeVariant } from '@/components/SignalBadge'
+import { SignalBadge, type BadgeVariant, sortBadges } from '@/components/SignalBadge'
 import { ToastStack, type ToastItem } from '@/components/ui/Toast'
 import { ShareDialog } from '@/components/ShareDialog'
 import { Tooltip } from '@/components/ui/Tooltip'
@@ -231,11 +231,12 @@ export function SubmissionDrawer({ open, onClose, onArchive, onFlag, cardId, sub
             )}
 
             {/* Signal tags */}
-            {submission?.badges && submission.badges.length > 0 && (
+            {submission?.badges && (submission.badges.length > 0 || flagged) && (
               <div className="absolute right-[19px] top-[14px] flex items-center gap-1.5">
-                {(submission.badges as BadgeVariant[])
-                  .map(b => <SignalBadge key={b} variant={b} />)
-                }
+                {sortBadges([
+                  ...submission.badges.filter(b => b !== 'flagged'),
+                  ...(flagged ? ['flagged'] : []),
+                ] as BadgeVariant[]).map(b => <SignalBadge key={b} variant={b} />)}
               </div>
             )}
           </div>

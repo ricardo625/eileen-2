@@ -65,6 +65,7 @@ interface Submission {
   address: string
   image: string
   badges: BadgeVariant[]
+  badgeCounts?: Partial<Record<BadgeVariant, number>>
   archived?: boolean
   imageCount?: number
   completedAt?: string
@@ -80,6 +81,7 @@ const INITIAL_SUBMISSIONS: Submission[] = [
     address: '2660 San Miguel Dr, Newport Beach, CA, USA 92660',
     image: imgStore1,
     badges: ['flagged', 'notes', 'no-stock'],
+    badgeCounts: { 'no-stock': 3, notes: 4 },
     noteCount: 4,
     imageCount: 13,
     completedAt: 'Apr 28, 2026',
@@ -91,6 +93,7 @@ const INITIAL_SUBMISSIONS: Submission[] = [
     address: '8148 La Palma Ave, Buena Park, CA, USA 90620',
     image: imgStore2,
     badges: ['notes', 'low-stock'],
+    badgeCounts: { 'low-stock': 2, notes: 2 },
     noteCount: 2,
     archived: true,
     imageCount: 7,
@@ -102,7 +105,8 @@ const INITIAL_SUBMISSIONS: Submission[] = [
     storeName: 'Pavilions Garden Grove',
     address: '13200 Chapman Ave, Garden Grove, CA, USA 92840',
     image: imgStore3,
-    badges: ['no-stock'],
+    badges: ['out-of-stock'],
+    badgeCounts: { 'out-of-stock': 4 },
     imageCount: 5,
     completedAt: 'Apr 26, 2026',
     completedBy: 'Sara',
@@ -123,7 +127,7 @@ const INITIAL_SUBMISSIONS: Submission[] = [
     storeName: 'Safeway Burbank',
     address: '1611 W Olive Ave, Burbank, CA, USA 91506',
     image: imgU02,
-    badges: ['no-stock'],
+    badges: ['out-of-stock'],
     imageCount: 6,
     completedAt: 'Apr 24, 2026',
     completedBy: 'David',
@@ -715,8 +719,8 @@ function SubmissionCard({ submission, selected, onToggle, onOpen }: {
         <div className="flex items-center gap-1.5 pt-4">
           {sortBadges(submission.badges).map(b => (
             b === 'notes' && submission.noteCount
-              ? <Tooltip key={b} label={`${submission.noteCount} note${submission.noteCount !== 1 ? 's' : ''}`}><SignalBadge variant={b} /></Tooltip>
-              : <SignalBadge key={b} variant={b} />
+              ? <Tooltip key={b} label={`${submission.noteCount} note${submission.noteCount !== 1 ? 's' : ''}`}><SignalBadge variant={b} count={submission.badgeCounts?.[b]} /></Tooltip>
+              : <SignalBadge key={b} variant={b} count={submission.badgeCounts?.[b]} />
           ))}
           <div className="flex-1 flex items-center justify-end min-w-0">
             <div
@@ -794,8 +798,8 @@ function SubmissionListRow({ submission, selected, onToggle, onOpen }: {
         <div className="flex-1 flex items-center justify-end gap-1.5 min-w-0">
           {sortBadges(submission.badges).map(b => (
             b === 'notes' && submission.noteCount
-              ? <Tooltip key={b} label={`${submission.noteCount} note${submission.noteCount !== 1 ? 's' : ''}`}><SignalBadge variant={b} /></Tooltip>
-              : <SignalBadge key={b} variant={b} />
+              ? <Tooltip key={b} label={`${submission.noteCount} note${submission.noteCount !== 1 ? 's' : ''}`}><SignalBadge variant={b} count={submission.badgeCounts?.[b]} /></Tooltip>
+              : <SignalBadge key={b} variant={b} count={submission.badgeCounts?.[b]} />
           ))}
         </div>
       </div>

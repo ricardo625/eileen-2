@@ -10,11 +10,10 @@ import {
 import { cn } from '@/lib/utils'
 import { Tooltip } from '@/components/ui/Tooltip'
 import heatMapImage from '@/assets/heat.png'
+import mapImage from '@/assets/map2.png'
 import raleysLogo from '@/assets/logos/raleys.png'
 import pavilionsLogo from '@/assets/logos/pavilions.png'
 import albertsonsLogo from '@/assets/logos/albertsons.png'
-
-const MAP_IMAGE = 'https://www.figma.com/api/mcp/asset/e66f2024-23e3-492e-af4f-07cf36c8ed1d'
 
 type StoreDot = {
   id: number
@@ -463,7 +462,7 @@ function MapView({ onLearnMore }: { onLearnMore: (submissionId: string) => void 
       <div
         className="absolute inset-0 transition-opacity duration-300"
         style={{
-          backgroundImage: `url(${MAP_IMAGE})`,
+          backgroundImage: `url(${mapImage})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           filter: 'saturate(0)',

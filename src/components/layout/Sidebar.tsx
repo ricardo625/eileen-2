@@ -327,6 +327,7 @@ export function Sidebar({ collapsed, onToggle, activePage, onNavigate, shelfBadg
                 activeSubItem={activeSubItem}
                 onSubItemClick={item => {
                   if (item === 'The Shelf') onNavigate?.('submissions')
+                  if (item === 'Stores') onNavigate?.('stores')
                 }}
               />
               {storeInsightsExpanded && (

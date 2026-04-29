@@ -336,7 +336,6 @@ export function Sidebar({ collapsed, onToggle, activePage, onNavigate, shelfBadg
                     label="The Shelf"
                     active={activePage === 'submissions'}
                     collapsed={collapsed}
-                    badge={shelfBadge ?? 39}
                     onClick={() => onNavigate?.('submissions')}
                   />
                   <SubNavItem

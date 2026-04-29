@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Copy, FileText, Sheet, X } from 'lucide-react'
+import { Copy, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tooltip } from '@/components/ui/Tooltip'
 import { trackEvent } from '@/lib/clarity'
+import iconPdf from '@/assets/icon-pdf.png'
+import iconCsv from '@/assets/icon-csv.png'
 
 const SHARE_URL = `${window.location.origin}/s/8a2hf6fi`
 
@@ -95,7 +97,7 @@ export function ShareDialog({ onClose, onCopy, onExportPdf, onExportCsv }: Share
               className="flex flex-col items-center gap-2.5"
             >
               <div className="size-12 flex items-center justify-center rounded-full bg-soft-red border border-soft-red-border">
-                <FileText className="size-6 text-soft-red-foreground" />
+                <img src={iconPdf} alt="PDF" className="size-6" />
               </div>
               <span className="font-sans font-semibold text-xs text-foreground">PDF</span>
             </button>
@@ -106,7 +108,7 @@ export function ShareDialog({ onClose, onCopy, onExportPdf, onExportCsv }: Share
               className="flex flex-col items-center gap-2.5"
             >
               <div className="size-12 flex items-center justify-center rounded-full bg-soft-green border border-soft-green-border">
-                <Sheet className="size-6 text-soft-green-foreground" />
+                <img src={iconCsv} alt="CSV" className="size-6" />
               </div>
               <span className="font-sans font-semibold text-xs text-foreground">CSV</span>
             </button>

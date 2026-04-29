@@ -1529,7 +1529,7 @@ export function SubmissionsPage() {
           <button
             ref={filterBtnRef}
             onClick={() => setFilterOpen(o => !o)}
-            className="h-9 w-9 flex items-center justify-center bg-background border border-input rounded-full shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] hover:bg-accent transition-colors"
+            className="h-9 w-9 flex items-center justify-center bg-secondary text-secondary-foreground rounded-full hover:bg-secondary/80 transition-colors"
           >
             <SlidersHorizontal className="size-4 text-foreground" />
           </button>

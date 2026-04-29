@@ -523,7 +523,7 @@ function MapView({ onLearnMore }: { onLearnMore: (submissionId: string) => void 
         <button
           ref={stateTriggerRef}
           onClick={() => { setStateDropdownOpen(o => !o); setStateSearch('') }}
-          className="flex items-center gap-2 h-9 px-3 bg-background border border-input rounded-lg shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] hover:bg-accent transition-colors"
+          className="flex items-center gap-2 h-9 px-3 bg-background border border-input rounded-lg shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] hover:bg-muted transition-colors"
         >
           <MapPin className="size-4 text-muted-foreground shrink-0" />
           <span className="text-sm text-foreground">{selectedState}</span>

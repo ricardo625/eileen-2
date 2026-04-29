@@ -1833,11 +1833,23 @@ export function SubmissionsPage() {
       )}
 
       <ToastStack toasts={toasts} onDismiss={dismissToast} />
-      {shareOpen && <ShareDialog onClose={() => setShareOpen(false)} onCopy={() => {
-        // track copy link click inside the share dialog (opened from island)
-        trackEvent('click_copy_link_share_shelf', { source: 'island' })
-        showToast('Link copied successfully')
-      }} />}
+      {shareOpen && <ShareDialog
+        onClose={() => setShareOpen(false)}
+        onCopy={() => {
+          trackEvent('click_copy_link_share_shelf', { source: 'island' })
+          showToast('Link copied successfully')
+        }}
+        onExportPdf={() => {
+          setShareOpen(false)
+          trackEvent('click_export_shelf', { format: 'pdf', source: 'share_dialog' })
+          triggerExport('Exported to PDF successfully')
+        }}
+        onExportCsv={() => {
+          setShareOpen(false)
+          trackEvent('click_export_shelf', { format: 'csv', source: 'share_dialog' })
+          triggerExport('Exported to CSV successfully')
+        }}
+      />}
     </div>
   )
 }

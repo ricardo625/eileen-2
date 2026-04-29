@@ -1,4 +1,4 @@
-import { ChevronsDown, CircleDashed, FlagTriangleRight, StickyNote } from 'lucide-react'
+import { Ban, ChevronsDown, FlagTriangleRight, StickyNote } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export type BadgeVariant = 'flagged' | 'notes' | 'no-stock' | 'low-stock'
@@ -17,15 +17,15 @@ export const BADGE_CONFIG: Record<BadgeVariant, {
   },
   notes: {
     label: 'Notes',
-    wrapperClass: 'bg-gradient-to-r from-soft-indigo to-brighter text-soft-indigo-foreground',
-    borderClass: 'border-soft-indigo-border',
+    wrapperClass: 'bg-brighter text-foreground',
+    borderClass: 'border-[var(--border-alpha)]',
     Icon: StickyNote,
   },
   'no-stock': {
     label: 'No Stock',
-    wrapperClass: 'bg-card text-foreground',
-    borderClass: 'border-border',
-    Icon: CircleDashed,
+    wrapperClass: 'bg-gradient-to-r from-soft-red to-brighter text-soft-red-foreground',
+    borderClass: 'border-soft-red-border',
+    Icon: Ban,
   },
   'low-stock': {
     label: 'Low Stock',

@@ -6,6 +6,7 @@ import { Tooltip } from '@/components/ui/Tooltip'
 import { cn } from '@/lib/utils'
 import { trackEvent } from '@/lib/clarity'
 import { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 
 const imgExpandIcon = 'https://www.figma.com/api/mcp/asset/140f4632-f821-42e0-a60a-5279e7fbc00e'
 
@@ -491,7 +492,7 @@ export function SubmissionDrawer({ open, onClose, onArchive, onFlag, cardId, sub
         </>
       )}
 
-      <ToastStack toasts={toasts} onDismiss={id => setToasts(prev => prev.filter(t => t.id !== id))} />
+      {createPortal(<ToastStack toasts={toasts} onDismiss={id => setToasts(prev => prev.filter(t => t.id !== id))} />, document.body)}
       {shareOpen && <ShareDialog onClose={() => setShareOpen(false)} />}
     </>
   )

@@ -63,9 +63,14 @@ export function ShareDialog({ onClose, onCopy }: ShareDialogProps) {
 
         {/* URL input */}
         <div className="flex items-center h-9 px-3 bg-background border border-input rounded-full shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)]">
-          <span className="flex-1 font-sans text-sm text-muted-foreground truncate min-w-0">
+          <a
+            href={SHARE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 font-sans text-sm text-muted-foreground truncate min-w-0 hover:text-foreground hover:underline transition-colors"
+          >
             {SHARE_URL}
-          </span>
+          </a>
           <Tooltip label={copied ? 'Copied!' : 'Copy link'}>
             <button
               onClick={handleCopy}

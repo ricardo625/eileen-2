@@ -911,7 +911,7 @@ export function SubmissionsPage() {
     trackEvent('open_shelf_drawer', {
       card_id: id,
       store_name: submission?.storeName ?? null,
-      badges: submission?.badges ?? [],
+      badges: (submission?.badges ?? []).join(','),
     })
   }
 
@@ -1684,9 +1684,9 @@ export function SubmissionsPage() {
           if (activeSubmissionId) {
             setSubmissions(prev => prev.map(s => {
               if (s.id !== activeSubmissionId) return s
-              const badges = flagged
+              const badges = (flagged
                 ? [...s.badges.filter(b => b !== 'flagged'), 'flagged']
-                : s.badges.filter(b => b !== 'flagged')
+                : s.badges.filter(b => b !== 'flagged')) as typeof s.badges
               return { ...s, badges }
             }))
           }

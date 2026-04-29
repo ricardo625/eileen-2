@@ -4,12 +4,10 @@ import { cn } from '@/lib/utils'
 import { WorkspaceSwitcher } from './WorkspaceSwitcher'
 import {
   Bell,
-  Bot,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   Layers,
-  Settings,
   Store,
   Truck,
 } from 'lucide-react'
@@ -251,7 +249,7 @@ function SubNavItem({
   )
 }
 
-export function Sidebar({ collapsed, onToggle, activePage, onNavigate, shelfBadge }: SidebarProps) {
+export function Sidebar({ collapsed, onToggle, activePage, onNavigate, shelfBadge: _shelfBadge }: SidebarProps) {
   const [storeInsightsExpanded, setStoreInsightsExpanded] = useState(true)
   const [planProgress, setPlanProgress] = useState(0)
 

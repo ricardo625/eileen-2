@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { Copy, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tooltip } from '@/components/ui/Tooltip'
+import { trackEvent } from '@/lib/clarity'
 
 const SHARE_URL = `${window.location.origin}/s/8a2hf6fi`
 
@@ -27,6 +28,7 @@ export function ShareDialog({ onClose, onCopy }: ShareDialogProps) {
     navigator.clipboard.writeText(SHARE_URL).catch(() => {})
     setCopied(true)
     onCopy?.()
+    trackEvent('copy_share_url', { url: SHARE_URL })
     setTimeout(() => setCopied(false), 2000)
   }
 

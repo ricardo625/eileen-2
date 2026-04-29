@@ -4,8 +4,8 @@ import { Copy, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tooltip } from '@/components/ui/Tooltip'
 import { trackEvent } from '@/lib/clarity'
-import iconPdf from '@/assets/icon-pdf.png'
-import iconCsv from '@/assets/icon-csv.png'
+import iconPdf from '@/assets/icon-pdf.svg'
+import iconCsv from '@/assets/icon-csv.svg'
 
 const SHARE_URL = `${window.location.origin}/s/8a2hf6fi`
 

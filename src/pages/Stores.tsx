@@ -877,7 +877,10 @@ export function StoresPage({ onLearnMore, onNavigateToShelf }: { onLearnMore?: (
       {/* Search */}
       <div className="flex items-center gap-3">
         <div ref={searchWrapperRef} className="flex-1 relative">
-          <div className="flex items-center gap-2 h-9 px-3 bg-background border-b border-input overflow-hidden">
+          <div className={cn(
+              'flex items-center gap-2 h-9 px-3 bg-background border-b overflow-hidden transition-colors',
+              searchFocused ? 'border-[#eb978a] shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)]' : 'border-input',
+            )}>
             <Search className="size-4 text-muted-foreground shrink-0" />
             <input
               value={search}

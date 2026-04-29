@@ -135,6 +135,10 @@ export function SubmissionDrawer({ open, onClose, onArchive, onFlag, cardId, sub
   const [flagged, setFlagged]           = useState(submission?.badges.includes('flagged') ?? false)
   const [toasts, setToasts]             = useState<ToastItem[]>([])
   const [shareOpen, setShareOpen]       = useState(false)
+
+  function addToast(message: string) {
+    setToasts(prev => [...prev, { id: Date.now() + Math.random(), message }])
+  }
   const searchInputRefs  = useRef<Record<string, HTMLInputElement | null>>({})
   const blurTimerRef     = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -493,7 +497,11 @@ export function SubmissionDrawer({ open, onClose, onArchive, onFlag, cardId, sub
       )}
 
       {createPortal(<ToastStack toasts={toasts} onDismiss={id => setToasts(prev => prev.filter(t => t.id !== id))} />, document.body)}
-      {shareOpen && <ShareDialog onClose={() => setShareOpen(false)} />}
+      {shareOpen && <ShareDialog
+        onClose={() => setShareOpen(false)}
+        onExportPdf={() => { setShareOpen(false); trackEvent('click_export_shelf', { format: 'pdf', source: 'drawer' }); addToast('Exported to PDF successfully') }}
+        onExportCsv={() => { setShareOpen(false); trackEvent('click_export_shelf', { format: 'csv', source: 'drawer' }); addToast('Exported to CSV successfully') }}
+      />}
     </>
   )
 }

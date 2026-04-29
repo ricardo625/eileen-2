@@ -1090,7 +1090,7 @@ export function SubmissionsPage() {
         <h1 className="font-sans font-medium text-2xl leading-8 text-foreground">The Shelf</h1>
         <div className="flex items-center gap-2">
           {selectedIds.size > 0 && (
-            <span className="text-sm text-muted-foreground whitespace-nowrap">Selected {selectedIds.size}</span>
+            <span className="text-sm text-[var(--red)] whitespace-nowrap">Selected {selectedIds.size}</span>
           )}
           <Tooltip label="Select all">
             <button
@@ -1106,6 +1106,7 @@ export function SubmissionsPage() {
               <CircleCheck className={cn('size-4 transition-colors', selectedIds.size === submissions.length ? 'text-[#f91616]' : 'text-foreground')} />
             </button>
           </Tooltip>
+          <div className="w-px h-5 bg-border shrink-0" />
           <Tooltip label="Export CSV">
             <button
               onClick={() => {

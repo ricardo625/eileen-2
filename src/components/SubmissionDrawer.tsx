@@ -134,6 +134,7 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
   const [toasts, setToasts]             = useState<ToastItem[]>([])
   const [shareOpen, setShareOpen]       = useState(false)
   const searchInputRefs  = useRef<Record<string, HTMLInputElement | null>>({})
+  const blurTimerRef     = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Reset per-card state when a different card is opened
   useEffect(() => {
@@ -251,8 +252,8 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
               // Dropdown: suggestions from base options filtered by search
               const suggestions = search
                 ? visibleBase.filter(n => n.toLowerCase().includes(search.toLowerCase()))
-                : []
-              const isDropdownOpen = focusedSection === title && search.length > 0
+                : visibleBase
+              const isDropdownOpen = focusedSection === title
               const exactMatch = allOpts.some(n => n.toLowerCase() === search.toLowerCase())
 
               const commitSearch = () => {
@@ -288,8 +289,13 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
                         type="text"
                         value={search}
                         onChange={e => setSectionSearches(prev => ({ ...prev, [title]: e.target.value }))}
-                        onFocus={() => setFocusedSection(title)}
-                        onBlur={() => setTimeout(() => setFocusedSection(null), 150)}
+                        onFocus={() => {
+                          if (blurTimerRef.current) clearTimeout(blurTimerRef.current)
+                          setFocusedSection(title)
+                        }}
+                        onBlur={() => {
+                          blurTimerRef.current = setTimeout(() => setFocusedSection(null), 200)
+                        }}
                         onKeyDown={e => {
                           if (e.key === 'Enter') { e.preventDefault(); commitSearch() }
                           if (e.key === 'Escape') { setSectionSearches(prev => ({ ...prev, [title]: '' })); setFocusedSection(null) }
@@ -301,7 +307,10 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
 
                     {/* Suggestions dropdown */}
                     {isDropdownOpen && (
-                      <div className="absolute left-0 right-0 top-full mt-1 bg-card border border-border rounded-xl shadow-[0px_4px_28px_0px_var(--shadow)] z-[60] overflow-hidden flex flex-col">
+                      <div
+                        className="absolute left-0 right-0 top-full mt-1 bg-card border border-border rounded-xl shadow-[0px_4px_28px_0px_var(--shadow)] z-[60] overflow-hidden flex flex-col"
+                        onMouseDown={e => e.preventDefault()}
+                      >
                         {suggestions.map(note => {
                           const checked = tags.includes(note)
                           return (

@@ -78,7 +78,7 @@ const INITIAL_ITEMS = [
 
 export function SharedLinkPage() {
   const [dialogOpen, setDialogOpen] = useState(true)
-  const [viewerName, setViewerName] = useState('')
+  const [_viewerName, setViewerName] = useState('')
   const [acknowledged, setAcknowledged] = useState(false)
   const [activeIdx, setActiveIdx] = useState(0)
   const [lightboxOpen, setLightboxOpen] = useState(false)

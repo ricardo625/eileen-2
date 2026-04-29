@@ -106,6 +106,8 @@ export function SharedLinkPage() {
     }])
   }
 
+  const allChecked = items.every(item => item.checked)
+
   function toggleItem(id: number) {
     setItems(prev => prev.map(item => item.id === id ? { ...item, checked: !item.checked } : item))
   }
@@ -133,19 +135,20 @@ export function SharedLinkPage() {
       />
 
       <div className="relative z-10 flex flex-col items-center py-16 px-4">
-        <div className="w-full max-w-[688px] flex flex-col gap-10">
+        <div className="w-full max-w-[688px] flex flex-col gap-6">
 
           {/* Header */}
-          <div className="relative flex flex-col gap-2 py-3.5">
+          <div className="relative flex flex-col gap-2 py-2">
             <h1 className="font-semibold text-xl leading-7 text-foreground">The Corner Market</h1>
             <p className="text-sm text-muted-foreground">2660 San Miguel Drive, Newport Beach, CA, US - 92660</p>
             <p className="text-xs text-muted-foreground leading-none">Apr 18, 2026, 02:31 PM PDT</p>
 
             <button
               onClick={handleAcknowledge}
+              disabled={!allChecked || acknowledged}
               className={cn(
-                'absolute right-0 top-0 flex items-center gap-2 h-9 px-4 rounded-lg bg-darker text-brighter font-medium text-sm shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] transition-opacity',
-                acknowledged ? 'opacity-50 cursor-default' : 'opacity-100 hover:opacity-80',
+                'absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-2 h-9 px-4 rounded-lg bg-darker text-brighter font-medium text-sm shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] transition-opacity',
+                allChecked && !acknowledged ? 'opacity-100 hover:opacity-80' : 'opacity-40 cursor-default',
               )}
             >
               <Check className="size-4" />
@@ -239,6 +242,21 @@ export function SharedLinkPage() {
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Bottom Acknowledge */}
+          <div className="flex justify-end pb-8">
+            <button
+              onClick={handleAcknowledge}
+              disabled={!allChecked || acknowledged}
+              className={cn(
+                'flex items-center gap-2 h-9 px-4 rounded-lg bg-darker text-brighter font-medium text-sm shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] transition-opacity',
+                allChecked && !acknowledged ? 'opacity-100 hover:opacity-80' : 'opacity-40 cursor-default',
+              )}
+            >
+              <Check className="size-4" />
+              Acknowledged
+            </button>
           </div>
 
         </div>

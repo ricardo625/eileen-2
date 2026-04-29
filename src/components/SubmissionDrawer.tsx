@@ -234,7 +234,7 @@ export function SubmissionDrawer({ open, onClose, onArchive, onFlag, cardId, sub
             {submission?.badges && (submission.badges.length > 0 || flagged) && (
               <div className="absolute right-[19px] top-[14px] flex items-center gap-1.5">
                 {sortBadges([
-                  ...submission.badges.filter(b => b !== 'flagged'),
+                  ...submission.badges.filter(b => b !== 'flagged' && b !== 'notes'),
                   ...(flagged ? ['flagged'] : []),
                 ] as BadgeVariant[]).map(b => <SignalBadge key={b} variant={b} />)}
               </div>

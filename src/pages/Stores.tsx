@@ -426,6 +426,26 @@ function MapView({ onLearnMore }: { onLearnMore: (submissionId: string) => void 
   const [selected, setSelected] = useState<{ store: StoreDot; el: HTMLElement } | null>(null)
   const [selectedState, setSelectedState] = useState('California')
   const [mapView, setMapView] = useState<'default' | 'heat'>('default')
+  const [stateDropdownOpen, setStateDropdownOpen] = useState(false)
+  const [stateSearch, setStateSearch] = useState('')
+  const stateDropdownRef = useRef<HTMLDivElement>(null)
+  const stateTriggerRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (!stateDropdownOpen) return
+    function handleClick(e: MouseEvent) {
+      const t = e.target as Node
+      if (
+        stateDropdownRef.current && !stateDropdownRef.current.contains(t) &&
+        stateTriggerRef.current && !stateTriggerRef.current.contains(t)
+      ) {
+        setStateDropdownOpen(false)
+        setStateSearch('')
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [stateDropdownOpen])
 
   function handleDotClick(e: React.MouseEvent<HTMLButtonElement>, store: StoreDot) {
     e.stopPropagation()
@@ -500,16 +520,53 @@ function MapView({ onLearnMore }: { onLearnMore: (submissionId: string) => void 
       </div>
 
       {/* State selector */}
-      <div className="absolute left-5 top-[18px] flex items-center gap-2 h-9 px-3 bg-background border border-input rounded-lg shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] z-10">
-        <MapPin className="size-4 text-muted-foreground shrink-0" />
-        <select
-          value={selectedState}
-          onChange={e => setSelectedState(e.target.value)}
-          className="appearance-none bg-transparent text-sm text-foreground outline-none cursor-pointer pr-4"
+      <div className="absolute left-5 top-[18px] z-20">
+        <button
+          ref={stateTriggerRef}
+          onClick={() => { setStateDropdownOpen(o => !o); setStateSearch('') }}
+          className="flex items-center gap-2 h-9 px-3 bg-background border border-input rounded-lg shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] hover:bg-accent transition-colors"
         >
-          {US_STATES.map(s => <option key={s} value={s}>{s}</option>)}
-        </select>
-        <ChevronDown className="size-4 text-muted-foreground shrink-0 -ml-3 pointer-events-none" />
+          <MapPin className="size-4 text-muted-foreground shrink-0" />
+          <span className="text-sm text-foreground">{selectedState}</span>
+          <ChevronDown className="size-4 text-muted-foreground shrink-0" />
+        </button>
+
+        {stateDropdownOpen && (
+          <div
+            ref={stateDropdownRef}
+            className="absolute top-full left-0 mt-2 w-[260px] bg-card border border-sidebar-border rounded-2xl shadow-[0px_4px_14px_0px_var(--shadow)] p-0.5 z-50"
+          >
+            {/* Search */}
+            <div className="p-2">
+              <div className="flex items-center gap-2 h-9 px-3 bg-background border border-input rounded-full shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)]">
+                <Search className="size-5 text-muted-foreground shrink-0" />
+                <input
+                  autoFocus
+                  type="text"
+                  value={stateSearch}
+                  onChange={e => setStateSearch(e.target.value)}
+                  placeholder="Search"
+                  className="flex-1 text-sm bg-transparent outline-none text-foreground placeholder:text-muted-foreground"
+                />
+              </div>
+            </div>
+            {/* List */}
+            <div className="max-h-[240px] overflow-y-auto flex flex-col gap-0 pb-1">
+              {US_STATES.filter(s => s.toLowerCase().includes(stateSearch.toLowerCase())).map(s => (
+                <button
+                  key={s}
+                  onClick={() => { setSelectedState(s); setStateDropdownOpen(false); setStateSearch('') }}
+                  className={cn(
+                    'w-full px-4 py-3 text-left font-poppins font-medium text-sm text-sidebar-primary-foreground transition-colors rounded-[14px]',
+                    s === selectedState ? 'bg-accent' : 'hover:bg-accent',
+                  )}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Map view mode */}

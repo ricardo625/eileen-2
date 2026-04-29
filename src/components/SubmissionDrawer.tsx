@@ -117,11 +117,12 @@ interface Props {
   open: boolean
   onClose: () => void
   onArchive?: () => void
+  onFlag?: (flagged: boolean) => void
   cardId?: string | null
   submission?: SubmissionData | null
 }
 
-export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission }: Props) {
+export function SubmissionDrawer({ open, onClose, onArchive, onFlag, cardId, submission }: Props) {
   const [sectionSearches, setSectionSearches] = useState<Record<string, string>>({})
   const [focusedSection, setFocusedSection]   = useState<string | null>(null)
   const [selectedNotes, setSelectedNotes] = useState<Record<string, string[]>>(
@@ -433,7 +434,7 @@ export function SubmissionDrawer({ open, onClose, onArchive, cardId, submission 
 
         {/* Flag */}
         <button
-          onClick={() => setFlagged(f => !f)}
+          onClick={() => { const next = !flagged; setFlagged(next); onFlag?.(next) }}
           className={cn(
             'size-12 flex items-center justify-center rounded-full border transition-colors shrink-0',
             flagged

@@ -1680,6 +1680,17 @@ export function SubmissionsPage() {
             showToast('Submissions archived successfully', () => setSubmissions(snapshot))
           }
         }}
+        onFlag={(flagged) => {
+          if (activeSubmissionId) {
+            setSubmissions(prev => prev.map(s => {
+              if (s.id !== activeSubmissionId) return s
+              const badges = flagged
+                ? [...s.badges.filter(b => b !== 'flagged'), 'flagged']
+                : s.badges.filter(b => b !== 'flagged')
+              return { ...s, badges }
+            }))
+          }
+        }}
       />
 
       {/* Selection island */}

@@ -1009,7 +1009,12 @@ export function SubmissionsPage() {
   const toggleSelected = (id: string) =>
     setSelectedIds(prev => {
       const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
+      const selecting = !next.has(id)
+      selecting ? next.add(id) : next.delete(id)
+      if (selecting) {
+        const submission = submissions.find(s => s.id === id)
+        trackEvent('select_card_shelf', { card_id: id, store_name: submission?.storeName ?? null })
+      }
       return next
     })
   function showToast(msg: string, onUndo?: () => void) {

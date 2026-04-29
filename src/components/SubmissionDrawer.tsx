@@ -136,8 +136,16 @@ export function SubmissionDrawer({ open, onClose, onArchive, onFlag, cardId, sub
   const [toasts, setToasts]             = useState<ToastItem[]>([])
   const [shareOpen, setShareOpen]       = useState(false)
 
-  function addToast(message: string) {
-    setToasts(prev => [...prev, { id: Date.now() + Math.random(), message }])
+  function addToast(message: string, onUndo?: () => void) {
+    setToasts(prev => [...prev, { id: Date.now() + Math.random(), message, onUndo }])
+  }
+
+  function triggerExport(successMsg: string) {
+    let cancelled = false
+    const tid = setTimeout(() => {
+      if (!cancelled) addToast(successMsg, () => {})
+    }, 1800)
+    addToast('Preparing the file...', () => { cancelled = true; clearTimeout(tid) })
   }
   const searchInputRefs  = useRef<Record<string, HTMLInputElement | null>>({})
   const blurTimerRef     = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -499,8 +507,8 @@ export function SubmissionDrawer({ open, onClose, onArchive, onFlag, cardId, sub
       {createPortal(<ToastStack toasts={toasts} onDismiss={id => setToasts(prev => prev.filter(t => t.id !== id))} />, document.body)}
       {shareOpen && <ShareDialog
         onClose={() => setShareOpen(false)}
-        onExportPdf={() => { setShareOpen(false); trackEvent('click_export_shelf', { format: 'pdf', source: 'drawer' }); addToast('Exported to PDF successfully') }}
-        onExportCsv={() => { setShareOpen(false); trackEvent('click_export_shelf', { format: 'csv', source: 'drawer' }); addToast('Exported to CSV successfully') }}
+        onExportPdf={() => { setShareOpen(false); trackEvent('click_export_shelf', { format: 'pdf', source: 'drawer' }); triggerExport('Exported to PDF successfully') }}
+        onExportCsv={() => { setShareOpen(false); trackEvent('click_export_shelf', { format: 'csv', source: 'drawer' }); triggerExport('Exported to CSV successfully') }}
       />}
     </>
   )

@@ -13,7 +13,14 @@ posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_PROJECT_TOKEN, {
   capture_pageview: false,
   capture_pageleave: false,
   debug: true,
+  loaded: (ph) => {
+    console.log('[PostHog] loaded, token:', ph.config.token)
+    ph.capture('app_loaded')
+  },
 })
+
+// Expose for browser console debugging
+;(window as unknown as Record<string, unknown>).posthog = posthog
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
   state = { error: null }

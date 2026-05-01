@@ -7,7 +7,7 @@ import posthog from 'posthog-js'
 import { PostHogProvider, PostHogErrorBoundary } from '@posthog/react'
 
 posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_PROJECT_TOKEN, {
-  api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
+  api_host: 'https://us.posthog.com',
   autocapture: false,
   capture_pageview: false,
   capture_pageleave: false,

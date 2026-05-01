@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { STORE_RISK_MAP } from '@/lib/storeRiskMap'
+import { fetchSubmissions, updateSubmission } from '@/lib/db/submissions'
 import { createPortal } from 'react-dom'
 import {
   Archive, BarChart3, Barcode, Calendar, ChevronDown, CircleCheck,
@@ -900,6 +901,29 @@ export function SubmissionsPage() {
     Object.fromEntries(FILTER_SELECTS.map(k => [k, []]))
   )
   const [submissions, setSubmissions] = useState<Submission[]>(INITIAL_SUBMISSIONS)
+
+  useEffect(() => {
+    fetchSubmissions()
+      .then(rows => {
+        if (rows.length === 0) return
+        setSubmissions(rows.map(r => ({
+          id: r.id,
+          storeName: r.store_name,
+          address: r.address,
+          image: r.image,
+          badges: r.badges as Submission['badges'],
+          badgeCounts: r.badge_counts as Submission['badgeCounts'],
+          archived: r.archived,
+          imageCount: r.image_count,
+          completedAt: r.completed_at ?? undefined,
+          completedBy: r.completed_by ?? undefined,
+          completedAvatar: r.completed_avatar ?? undefined,
+          noteCount: r.note_count,
+        })))
+      })
+      .catch(() => {/* keep static fallback */})
+  }, [])
+
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [activeSubmissionId, setActiveSubmissionId] = useState<string | null>(submissionId ?? null)
   const [batch, setBatch] = useState(12)
@@ -1710,7 +1734,11 @@ export function SubmissionsPage() {
           if (activeSubmissionId) {
             const snapshot = submissions
             setSubmissions(prev => prev.map(s => s.id === activeSubmissionId ? { ...s, archived: true } : s))
-            showToast('Submissions archived successfully', () => setSubmissions(snapshot))
+            updateSubmission(activeSubmissionId, { archived: true }).catch(() => setSubmissions(snapshot))
+            showToast('Submissions archived successfully', () => {
+              setSubmissions(snapshot)
+              updateSubmission(activeSubmissionId, { archived: false }).catch(() => {})
+            })
           }
         }}
         onFlag={(flagged) => {
@@ -1720,6 +1748,7 @@ export function SubmissionsPage() {
               const badges = (flagged
                 ? [...s.badges.filter(b => b !== 'flagged'), 'flagged']
                 : s.badges.filter(b => b !== 'flagged')) as typeof s.badges
+              updateSubmission(activeSubmissionId, { badges }).catch(() => {})
               return { ...s, badges }
             }))
           }
@@ -1779,9 +1808,15 @@ export function SubmissionsPage() {
                   onClick={() => {
                     const snapshot = submissions
                     const restoredIds = new Set(selectedIds)
+                    const idsToArchive = [...selectedIds]
                     setSubmissions(prev => prev.map(s => selectedIds.has(s.id) ? { ...s, archived: true } : s))
                     setSelectedIds(new Set())
-                    showToast('Submissions archived successfully', () => { setSubmissions(snapshot); setSelectedIds(restoredIds) })
+                    idsToArchive.forEach(id => updateSubmission(id, { archived: true }).catch(() => {}))
+                    showToast('Submissions archived successfully', () => {
+                      setSubmissions(snapshot)
+                      setSelectedIds(restoredIds)
+                      idsToArchive.forEach(id => updateSubmission(id, { archived: false }).catch(() => {}))
+                    })
                   }}
                   className="size-9 flex items-center justify-center rounded-full bg-background hover:bg-accent transition-colors"
                 >

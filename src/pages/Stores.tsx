@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { track } from '@/lib/analytics'
+import { fetchBanners, type BannerRow } from '@/lib/db/banners'
 import { SHELF_SIGNAL_COUNTS, SHELF_SUBMISSION_TOTAL } from '@/pages/Submissions'
 import {
   MoveDown, CircleDashed, Check, FlagTriangleRight, StickyNote,
@@ -800,12 +801,37 @@ const STORE_SIGNAL_TO_SHELF: Record<string, string> = {
   'Promotion': 'Promotional Pricing',
 }
 
+function mapBannerRow(r: BannerRow): Row {
+  return {
+    banner: r.banner,
+    checked: r.checked,
+    past30: r.past30,
+    skuOosRate: r.sku_oos_rate,
+    skuLowStockRate: r.sku_low_stock_rate,
+    brandNotFound: r.brand_not_found,
+    skuNotCarried: r.sku_not_carried,
+    onSaleRate: r.on_sale_rate,
+    uniqueSkus: r.unique_skus,
+    risk: { label: r.risk_label as RiskLevel, percent: r.risk_percent },
+    linkedFields: r.linked_fields,
+    signal: r.signal,
+    aiSuggestions: r.ai_suggestions as [string, string, string],
+  }
+}
+
 export function StoresPage({ onLearnMore, onNavigateToShelf }: { onLearnMore?: (submissionId: string) => void; onNavigateToShelf?: () => void }) {
   const navigate = useNavigate()
   const [search, setSearch] = useState('')
   const [searchFocused, setSearchFocused] = useState(false)
   const searchWrapperRef = useRef<HTMLDivElement>(null)
   const [view, setView] = useState<'table' | 'map'>('table')
+  const [rows, setRows] = useState<Row[]>(ROWS)
+
+  useEffect(() => {
+    fetchBanners()
+      .then(data => { if (data.length > 0) setRows(data.map(mapBannerRow)) })
+      .catch(() => {/* keep static fallback */})
+  }, [])
 
   useEffect(() => {
     if (!search.trim()) return
@@ -824,8 +850,8 @@ export function StoresPage({ onLearnMore, onNavigateToShelf }: { onLearnMore?: (
   }, [])
 
   const filteredRows = search.trim()
-    ? ROWS.filter(r => r.banner.toLowerCase().includes(search.toLowerCase()))
-    : ROWS
+    ? rows.filter(r => r.banner.toLowerCase().includes(search.toLowerCase()))
+    : rows
   const [popoverState, setPopoverState] = useState<{ top: number; left: number; risk: Row['risk']; signal: string; aiSuggestions: Row['aiSuggestions'] } | null>(null)
 
   function handleRowMouseMove(e: React.MouseEvent<HTMLDivElement>, row: Row) {

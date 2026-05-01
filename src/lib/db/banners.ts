@@ -19,12 +19,14 @@ export type BannerRow = {
 }
 
 export async function fetchBanners(): Promise<BannerRow[]> {
+  if (!supabase) return []
   const { data, error } = await supabase.from('banners').select('*').order('banner')
   if (error) throw error
   return data ?? []
 }
 
 export async function updateBanner(id: number, updates: Partial<Omit<BannerRow, 'id'>>): Promise<void> {
+  if (!supabase) return
   const { error } = await supabase.from('banners').update(updates).eq('id', id)
   if (error) throw error
 }

@@ -16,10 +16,8 @@ export type SubmissionRow = {
 }
 
 export async function fetchSubmissions(): Promise<SubmissionRow[]> {
-  const { data, error } = await supabase
-    .from('submissions')
-    .select('*')
-    .order('id')
+  if (!supabase) return []
+  const { data, error } = await supabase.from('submissions').select('*').order('id')
   if (error) throw error
   return data ?? []
 }
@@ -28,6 +26,7 @@ export async function updateSubmission(
   id: string,
   updates: Partial<Omit<SubmissionRow, 'id'>>,
 ): Promise<void> {
+  if (!supabase) return
   const { error } = await supabase.from('submissions').update(updates).eq('id', id)
   if (error) throw error
 }
@@ -35,6 +34,7 @@ export async function updateSubmission(
 export async function insertSubmission(
   row: Omit<SubmissionRow, 'id'>,
 ): Promise<SubmissionRow> {
+  if (!supabase) throw new Error('Supabase not configured')
   const { data, error } = await supabase.from('submissions').insert(row).select().single()
   if (error) throw error
   return data

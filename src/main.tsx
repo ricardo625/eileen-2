@@ -14,7 +14,7 @@ posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_PROJECT_TOKEN, {
   capture_pageleave: false,
   debug: true,
   loaded: (ph) => {
-    console.log('[PostHog] loaded, token:', ph.config.token)
+    console.log('[PostHog] loaded successfully')
     ph.capture('app_loaded')
   },
 })

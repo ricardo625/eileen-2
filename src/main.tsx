@@ -6,6 +6,7 @@ import App from './App.tsx'
 import posthog from 'posthog-js'
 import { PostHogProvider, PostHogErrorBoundary } from '@posthog/react'
 
+console.log('[PostHog] token:', import.meta.env.VITE_PUBLIC_POSTHOG_PROJECT_TOKEN, 'host:', import.meta.env.VITE_PUBLIC_POSTHOG_HOST)
 posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_PROJECT_TOKEN, {
   api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
   autocapture: false,

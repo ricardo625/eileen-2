@@ -461,7 +461,7 @@ export function SubmissionDrawer({ open, onClose, onArchive, onFlag, cardId, sub
 
         {/* Share */}
         <button
-          onClick={() => setShareOpen(true)}
+          onClick={() => { setShareOpen(true); track('click_share_drawer', { card_id: cardId ?? null }) }}
           className="flex-1 h-[52px] flex items-center justify-center gap-2 bg-[#121217] border border-[rgba(35,31,32,0.32)] rounded-full hover:opacity-90 transition-opacity"
         >
           <Forward className="size-5 text-white" />

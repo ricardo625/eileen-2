@@ -11,6 +11,7 @@ posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_PROJECT_TOKEN, {
   autocapture: false,
   capture_pageview: false,
   capture_pageleave: false,
+  request_batching: false,
 })
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {

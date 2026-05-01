@@ -6,6 +6,7 @@ import { Tooltip } from '@/components/ui/Tooltip'
 import { trackEvent } from '@/lib/clarity'
 import iconPdf from '@/assets/icon-pdf.svg'
 import iconCsv from '@/assets/icon-csv.svg'
+import { usePostHog } from '@posthog/react'
 
 const SHARE_URL = `${window.location.origin}/s/8a2hf6fi`
 
@@ -19,6 +20,7 @@ interface ShareDialogProps {
 export function ShareDialog({ onClose, onCopy, onExportPdf, onExportCsv }: ShareDialogProps) {
   const [copied, setCopied] = useState(false)
   const dialogRef = useRef<HTMLDivElement>(null)
+  const posthog = usePostHog()
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
@@ -33,7 +35,18 @@ export function ShareDialog({ onClose, onCopy, onExportPdf, onExportCsv }: Share
     setCopied(true)
     onCopy?.()
     trackEvent('copy_share_url', { url: SHARE_URL })
+    posthog?.capture('submission_share_link_copied', { url: SHARE_URL })
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  function handleExportPdf() {
+    onExportPdf?.()
+    posthog?.capture('submission_pdf_exported')
+  }
+
+  function handleExportCsv() {
+    onExportCsv?.()
+    posthog?.capture('submission_csv_exported')
   }
 
   return createPortal(
@@ -93,7 +106,7 @@ export function ShareDialog({ onClose, onCopy, onExportPdf, onExportCsv }: Share
           <div className="flex items-center gap-4">
             {/* PDF */}
             <button
-              onClick={onExportPdf}
+              onClick={handleExportPdf}
               className="flex flex-col items-center gap-2.5"
             >
               <div className="size-12 flex items-center justify-center rounded-full bg-soft-red border border-soft-red-border">
@@ -104,7 +117,7 @@ export function ShareDialog({ onClose, onCopy, onExportPdf, onExportCsv }: Share
 
             {/* CSV */}
             <button
-              onClick={onExportCsv}
+              onClick={handleExportCsv}
               className="flex flex-col items-center gap-2.5"
             >
               <div className="size-12 flex items-center justify-center rounded-full bg-soft-green border border-soft-green-border">

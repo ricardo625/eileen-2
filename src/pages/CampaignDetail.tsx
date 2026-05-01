@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ChevronLeft, ChevronDown, Check, MoveDown, CircleDashed, NotepadText, TableProperties, Map } from 'lucide-react'
+import { usePostHog } from '@posthog/react'
 
 function MapPinIcon({ className }: { className?: string }) {
   return (
@@ -229,6 +230,7 @@ function ShelfPositionList() {
 
 export function CampaignDetailPage() {
   const navigate = useNavigate()
+  const posthog = usePostHog()
   const [activeTab, setActiveTab] = useState<Tab>('Overview')
   const [storeView, setStoreView] = useState<'grid' | 'list'>('list')
 
@@ -254,7 +256,10 @@ export function CampaignDetailPage() {
           {TABS.map(tab => (
             <button
               key={tab}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => {
+                setActiveTab(tab)
+                posthog?.capture('campaign_tab_switched', { tab })
+              }}
               className={cn(
                 'px-3 py-4 text-sm font-sans whitespace-nowrap transition-colors',
                 activeTab === tab

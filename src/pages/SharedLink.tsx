@@ -3,6 +3,7 @@ import { Check, ChevronLeft, ChevronRight, Maximize2, X } from 'lucide-react'
 import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
 import { ToastStack, type ToastItem } from '@/components/ui/Toast'
+import { usePostHog } from '@posthog/react'
 
 function NameDialog({ onContinue, onClose }: { onContinue: (name: string) => void; onClose: () => void }) {
   const [name, setName] = useState('')
@@ -80,6 +81,7 @@ const INITIAL_ITEMS = [
 ]
 
 export function SharedLinkPage() {
+  const posthog = usePostHog()
   const [dialogOpen, setDialogOpen] = useState(true)
   const [_viewerName, setViewerName] = useState('')
   const [acknowledged, setAcknowledged] = useState(false)
@@ -97,6 +99,7 @@ export function SharedLinkPage() {
   function handleAcknowledge() {
     if (acknowledged) return
     setAcknowledged(true)
+    posthog?.capture('shared_link_acknowledged', { items_total: items.length, items_checked: items.filter(i => i.checked).length })
     const id = nextId
     setNextId(n => n + 1)
     setToasts(prev => [...prev, {
@@ -109,6 +112,10 @@ export function SharedLinkPage() {
   const allChecked = items.every(item => item.checked)
 
   function toggleItem(id: number) {
+    const item = items.find(i => i.id === id)
+    if (item) {
+      posthog?.capture('action_item_toggled', { item_label: item.label, checked: !item.checked })
+    }
     setItems(prev => prev.map(item => item.id === id ? { ...item, checked: !item.checked } : item))
   }
 
@@ -116,7 +123,12 @@ export function SharedLinkPage() {
     <div className="min-h-screen bg-background relative overflow-hidden">
       {dialogOpen && (
         <NameDialog
-          onContinue={name => { setViewerName(name); setDialogOpen(false) }}
+          onContinue={name => {
+            setViewerName(name)
+            setDialogOpen(false)
+            posthog?.capture('shared_link_viewer_identified')
+            posthog?.identify(name)
+          }}
           onClose={() => setDialogOpen(false)}
         />
       )}

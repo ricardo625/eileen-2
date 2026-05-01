@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ChevronDown, Plus, Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { usePostHog } from '@posthog/react'
 
 type CampaignStatus = 'Active' | 'Completed' | 'Draft'
 
@@ -131,6 +132,7 @@ function CampaignCard({ campaign, onClick }: { campaign: Campaign; onClick: () =
 
 export function CampaignHubPage() {
   const navigate = useNavigate()
+  const posthog = usePostHog()
   const [activeTab, setActiveTab] = useState<StatusTab>('All')
   const [search, setSearch] = useState('')
 
@@ -153,7 +155,10 @@ export function CampaignHubPage() {
               <span>25 per page</span>
               <ChevronDown className="size-4 text-muted-foreground" />
             </button>
-            <button className="h-9 flex items-center gap-1.5 px-4 rounded-xl bg-foreground text-background text-sm font-poppins font-medium hover:opacity-90 transition-opacity">
+            <button
+              onClick={() => posthog?.capture('campaign_created')}
+              className="h-9 flex items-center gap-1.5 px-4 rounded-xl bg-foreground text-background text-sm font-poppins font-medium hover:opacity-90 transition-opacity"
+            >
               <Plus className="size-4" />
               <span>New Campaign</span>
             </button>
@@ -209,7 +214,10 @@ export function CampaignHubPage() {
               No campaigns found.
             </div>
           ) : (
-            filtered.map(c => <CampaignCard key={c.id} campaign={c} onClick={() => navigate(`/campaign-hub/${c.id}`)} />)
+            filtered.map(c => <CampaignCard key={c.id} campaign={c} onClick={() => {
+              posthog?.capture('campaign_opened', { campaign_id: c.id, campaign_title: c.title, campaign_status: c.status })
+              navigate(`/campaign-hub/${c.id}`)
+            }} />)
           )}
         </div>
 

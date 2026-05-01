@@ -31,7 +31,6 @@ function clarityEvent(name: string, props?: Properties) {
  * Use this everywhere instead of calling each SDK directly.
  */
 export function track(name: string, props?: Properties) {
-  console.log('[Analytics] track:', name, props)
   clarityEvent(name, props)
   posthog.capture(name, props)
 }

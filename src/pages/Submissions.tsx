@@ -933,8 +933,10 @@ export function SubmissionsPage() {
     const submission = submissions.find(s => s.id === id)
     track('open_shelf_drawer', {
       card_id: id,
+      submission_id: id,
       store_name: submission?.storeName ?? null,
       badges: (submission?.badges ?? []).join(','),
+      source_page: 'shelf',
     })
   }
 
@@ -1036,7 +1038,7 @@ export function SubmissionsPage() {
       selecting ? next.add(id) : next.delete(id)
       if (selecting) {
         const submission = submissions.find(s => s.id === id)
-        track('select_card_shelf', { card_id: id, store_name: submission?.storeName ?? null })
+        track('select_card_shelf', { card_id: id, submission_id: id, store_name: submission?.storeName ?? null, source_page: 'shelf' })
       }
       return next
     })
@@ -1145,7 +1147,7 @@ export function SubmissionsPage() {
             <button
               onClick={() => {
                 // track header export button click
-                track('click_export_shelf', { format: 'csv', source: 'header', selected_count: selectedIds.size })
+                track('click_export_shelf', { format: 'csv', export_type: 'csv', source: 'header', source_page: 'shelf', selected_count: selectedIds.size })
                 triggerExport('Exported to CSV successfully')
               }}
               disabled={selectedIds.size === 0}
@@ -1674,7 +1676,7 @@ export function SubmissionsPage() {
               selected={selectedIds.has(s.id)}
               onToggle={() => toggleSelected(s.id)}
               onOpen={() => {
-                track('click_card_shelf', { card_id: s.id, card_type: 'submission', position: index })
+                track('click_card_shelf', { card_id: s.id, submission_id: s.id, card_type: 'submission', position: index, risk_level: STORE_RISK_MAP[s.id] ?? null, banner: cardBanner(s.id), source_page: 'shelf' })
                 openDrawerFor(s.id)
               }}
             />
@@ -1690,7 +1692,7 @@ export function SubmissionsPage() {
               selected={selectedIds.has(s.id)}
               onToggle={() => toggleSelected(s.id)}
               onOpen={() => {
-                track('click_card_shelf', { card_id: s.id, card_type: 'submission', position: index })
+                track('click_card_shelf', { card_id: s.id, submission_id: s.id, card_type: 'submission', position: index, risk_level: STORE_RISK_MAP[s.id] ?? null, banner: cardBanner(s.id), source_page: 'shelf' })
                 openDrawerFor(s.id)
               }}
             />
@@ -1812,11 +1814,11 @@ export function SubmissionsPage() {
                           setIslandSendOpen(false)
                           if (label === 'Export to PDF') {
                             // track island PDF export
-                            track('click_export_shelf', { format: 'pdf', source: 'island', selected_count: selectedIds.size })
+                            track('click_export_shelf', { format: 'pdf', export_type: 'pdf', source: 'island', source_page: 'shelf', selected_count: selectedIds.size })
                             triggerExport(msg!)
                           } else if (label === 'Export to CSV') {
                             // track island CSV export
-                            track('click_export_shelf', { format: 'csv', source: 'island', selected_count: selectedIds.size })
+                            track('click_export_shelf', { format: 'csv', export_type: 'csv', source: 'island', source_page: 'shelf', selected_count: selectedIds.size })
                             triggerExport(msg!)
                           } else if (label === 'Share URL') {
                             // track share URL intent from island
@@ -1847,12 +1849,12 @@ export function SubmissionsPage() {
         }}
         onExportPdf={() => {
           setShareOpen(false)
-          track('click_export_shelf', { format: 'pdf', source: 'share_dialog' })
+          track('click_export_shelf', { format: 'pdf', export_type: 'pdf', source: 'share_dialog', source_page: 'shelf' })
           triggerExport('Exported to PDF successfully')
         }}
         onExportCsv={() => {
           setShareOpen(false)
-          track('click_export_shelf', { format: 'csv', source: 'share_dialog' })
+          track('click_export_shelf', { format: 'csv', export_type: 'csv', source: 'share_dialog', source_page: 'shelf' })
           triggerExport('Exported to CSV successfully')
         }}
       />}

@@ -986,7 +986,8 @@ export function StoresPage({ onLearnMore, onNavigateToShelf }: { onLearnMore?: (
                   'flex items-center gap-4 px-6 py-5 border-t border-border-alpha transition-colors hover:bg-accent/60 cursor-pointer',
                   i === 0 && 'border-t-0',
                 )}
-                onClick={() => { track('click_banner_store', { banner: row.banner }); onNavigateToShelf?.() }}
+                onClick={() => { track('click_banner_store', { banner: row.banner, banner_id: row.banner, risk_level: row.risk.label, source_page: 'stores' }); onNavigateToShelf?.() }}
+                onMouseEnter={() => track('hover_banner_store', { banner: row.banner, banner_id: row.banner, risk_level: row.risk.label, source_page: 'stores' })}
                 onMouseMove={e => handleRowMouseMove(e, row)}
                 onMouseLeave={() => setPopoverState(null)}
               >

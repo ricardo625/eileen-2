@@ -166,7 +166,7 @@ export function SubmissionDrawer({ open, onClose, onArchive, onFlag, cardId, sub
 
   const toggleNote = (section: string, note: string) => {
     const isAdding = !(selectedNotes[section] ?? []).includes(note)
-    if (isAdding) track('select_tag_shelf_drawer', { card_id: cardId ?? null, tag_name: note, is_new: false })
+    if (isAdding) track('select_tag_shelf_drawer', { card_id: cardId ?? null, submission_id: cardId ?? null, tag_name: note, tag_type: section, tags_count: (selectedNotes[section] ?? []).length + 1, is_new: false })
     setSelectedNotes(prev => {
       const cur = prev[section] ?? []
       return { ...prev, [section]: cur.includes(note) ? cur.filter(n => n !== note) : [...cur, note] }
@@ -278,7 +278,7 @@ export function SubmissionDrawer({ open, onClose, onArchive, onFlag, cardId, sub
                   const match = allOpts.find(n => n.toLowerCase() === name.toLowerCase())!
                   toggleNote(title, match)
                 } else {
-                  track('select_tag_shelf_drawer', { card_id: cardId ?? null, tag_name: name, is_new: true })
+                  track('select_tag_shelf_drawer', { card_id: cardId ?? null, submission_id: cardId ?? null, tag_name: name, tag_type: title, tags_count: (selectedNotes[title] ?? []).length + 1, is_new: true })
                   setSelectedNotes(prev => ({ ...prev, [title]: [...(prev[title] ?? []), name] }))
                 }
                 setSectionSearches(prev => ({ ...prev, [title]: '' }))
@@ -461,7 +461,7 @@ export function SubmissionDrawer({ open, onClose, onArchive, onFlag, cardId, sub
 
         {/* Share */}
         <button
-          onClick={() => { setShareOpen(true); track('click_share_drawer', { card_id: cardId ?? null }) }}
+          onClick={() => { setShareOpen(true); track('click_share_drawer', { card_id: cardId ?? null, submission_id: cardId ?? null, source_page: 'drawer' }) }}
           className="flex-1 h-[52px] flex items-center justify-center gap-2 bg-[#121217] border border-[rgba(35,31,32,0.32)] rounded-full hover:opacity-90 transition-opacity"
         >
           <Forward className="size-5 text-white" />
@@ -507,8 +507,8 @@ export function SubmissionDrawer({ open, onClose, onArchive, onFlag, cardId, sub
       {createPortal(<ToastStack toasts={toasts} onDismiss={id => setToasts(prev => prev.filter(t => t.id !== id))} />, document.body)}
       {shareOpen && <ShareDialog
         onClose={() => setShareOpen(false)}
-        onExportPdf={() => { setShareOpen(false); track('click_export_shelf', { format: 'pdf', source: 'drawer' }); triggerExport('Exported to PDF successfully') }}
-        onExportCsv={() => { setShareOpen(false); track('click_export_shelf', { format: 'csv', source: 'drawer' }); triggerExport('Exported to CSV successfully') }}
+        onExportPdf={() => { setShareOpen(false); track('click_export_shelf', { format: 'pdf', export_type: 'pdf', source: 'drawer', source_page: 'drawer', submission_id: cardId ?? null }); triggerExport('Exported to PDF successfully') }}
+        onExportCsv={() => { setShareOpen(false); track('click_export_shelf', { format: 'csv', export_type: 'csv', source: 'drawer', source_page: 'drawer', submission_id: cardId ?? null }); triggerExport('Exported to CSV successfully') }}
       />}
     </>
   )

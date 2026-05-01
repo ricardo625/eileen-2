@@ -3,10 +3,9 @@ import { createPortal } from 'react-dom'
 import { Copy, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tooltip } from '@/components/ui/Tooltip'
-import { trackEvent } from '@/lib/clarity'
+import { track } from '@/lib/analytics'
 import iconPdf from '@/assets/icon-pdf.svg'
 import iconCsv from '@/assets/icon-csv.svg'
-import { usePostHog } from '@posthog/react'
 
 const SHARE_URL = `${window.location.origin}/s/8a2hf6fi`
 
@@ -20,7 +19,6 @@ interface ShareDialogProps {
 export function ShareDialog({ onClose, onCopy, onExportPdf, onExportCsv }: ShareDialogProps) {
   const [copied, setCopied] = useState(false)
   const dialogRef = useRef<HTMLDivElement>(null)
-  const posthog = usePostHog()
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
@@ -34,19 +32,18 @@ export function ShareDialog({ onClose, onCopy, onExportPdf, onExportCsv }: Share
     navigator.clipboard.writeText(SHARE_URL).catch(() => {})
     setCopied(true)
     onCopy?.()
-    trackEvent('copy_share_url', { url: SHARE_URL })
-    posthog?.capture('submission_share_link_copied', { url: SHARE_URL })
+    track('submission_share_link_copied', { url: SHARE_URL })
     setTimeout(() => setCopied(false), 2000)
   }
 
   function handleExportPdf() {
     onExportPdf?.()
-    posthog?.capture('submission_pdf_exported')
+    track('submission_pdf_exported')
   }
 
   function handleExportCsv() {
     onExportCsv?.()
-    posthog?.capture('submission_csv_exported')
+    track('submission_csv_exported')
   }
 
   return createPortal(

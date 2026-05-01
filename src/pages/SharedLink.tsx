@@ -3,7 +3,7 @@ import { Check, ChevronLeft, ChevronRight, Maximize2, X } from 'lucide-react'
 import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
 import { ToastStack, type ToastItem } from '@/components/ui/Toast'
-import { usePostHog } from '@posthog/react'
+import { track, identify } from '@/lib/analytics'
 
 function NameDialog({ onContinue, onClose }: { onContinue: (name: string) => void; onClose: () => void }) {
   const [name, setName] = useState('')
@@ -81,7 +81,6 @@ const INITIAL_ITEMS = [
 ]
 
 export function SharedLinkPage() {
-  const posthog = usePostHog()
   const [dialogOpen, setDialogOpen] = useState(true)
   const [_viewerName, setViewerName] = useState('')
   const [acknowledged, setAcknowledged] = useState(false)
@@ -99,7 +98,7 @@ export function SharedLinkPage() {
   function handleAcknowledge() {
     if (acknowledged) return
     setAcknowledged(true)
-    posthog?.capture('shared_link_acknowledged', { items_total: items.length, items_checked: items.filter(i => i.checked).length })
+    track('shared_link_acknowledged', { items_total: items.length, items_checked: items.filter(i => i.checked).length })
     const id = nextId
     setNextId(n => n + 1)
     setToasts(prev => [...prev, {
@@ -114,7 +113,7 @@ export function SharedLinkPage() {
   function toggleItem(id: number) {
     const item = items.find(i => i.id === id)
     if (item) {
-      posthog?.capture('action_item_toggled', { item_label: item.label, checked: !item.checked })
+      track('action_item_toggled', { item_label: item.label, checked: !item.checked })
     }
     setItems(prev => prev.map(item => item.id === id ? { ...item, checked: !item.checked } : item))
   }
@@ -126,8 +125,8 @@ export function SharedLinkPage() {
           onContinue={name => {
             setViewerName(name)
             setDialogOpen(false)
-            posthog?.capture('shared_link_viewer_identified')
-            posthog?.identify(name)
+            track('shared_link_viewer_identified', { viewer_name: name })
+            identify(name)
           }}
           onClose={() => setDialogOpen(false)}
         />

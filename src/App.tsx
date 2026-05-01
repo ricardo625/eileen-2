@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom'
-import { usePostHog } from '@posthog/react'
+import { track } from '@/lib/analytics'
 import { Moon, Sun } from 'lucide-react'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Tooltip } from '@/components/ui/Tooltip'
@@ -29,8 +29,6 @@ function getActivePage(pathname: string) {
 export default function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [theme, setTheme] = useState<Theme>('theme-4')
-  const posthog = usePostHog()
-
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -78,7 +76,7 @@ export default function App() {
             onClick={() => {
               const next = isDark ? 'theme-4' : 'dark'
               setTheme(next)
-              posthog?.capture('theme_toggled', { theme: next })
+              track('theme_toggled', { theme: next })
             }}
             className="size-9 flex items-center justify-center rounded-full border border-border bg-background shadow-sm transition hover:bg-accent"
           >

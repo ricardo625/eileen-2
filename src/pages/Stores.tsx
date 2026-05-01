@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { trackEvent } from '@/lib/clarity'
+import { track } from '@/lib/analytics'
 import { SHELF_SIGNAL_COUNTS, SHELF_SUBMISSION_TOTAL } from '@/pages/Submissions'
 import {
   MoveDown, CircleDashed, Check, FlagTriangleRight, StickyNote,
@@ -398,7 +398,7 @@ function StoreMapPopover({ store, anchorEl, onClose, onLearnMore }: {
         <button
           onClick={() => {
             // track learn more click from the map popover card
-            trackEvent('click_learn_more_store_popover', { store_id: store.id, source: 'popover' })
+            track('click_learn_more_store_popover', { store_id: store.id, source: 'popover' })
             onLearnMore(store.submissionId)
           }}
           className="w-full h-9 flex items-center justify-center gap-2 border border-black/5 rounded-md shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] text-sm font-medium text-card-foreground hover:bg-accent transition-colors"
@@ -453,7 +453,7 @@ function MapView({ onLearnMore }: { onLearnMore: (submissionId: string) => void 
     setSelected(prev => prev?.store.id === store.id ? null : { store, el })
     if (isOpening) {
       // track map pin click — fires on open only, not on dismiss
-      trackEvent('click_pin_store_map', { store_id: store.id, coord_x: store.x, coord_y: store.y })
+      track('click_pin_store_map', { store_id: store.id, coord_x: store.x, coord_y: store.y })
     }
   }
 
@@ -929,7 +929,7 @@ export function StoresPage({ onLearnMore, onNavigateToShelf }: { onLearnMore?: (
             <button
               key={label}
               onClick={() => {
-                trackEvent('interact_signal_store', { store_id: null, signal_type: label, severity: count })
+                track('interact_signal_store', { store_id: null, signal_type: label, severity: count })
                 const shelfSignal = STORE_SIGNAL_TO_SHELF[label]
                 navigate(shelfSignal ? `/shelf?signal=${encodeURIComponent(shelfSignal)}` : '/shelf')
               }}

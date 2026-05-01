@@ -4,7 +4,7 @@ import { ToastStack, type ToastItem } from '@/components/ui/Toast'
 import { ShareDialog } from '@/components/ShareDialog'
 import { Tooltip } from '@/components/ui/Tooltip'
 import { cn } from '@/lib/utils'
-import { trackEvent } from '@/lib/clarity'
+import { track } from '@/lib/analytics'
 import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 
@@ -166,7 +166,7 @@ export function SubmissionDrawer({ open, onClose, onArchive, onFlag, cardId, sub
 
   const toggleNote = (section: string, note: string) => {
     const isAdding = !(selectedNotes[section] ?? []).includes(note)
-    if (isAdding) trackEvent('select_tag_shelf_drawer', { card_id: cardId ?? null, tag_name: note, is_new: false })
+    if (isAdding) track('select_tag_shelf_drawer', { card_id: cardId ?? null, tag_name: note, is_new: false })
     setSelectedNotes(prev => {
       const cur = prev[section] ?? []
       return { ...prev, [section]: cur.includes(note) ? cur.filter(n => n !== note) : [...cur, note] }
@@ -278,7 +278,7 @@ export function SubmissionDrawer({ open, onClose, onArchive, onFlag, cardId, sub
                   const match = allOpts.find(n => n.toLowerCase() === name.toLowerCase())!
                   toggleNote(title, match)
                 } else {
-                  trackEvent('select_tag_shelf_drawer', { card_id: cardId ?? null, tag_name: name, is_new: true })
+                  track('select_tag_shelf_drawer', { card_id: cardId ?? null, tag_name: name, is_new: true })
                   setSelectedNotes(prev => ({ ...prev, [title]: [...(prev[title] ?? []), name] }))
                 }
                 setSectionSearches(prev => ({ ...prev, [title]: '' }))
@@ -507,8 +507,8 @@ export function SubmissionDrawer({ open, onClose, onArchive, onFlag, cardId, sub
       {createPortal(<ToastStack toasts={toasts} onDismiss={id => setToasts(prev => prev.filter(t => t.id !== id))} />, document.body)}
       {shareOpen && <ShareDialog
         onClose={() => setShareOpen(false)}
-        onExportPdf={() => { setShareOpen(false); trackEvent('click_export_shelf', { format: 'pdf', source: 'drawer' }); triggerExport('Exported to PDF successfully') }}
-        onExportCsv={() => { setShareOpen(false); trackEvent('click_export_shelf', { format: 'csv', source: 'drawer' }); triggerExport('Exported to CSV successfully') }}
+        onExportPdf={() => { setShareOpen(false); track('click_export_shelf', { format: 'pdf', source: 'drawer' }); triggerExport('Exported to PDF successfully') }}
+        onExportCsv={() => { setShareOpen(false); track('click_export_shelf', { format: 'csv', source: 'drawer' }); triggerExport('Exported to CSV successfully') }}
       />}
     </>
   )

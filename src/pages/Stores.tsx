@@ -808,6 +808,12 @@ export function StoresPage({ onLearnMore, onNavigateToShelf }: { onLearnMore?: (
   const [view, setView] = useState<'table' | 'map'>('table')
 
   useEffect(() => {
+    if (!search.trim()) return
+    const t = setTimeout(() => track('search_stores', { query: search.trim() }), 800)
+    return () => clearTimeout(t)
+  }, [search])
+
+  useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (searchWrapperRef.current && !searchWrapperRef.current.contains(e.target as Node)) {
         setSearchFocused(false)

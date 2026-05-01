@@ -881,6 +881,12 @@ export function SubmissionsPage() {
   const [searchFocused, setSearchFocused] = useState(false)
   const searchWrapperRef = useRef<HTMLDivElement>(null)
   const [view, setView] = useState<'grid' | 'list'>('grid')
+
+  useEffect(() => {
+    if (!search.trim()) return
+    const t = setTimeout(() => track('search_shelf', { query: search.trim() }), 800)
+    return () => clearTimeout(t)
+  }, [search])
   const [filterOpen, setFilterOpen] = useState(false)
 
   const [activeDateRange, setActiveDateRange] = useState('Last 30 Days')

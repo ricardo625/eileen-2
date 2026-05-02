@@ -955,9 +955,8 @@ export function StoresPage({ onLearnMore, onNavigateToShelf }: { onLearnMore?: (
         </button>
       </div>
 
-      {/* Signal cards — position controlled by A/B flag */}
-      <div className={cn('flex flex-col gap-6', insightsAboveTable && 'flex-col-reverse')}>
-      <div className="grid grid-cols-6 gap-4">
+      <div className="flex flex-col gap-6">
+      {insightsAboveTable && <div className="grid grid-cols-6 gap-4">
         {SIGNAL_CARDS.map(({ label, count, Icon, iconClass }) => {
           const pct = Math.round((count / SHELF_SUBMISSION_TOTAL) * 100)
           return (
@@ -981,7 +980,7 @@ export function StoresPage({ onLearnMore, onNavigateToShelf }: { onLearnMore?: (
             </button>
           )
         })}
-      </div>
+      </div>}
 
       {view === 'map' ? (
         <MapView onLearnMore={id => onLearnMore?.(id)} />

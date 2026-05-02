@@ -878,6 +878,12 @@ export function SubmissionsPage() {
   const { submissionId } = useParams<{ submissionId: string }>()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
+  const campaignId = searchParams.get('campaign_id') ?? undefined
+
+  function trackWithCampaign(name: string, props?: Record<string, string | number | boolean | null | undefined>) {
+    track(name, { ...props, ...(campaignId ? { campaign_id: campaignId } : {}) })
+  }
+
   const [search, setSearch] = useState('')
   const [searchFocused, setSearchFocused] = useState(false)
   const searchWrapperRef = useRef<HTMLDivElement>(null)
@@ -885,7 +891,7 @@ export function SubmissionsPage() {
 
   useEffect(() => {
     if (!search.trim()) return
-    const t = setTimeout(() => track('search_shelf', { query: search.trim() }), 800)
+    const t = setTimeout(() => trackWithCampaign('search_shelf', { query: search.trim() }), 800)
     return () => clearTimeout(t)
   }, [search])
   const [filterOpen, setFilterOpen] = useState(false)
@@ -955,7 +961,7 @@ export function SubmissionsPage() {
     setActiveSubmissionId(id)
     navigate(`/shelf/detail/${id}`)
     const submission = submissions.find(s => s.id === id)
-    track('open_shelf_drawer', {
+    trackWithCampaign('open_shelf_drawer', {
       card_id: id,
       submission_id: id,
       store_name: submission?.storeName ?? null,
@@ -1062,7 +1068,7 @@ export function SubmissionsPage() {
       selecting ? next.add(id) : next.delete(id)
       if (selecting) {
         const submission = submissions.find(s => s.id === id)
-        track('select_card_shelf', { card_id: id, submission_id: id, store_name: submission?.storeName ?? null, source_page: 'shelf' })
+        trackWithCampaign('select_card_shelf', { card_id: id, submission_id: id, store_name: submission?.storeName ?? null, source_page: 'shelf' })
       }
       return next
     })
@@ -1171,7 +1177,7 @@ export function SubmissionsPage() {
             <button
               onClick={() => {
                 // track header export button click
-                track('click_export_shelf', { format: 'csv', export_type: 'csv', source: 'header', source_page: 'shelf', selected_count: selectedIds.size })
+                trackWithCampaign('click_export_shelf', { format: 'csv', export_type: 'csv', source: 'header', source_page: 'shelf', selected_count: selectedIds.size })
                 triggerExport('Exported to CSV successfully')
               }}
               disabled={selectedIds.size === 0}
@@ -1317,7 +1323,7 @@ export function SubmissionsPage() {
                     onClick={() => {
                       setActiveDateRange(option)
                       setCustomRange({ start: null, end: null })
-                      track('select_filter_shelf', { filter_type: 'date_range', value: option })
+                      trackWithCampaign('select_filter_shelf', { filter_type: 'date_range', value: option })
                     }}
                     className={cn(
                       'flex items-center h-11 px-4 gap-3 w-full text-left transition-colors',
@@ -1462,7 +1468,7 @@ export function SubmissionsPage() {
           onClick={() => {
             const isActive = activeSignals.includes('Flagged')
             setActiveSignals(prev => isActive ? prev.filter(x => x !== 'Flagged') : [...prev, 'Flagged'])
-            track('select_filter_shelf', { filter_type: 'signal', value: 'Flagged', action: isActive ? 'deselect' : 'select' })
+            trackWithCampaign('select_filter_shelf', { filter_type: 'signal', value: 'Flagged', action: isActive ? 'deselect' : 'select' })
           }}
           className={cn(
             'h-10 flex items-center gap-2 px-3 rounded-full text-sm whitespace-nowrap transition-colors shrink-0',
@@ -1480,7 +1486,7 @@ export function SubmissionsPage() {
           onClick={() => {
             const isActive = activeSignals.includes('Notes')
             setActiveSignals(prev => isActive ? prev.filter(x => x !== 'Notes') : [...prev, 'Notes'])
-            track('select_filter_shelf', { filter_type: 'signal', value: 'Notes', action: isActive ? 'deselect' : 'select' })
+            trackWithCampaign('select_filter_shelf', { filter_type: 'signal', value: 'Notes', action: isActive ? 'deselect' : 'select' })
           }}
           className={cn(
             'h-10 flex items-center gap-2 px-3 rounded-full text-sm whitespace-nowrap transition-colors shrink-0',
@@ -1568,7 +1574,7 @@ export function SubmissionsPage() {
                             <button key={opt}
                               onClick={() => {
                                 setActiveSignals(prev => sel ? prev.filter(x => x !== opt) : [...prev, opt])
-                                track('select_filter_shelf', { filter_type: 'signal', value: opt, action: sel ? 'deselect' : 'select' })
+                                trackWithCampaign('select_filter_shelf', { filter_type: 'signal', value: opt, action: sel ? 'deselect' : 'select' })
                               }}
                               className={cn('w-full flex items-center gap-3 h-11 px-4 text-left transition-colors', i === 0 ? 'rounded-[14px] bg-accent' : 'rounded-full hover:bg-accent')}
                             >
@@ -1636,7 +1642,7 @@ export function SubmissionsPage() {
                                 e.stopPropagation()
                                 const isActive = selected.includes(option)
                                 toggleFilterOption(label, option)
-                                track('select_filter_shelf', { filter_type: label, value: option, action: isActive ? 'deselect' : 'select' })
+                                trackWithCampaign('select_filter_shelf', { filter_type: label, value: option, action: isActive ? 'deselect' : 'select' })
                               }}
                               className={cn(
                                 'w-full flex items-center gap-3 h-11 px-4 text-left transition-colors',
@@ -1700,7 +1706,7 @@ export function SubmissionsPage() {
               selected={selectedIds.has(s.id)}
               onToggle={() => toggleSelected(s.id)}
               onOpen={() => {
-                track('click_card_shelf', { card_id: s.id, submission_id: s.id, card_type: 'submission', position: index, risk_level: STORE_RISK_MAP[s.id] ?? null, banner: cardBanner(s.id), source_page: 'shelf' })
+                trackWithCampaign('click_card_shelf', { card_id: s.id, submission_id: s.id, card_type: 'submission', position: index, risk_level: STORE_RISK_MAP[s.id] ?? null, banner: cardBanner(s.id), source_page: 'shelf' })
                 openDrawerFor(s.id)
               }}
             />
@@ -1716,7 +1722,7 @@ export function SubmissionsPage() {
               selected={selectedIds.has(s.id)}
               onToggle={() => toggleSelected(s.id)}
               onOpen={() => {
-                track('click_card_shelf', { card_id: s.id, submission_id: s.id, card_type: 'submission', position: index, risk_level: STORE_RISK_MAP[s.id] ?? null, banner: cardBanner(s.id), source_page: 'shelf' })
+                trackWithCampaign('click_card_shelf', { card_id: s.id, submission_id: s.id, card_type: 'submission', position: index, risk_level: STORE_RISK_MAP[s.id] ?? null, banner: cardBanner(s.id), source_page: 'shelf' })
                 openDrawerFor(s.id)
               }}
             />
@@ -1849,15 +1855,15 @@ export function SubmissionsPage() {
                           setIslandSendOpen(false)
                           if (label === 'Export to PDF') {
                             // track island PDF export
-                            track('click_export_shelf', { format: 'pdf', export_type: 'pdf', source: 'island', source_page: 'shelf', selected_count: selectedIds.size })
+                            trackWithCampaign('click_export_shelf', { format: 'pdf', export_type: 'pdf', source: 'island', source_page: 'shelf', selected_count: selectedIds.size })
                             triggerExport(msg!)
                           } else if (label === 'Export to CSV') {
                             // track island CSV export
-                            track('click_export_shelf', { format: 'csv', export_type: 'csv', source: 'island', source_page: 'shelf', selected_count: selectedIds.size })
+                            trackWithCampaign('click_export_shelf', { format: 'csv', export_type: 'csv', source: 'island', source_page: 'shelf', selected_count: selectedIds.size })
                             triggerExport(msg!)
                           } else if (label === 'Share URL') {
                             // track share URL intent from island
-                            track('click_share_url_shelf', { source: 'island', selected_count: selectedIds.size })
+                            trackWithCampaign('click_share_url_shelf', { source: 'island', selected_count: selectedIds.size })
                             setShareOpen(true)
                           }
                         }}
@@ -1879,17 +1885,17 @@ export function SubmissionsPage() {
       {shareOpen && <ShareDialog
         onClose={() => setShareOpen(false)}
         onCopy={() => {
-          track('click_copy_link_share_shelf', { source: 'island' })
+          trackWithCampaign('click_copy_link_share_shelf', { source: 'island' })
           showToast('Link copied successfully')
         }}
         onExportPdf={() => {
           setShareOpen(false)
-          track('click_export_shelf', { format: 'pdf', export_type: 'pdf', source: 'share_dialog', source_page: 'shelf' })
+          trackWithCampaign('click_export_shelf', { format: 'pdf', export_type: 'pdf', source: 'share_dialog', source_page: 'shelf' })
           triggerExport('Exported to PDF successfully')
         }}
         onExportCsv={() => {
           setShareOpen(false)
-          track('click_export_shelf', { format: 'csv', export_type: 'csv', source: 'share_dialog', source_page: 'shelf' })
+          trackWithCampaign('click_export_shelf', { format: 'csv', export_type: 'csv', source: 'share_dialog', source_page: 'shelf' })
           triggerExport('Exported to CSV successfully')
         }}
       />}

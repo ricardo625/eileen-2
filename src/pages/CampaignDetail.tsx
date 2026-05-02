@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { ChevronLeft, ChevronDown, Check, MoveDown, CircleDashed, NotepadText, TableProperties, Map } from 'lucide-react'
 import { track } from '@/lib/analytics'
 
@@ -230,6 +230,7 @@ function ShelfPositionList() {
 
 export function CampaignDetailPage() {
   const navigate = useNavigate()
+  const { id: campaignId } = useParams<{ id: string }>()
   const [activeTab, setActiveTab] = useState<Tab>('Overview')
   const [storeView, setStoreView] = useState<'grid' | 'list'>('list')
 
@@ -245,9 +246,18 @@ export function CampaignDetailPage() {
           >
             <ChevronLeft className="size-4 text-foreground" />
           </button>
-          <h1 className="font-sans font-medium text-2xl text-foreground leading-8">
+          <h1 className="font-sans font-medium text-2xl text-foreground leading-8 flex-1">
             Raley's, Nob Hill, Bel Air
           </h1>
+          <button
+            onClick={() => {
+              track('campaign_view_shelf', { campaign_id: campaignId })
+              navigate(`/shelf?campaign_id=${campaignId}`)
+            }}
+            className="h-9 flex items-center gap-1.5 px-4 rounded-xl bg-foreground text-background text-sm font-poppins font-medium hover:opacity-90 transition-opacity shrink-0"
+          >
+            View Shelf
+          </button>
         </div>
 
         {/* Tabs */}

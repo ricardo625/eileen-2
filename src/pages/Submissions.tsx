@@ -930,6 +930,11 @@ export function SubmissionsPage() {
       .catch(() => {/* keep static fallback */})
   }, [])
 
+  useEffect(() => {
+    trackWithCampaign('shelf_viewed', { source_page: 'shelf' })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [activeSubmissionId, setActiveSubmissionId] = useState<string | null>(submissionId ?? null)
   const [batch, setBatch] = useState(12)

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { track } from '@/lib/analytics'
+import { useFeatureFlag } from '@/lib/useFeatureFlag'
 import { fetchBanners, type BannerRow } from '@/lib/db/banners'
 import { SHELF_SIGNAL_COUNTS, SHELF_SUBMISSION_TOTAL } from '@/pages/Submissions'
 import {
@@ -826,6 +827,7 @@ export function StoresPage({ onLearnMore, onNavigateToShelf }: { onLearnMore?: (
   const searchWrapperRef = useRef<HTMLDivElement>(null)
   const [view, setView] = useState<'table' | 'map'>('table')
   const [rows, setRows] = useState<Row[]>(ROWS)
+  const insightsAboveTable = useFeatureFlag('stores-insights-above-table')
 
   useEffect(() => {
     fetchBanners()
@@ -953,7 +955,8 @@ export function StoresPage({ onLearnMore, onNavigateToShelf }: { onLearnMore?: (
         </button>
       </div>
 
-      {/* Signal cards */}
+      {/* Signal cards — position controlled by A/B flag */}
+      <div className={cn('flex flex-col gap-6', insightsAboveTable && 'flex-col-reverse')}>
       <div className="grid grid-cols-6 gap-4">
         {SIGNAL_CARDS.map(({ label, count, Icon, iconClass }) => {
           const pct = Math.round((count / SHELF_SUBMISSION_TOTAL) * 100)
@@ -1036,6 +1039,7 @@ export function StoresPage({ onLearnMore, onNavigateToShelf }: { onLearnMore?: (
           )}
         </>
       )}
+      </div>{/* end A/B wrapper */}
     </div>
   )
 }

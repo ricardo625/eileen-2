@@ -126,7 +126,7 @@ export function SharedLinkPage() {
             setViewerName(name)
             setDialogOpen(false)
             track('shared_link_viewer_identified', { viewer_name: name })
-            identify(name)
+            identify(name, { is_beta: true })
           }}
           onClose={() => setDialogOpen(false)}
         />

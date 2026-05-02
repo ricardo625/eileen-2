@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom'
-import { track } from '@/lib/analytics'
+import { track, identify } from '@/lib/analytics'
 import { Moon, Sun } from 'lucide-react'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Tooltip } from '@/components/ui/Tooltip'
@@ -37,6 +37,10 @@ export default function App() {
     : location.pathname.startsWith('/campaign-hub')
       ? 'campaign-hub'
       : getActivePage(location.pathname)
+
+  useEffect(() => {
+    identify('ricardo@foundey.com', { is_beta: true, email: 'ricardo@foundey.com' })
+  }, [])
 
   useEffect(() => {
     document.body.className = theme

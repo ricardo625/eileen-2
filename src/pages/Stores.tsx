@@ -827,7 +827,7 @@ export function StoresPage({ onLearnMore, onNavigateToShelf }: { onLearnMore?: (
   const searchWrapperRef = useRef<HTMLDivElement>(null)
   const [view, setView] = useState<'table' | 'map'>('table')
   const [rows, setRows] = useState<Row[]>(ROWS)
-  const insightsAboveTable = useFeatureFlag('stores-insights-above-table')
+  const insightsAboveTable = useFeatureFlag('stores-insights-above-table-')
 
   useEffect(() => {
     fetchBanners()
